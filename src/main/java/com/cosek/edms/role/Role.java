@@ -49,4 +49,12 @@ public class Role {
         Role role = (Role) o;
         return Objects.equals(id, role.id);
     }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
