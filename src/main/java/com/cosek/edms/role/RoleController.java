@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins = "*")
@@ -16,6 +18,12 @@ public class RoleController {
     @PostMapping("/roles")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Role response = roleService.createRole(role);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> listRoles() {
+        List<Role> response = roleService.listRoles();
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 

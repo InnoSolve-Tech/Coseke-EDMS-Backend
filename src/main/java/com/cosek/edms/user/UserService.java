@@ -4,6 +4,7 @@ import com.cosek.edms.exception.NotFoundException;
 import com.cosek.edms.role.Role;
 import com.cosek.edms.role.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +15,18 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public User createUser(User request) {
+        User user = User
+                .builder()
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .address(request.getAddress())
+                .first_name(request.getFirst_name())
+                .last_name(request.getLast_name())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
         return userRepository.save(request);
     }
 

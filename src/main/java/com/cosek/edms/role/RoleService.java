@@ -6,6 +6,7 @@ import com.cosek.edms.permission.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -31,5 +32,9 @@ public class RoleService {
         permissions.add(permission);
         role.setPermissions(permissions);
         return roleRepository.save(role);
+    }
+
+    public List<Role> listRoles() {
+        return roleRepository.findAll();
     }
 }
