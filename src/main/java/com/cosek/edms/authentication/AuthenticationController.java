@@ -27,5 +27,4 @@ public class AuthenticationController {
     ) throws NotFoundException {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
-
 }

@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +25,9 @@ public class UserService {
                 .first_name(request.getFirst_name())
                 .last_name(request.getLast_name())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .roles(new HashSet<>())
                 .build();
-        return userRepository.save(request);
+        return userRepository.save(user);
     }
 
     public List<User> findAllUsers() {
@@ -45,5 +45,23 @@ public class UserService {
         roles.add(role);
         user.setRoles(roles);
         return userRepository.save(user);
+    }
+
+    public Map<String, Object> deleteUser(Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        userRepository.deleteById(id);
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isPresent()) {
+            response.put("success", false);
+            response.put("messages", "Delete Failed");
+            response.put("id", id);
+        } else {
+            response.put("success", true);
+            response.put("messages", "Delete Successful");
+            response.put("id", id);
+        }
+        return response;
     }
 }

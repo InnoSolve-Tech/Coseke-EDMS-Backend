@@ -62,8 +62,8 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
-                .firstname(user.getFirst_name())
-                .lastname(user.getLast_name())
+                .first_name(user.getFirst_name())
+                .last_name(user.getLast_name())
                 .email(user.getEmail())
                 .roles(roles)
                 .build();

@@ -20,8 +20,7 @@ public class RoleService {
     }
 
     public Role findOneRole(Long roleId) throws NotFoundException {
-        return roleRepository.findById(roleId)
-                .orElseThrow(() -> new NotFoundException("User with ID " + roleId + " is not found"));
+        return roleRepository.findById(roleId).orElse(null);
     }
 
     public Role addPermissionToRole(Long roleID, Long permID) throws NotFoundException {
