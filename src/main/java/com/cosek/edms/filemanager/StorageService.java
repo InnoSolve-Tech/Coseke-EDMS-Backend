@@ -10,9 +10,9 @@ public interface StorageService {
 
 	void init() throws Exception;
 
-	void store(String date, MultipartFile file, Long folderID) throws Exception;
+	void store(FileManager data, MultipartFile file) throws Exception;
 
-	void bulkStore(String[] dates, MultipartFile[] files, Long folderID) throws Exception;
+	void bulkStore(FileManager[] data, MultipartFile[] files) throws Exception;
 
 	Stream<Path> loadAll(Long folderID) throws Exception;
 
