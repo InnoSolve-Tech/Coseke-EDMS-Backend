@@ -7,13 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
@@ -33,7 +27,7 @@ public class FileManagerController {
     public List<String> listUploadedFiles(@PathVariable Long folderID) throws Exception {
         return fileService.loadAll(folderID).map(
                 path -> MvcUriComponentsBuilder.fromMethodName(FileManagerController.class,
-                        "serveFile", path.getFileName().toString()).build().toUri().toString())
+                        "serveFile", path.getFileName().toString(), folderID).build().toUri().toString())
                 .collect(Collectors.toList());
     }
 
@@ -42,8 +36,8 @@ public class FileManagerController {
         return ResponseEntity.ok(fileService.load(filename, folderID).toString());
     }
 
-    @GetMapping("/{filename:.+}/{folderID}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename, @PathVariable Long folderID) throws Exception {
+    @GetMapping("/{folderID}/{filename:.+}")
+    public ResponseEntity<Resource> serveFile(@PathVariable Long folderID, @PathVariable String filename) throws Exception {
         Resource file = fileService.loadAsResource(filename, folderID);
         if (file == null)
             return ResponseEntity.notFound().build();
@@ -51,16 +45,16 @@ public class FileManagerController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PostMapping("/{folderID}")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("date") String date, @RequestParam("file") MultipartFile file, @PathVariable Long folderID) throws Exception {
-        fileService.store(date, file, folderID);
+    @PostMapping("/")
+    public ResponseEntity<String> handleFileUpload(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file) throws Exception {
+        fileService.store(fileData, file);
         return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
 
-	@PostMapping("/bulk/{folderID}")
-    public ResponseEntity<String> handleBulkFileUpload(@RequestParam("dates") String[] dates,@RequestParam("files") MultipartFile[] files, @PathVariable Long folderID) throws Exception {
-        fileService.bulkStore(dates, files, folderID);
-        return ResponseEntity.ok().body("You successfully uploaded " + files.length + "files!");
+    @PostMapping("/bulk")
+    public ResponseEntity<String> handleBulkFileUpload(@RequestParam("data") FileManager[] fileData, @RequestParam("files") MultipartFile[] files) throws Exception {
+        fileService.bulkStore(fileData, files);
+        return ResponseEntity.ok().body("You successfully uploaded " + files.length + " files!");
     }
 
     @GetMapping("/stored")

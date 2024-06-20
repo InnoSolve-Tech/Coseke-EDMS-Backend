@@ -1,26 +1,29 @@
 package com.cosek.edms.filemanager;
 
-import java.time.LocalDateTime;
-
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.stereotype.Service;
+
+import com.cosek.edms.helper.JsonMapConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Service
+import java.time.LocalDateTime;
+import java.util.Map;
+
 @Data
 @Builder
 @Entity
@@ -28,13 +31,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class FileManager {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    public Long folderID;
-    public String filename;
-    public String dateUploaded;
-    
+
+    private Long folderID;
+    private String filename;
+    private String documentType;
+    private String hashName;
+    @Convert(converter = JsonMapConverter.class)
+    @Column(columnDefinition = "nvarchar(max)")
+    private Map<String, Object> metadata;
+
     @CreatedDate
     @Column(name = "createdDate", nullable = false, updatable = false)
     private LocalDateTime createdDate;
@@ -49,5 +58,6 @@ public class FileManager {
 
     @CreatedBy
     @Column(name="createdBy", nullable = false, updatable = false)
-    private Long createdBy;   
+    private Long createdBy;
+
 }

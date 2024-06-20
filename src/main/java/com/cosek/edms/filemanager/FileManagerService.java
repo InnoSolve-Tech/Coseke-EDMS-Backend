@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,10 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cosek.edms.config.StorageProperties;
+import com.cosek.edms.directory.Directory;
+import com.cosek.edms.directory.DirectoryRepository;
 import com.cosek.edms.directory.DirectoryService;
+import com.cosek.edms.helper.HashUtil;
 
 
 
@@ -33,6 +37,9 @@ public class FileManagerService implements StorageService  {
    private DirectoryService directoryService;
 
    @Autowired
+   private DirectoryRepository directoryRepository;
+
+   @Autowired
    private FileManagerRepository fileRepository;
 
 	@Autowired
@@ -44,73 +51,119 @@ public class FileManagerService implements StorageService  {
 	}
 
 	@Override
-	public void bulkStore(String[] dates, MultipartFile[] files, Long folderID) throws Exception {
+public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exception {
     List<String> fileNames = new ArrayList<>();
     try {
-        // Get the folder path based on the folderID
-        String folderPath = directoryService.getDirectoryPath(folderID);
-        
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
                 throw new Exception("Failed to store empty file.");
             }
-            
-            // Resolve the destination file within the root location and folderPath
-            Path destinationFile = Paths.get(folderPath)
-                    .resolve(file.getOriginalFilename())
-                    .normalize()
-                    .toAbsolutePath();
-            
-            // Create directories if they don't exist
-            Files.createDirectories(destinationFile.getParent()); // Create parent directories if not exist
-            
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            }
             fileNames.add(file.getOriginalFilename());
         }
-		for (int x = 0; x < files.length; x++) {
-			FileManager fileManager = FileManager.builder().dateUploaded(dates[x]).filename(files[x].getOriginalFilename()).folderID(folderID).build();
-			fileRepository.save(fileManager);
-		}
+        for (int x = 0; x < files.length; x++) {
+            Optional<Directory> directory = directoryRepository.findByName(data[x].getDocumentType());
+            FileManager fileManager;
+            if (directory.isPresent()) {
+                fileManager = FileManager.builder()
+                    .documentType(data[x].getDocumentType())
+                    .folderID(directory.get().getFolderID())
+                    .filename(files[x].getOriginalFilename())
+                    .build();
+                fileRepository.save(fileManager);
+            } else {
+                Directory newDirectory = Directory.builder().Name(data[x].getDocumentType()).build();
+                newDirectory = directoryService.creaDirectoryWithName(newDirectory);
+                fileManager = FileManager.builder()
+                    .documentType(data[x].getDocumentType())
+                    .folderID(newDirectory.getFolderID())
+                    .filename(files[x].getOriginalFilename())
+                    .build();
+                fileRepository.save(fileManager);
+            }
+            String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+             // Resolve the destination file within the folder path
+			Path destinationFile = Paths.get(this.rootLocation)
+            .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
+            .normalize()
+            .toAbsolutePath();
+        
+        // Security check to ensure the destination file is within the folder path
+        if (!destinationFile.getParent().equals(Paths.get(this.rootLocation).toAbsolutePath())) {
+            throw new Exception("Cannot store file outside current directory.");
+        }
+
+        // Create directories if they don't exist
+        Files.createDirectories(destinationFile.getParent());
+
+        try (InputStream inputStream = files[x].getInputStream()) {
+            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+            fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
+            fileRepository.save(fileManager);
+        }
     } catch (Exception e) {
         throw new Exception("Failed to store files.", e);
     }
 }
 
-	@Override
-	public void store(String date, MultipartFile file, Long folderID) throws Exception {
-		try {
-			if (file.isEmpty()) {
-				throw new Exception("Failed to store empty file.");
-			}
-			
-			// Get the folder path based on the folderID
-			String folderPath = directoryService.getDirectoryPath(folderID);
-			
-			// Resolve the destination file within the folder path
-			Path destinationFile = Paths.get(folderPath)
-				.resolve(file.getOriginalFilename())
-				.normalize()
-				.toAbsolutePath();
-			
-			// Security check to ensure the destination file is within the folder path
-			if (!destinationFile.getParent().equals(Paths.get(folderPath).toAbsolutePath())) {
-				throw new Exception("Cannot store file outside current directory.");
-			}
-	
-			// Create directories if they don't exist
-			Files.createDirectories(destinationFile.getParent());
-	
-			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-			}
-			FileManager fileManager = FileManager.builder().dateUploaded(date).filename(file.getOriginalFilename()).folderID(folderID).build();
-			fileRepository.save(fileManager);
-		} catch (Exception e) {
-			throw new Exception("Failed to store file.", e);
-		}
-	}
+@Override
+public void store(FileManager data, MultipartFile file) throws Exception {
+    try {
+        if (file.isEmpty()) {
+            throw new Exception("Failed to store empty file.");
+        }
+        Optional<Directory> directory = directoryRepository.findByName(data.getDocumentType());
+        FileManager fileManager;
+        if (directory.isPresent()) {
+            fileManager = FileManager.builder()
+                .documentType(data.getDocumentType())
+                .folderID(directory.get().getFolderID())
+                .filename(file.getOriginalFilename())
+					.metadata(data.getMetadata())
+                .build();
+            fileRepository.save(fileManager);
+        } else {
+            Directory newDirectory = Directory.builder().Name(data.getDocumentType()).build();
+            newDirectory = directoryService.creaDirectoryWithName(newDirectory);
+            fileManager = FileManager.builder()
+                .documentType(data.getDocumentType())
+                .folderID(newDirectory.getFolderID())
+                .filename(file.getOriginalFilename())
+                .metadata(data.getMetadata())
+                .build();
+            fileRepository.save(fileManager);
+        }
+        String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+        // Resolve the destination file within the folder path
+			Path destinationFile = Paths.get(this.rootLocation)
+            .resolve(hash + getFileExtension(file.getOriginalFilename()))
+            .normalize()
+            .toAbsolutePath();
+        
+        // Security check to ensure the destination file is within the folder path
+        if (!destinationFile.getParent().equals(Paths.get(this.rootLocation).toAbsolutePath())) {
+            throw new Exception("Cannot store file outside current directory.");
+        }
+
+        // Create directories if they don't exist
+        Files.createDirectories(destinationFile.getParent());
+
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+        fileManager.setHashName(hash);
+        fileRepository.save(fileManager);
+    } catch (Exception e) {
+        throw new Exception("Failed to store file.", e);
+    }
+}
+private String getFileExtension(String filename) {
+    if (filename == null) {
+        return "";
+    }
+    int dotIndex = filename.lastIndexOf('.');
+    return (dotIndex == -1) ? "" : filename.substring(dotIndex);
+}
 
 	@Override
 	public Stream<Path> loadAll(Long folderID) throws Exception {
