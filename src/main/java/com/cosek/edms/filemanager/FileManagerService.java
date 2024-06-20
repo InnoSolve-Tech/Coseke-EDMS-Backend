@@ -2,6 +2,7 @@ package com.cosek.edms.filemanager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -23,6 +26,7 @@ import com.cosek.edms.config.StorageProperties;
 import com.cosek.edms.directory.Directory;
 import com.cosek.edms.directory.DirectoryRepository;
 import com.cosek.edms.directory.DirectoryService;
+import com.cosek.edms.helper.EncryptionUtil;
 import com.cosek.edms.helper.HashUtil;
 
 
@@ -42,12 +46,15 @@ public class FileManagerService implements StorageService  {
    @Autowired
    private FileManagerRepository fileRepository;
 
+   private final SecretKey secretKey;
+
 	@Autowired
 	public FileManagerService(StorageProperties properties) throws Exception {
         if(properties.getLocation().trim().length() == 0){
             throw new Exception("File upload location can not be Empty."); 
         }
 		this.rootLocation = properties.getLocation();
+        this.secretKey = EncryptionUtil.generateSecretKey();
 	}
 
 	@Override
@@ -86,18 +93,16 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
             .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
             .normalize()
             .toAbsolutePath();
-        
-        // Security check to ensure the destination file is within the folder path
-        if (!destinationFile.getParent().equals(Paths.get(this.rootLocation).toAbsolutePath())) {
-            throw new Exception("Cannot store file outside current directory.");
-        }
+    
 
         // Create directories if they don't exist
         Files.createDirectories(destinationFile.getParent());
 
-        try (InputStream inputStream = files[x].getInputStream()) {
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-        }
+         // Encrypt the file before storing it
+        try (InputStream inputStream = files[x].getInputStream();
+        OutputStream outputStream = Files.newOutputStream(destinationFile)) {
+        EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+    }
             fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
             fileRepository.save(fileManager);
         }
@@ -105,13 +110,13 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         throw new Exception("Failed to store files.", e);
     }
 }
-
 @Override
-public void store(FileManager data, MultipartFile file) throws Exception {
-    try {
+ public void store(FileManager data, MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
+
+        // Fetch or create the directory entity
         Optional<Directory> directory = directoryRepository.findByName(data.getDocumentType());
         FileManager fileManager;
         if (directory.isPresent()) {
@@ -119,7 +124,7 @@ public void store(FileManager data, MultipartFile file) throws Exception {
                 .documentType(data.getDocumentType())
                 .folderID(directory.get().getFolderID())
                 .filename(file.getOriginalFilename())
-					.metadata(data.getMetadata())
+                .metadata(data.getMetadata())
                 .build();
             fileRepository.save(fileManager);
         } else {
@@ -133,30 +138,31 @@ public void store(FileManager data, MultipartFile file) throws Exception {
                 .build();
             fileRepository.save(fileManager);
         }
+
+        // Generate the file hash
         String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+
         // Resolve the destination file within the folder path
-			Path destinationFile = Paths.get(this.rootLocation)
+        Path destinationFile = Paths.get(this.rootLocation)
             .resolve(hash + getFileExtension(file.getOriginalFilename()))
             .normalize()
             .toAbsolutePath();
-        
-        // Security check to ensure the destination file is within the folder path
-        if (!destinationFile.getParent().equals(Paths.get(this.rootLocation).toAbsolutePath())) {
-            throw new Exception("Cannot store file outside current directory.");
-        }
 
         // Create directories if they don't exist
         Files.createDirectories(destinationFile.getParent());
 
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        // Encrypt the file before storing it
+        try (InputStream inputStream = file.getInputStream();
+             OutputStream outputStream = Files.newOutputStream(destinationFile)) {
+            EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
         }
+
+        // Save the file hash name
         fileManager.setHashName(hash);
         fileRepository.save(fileManager);
-    } catch (Exception e) {
-        throw new Exception("Failed to store file.", e);
     }
-}
+
+
 private String getFileExtension(String filename) {
     if (filename == null) {
         return "";
