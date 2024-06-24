@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.cosek.edms.helper.Constants.FAILED_DELETION;
+import static com.cosek.edms.helper.Constants.SUCCESSFUL_DELETION;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -30,6 +33,18 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User updateUser(User request, Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        assert user != null;
+        user.setFirst_name(request.getFirst_name());
+        user.setLast_name(request.getLast_name());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userRepository.save(user);
+    }
+
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
@@ -48,20 +63,21 @@ public class UserService {
     }
 
     public Map<String, Object> deleteUser(Long id) {
-        Map<String, Object> response = new HashMap<>();
 
         userRepository.deleteById(id);
         Optional<User> user = userRepository.findById(id);
 
         if (user.isPresent()) {
-            response.put("success", false);
-            response.put("messages", "Delete Failed");
-            response.put("id", id);
-        } else {
-            response.put("success", true);
-            response.put("messages", "Delete Successful");
-            response.put("id", id);
+            return deleteResponse(false, FAILED_DELETION, id);
         }
+        return deleteResponse(true, SUCCESSFUL_DELETION, id);
+    }
+
+    private Map<String, Object> deleteResponse(boolean status, String message, Long id) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", status);
+        response.put("messages", message);
+        response.put("id", id);
         return response;
     }
 }

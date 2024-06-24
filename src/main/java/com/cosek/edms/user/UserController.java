@@ -22,6 +22,11 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> findUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findOneUser(id));
+    }
+
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User request) {
         User response = userService.createUser(request);
@@ -37,6 +42,11 @@ public class UserController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
         Map<String, Object> response = userService.deleteUser(id);
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(user, id));
     }
 }
