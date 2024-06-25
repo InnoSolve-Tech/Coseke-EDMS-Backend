@@ -7,7 +7,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +14,7 @@ import java.util.stream.Stream;
 
 import javax.crypto.SecretKey;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -185,7 +185,7 @@ private String getFileExtension(String filename) {
 		}
 
 	}
-
+    
 	@Override
 	public Path load(String filename, Long folderID) {
 		String folderPath = directoryService.getDirectoryPath(folderID);
@@ -222,6 +222,19 @@ private String getFileExtension(String filename) {
 		}
 	}
 
+    public Path getEncryptedFilePath(String hash) {
+        FileManager file = fileRepository.findByHashName(hash).orElseThrow();
+        return Paths.get(this.rootLocation)
+            .resolve(hash + getFileExtension(file.getFilename()))
+            .normalize()
+            .toAbsolutePath();
+    }
+
+    public void decryptFile(Path encryptedFilePath, OutputStream outputStream) throws Exception {
+        try (InputStream inputStream = Files.newInputStream(encryptedFilePath)) {
+            EncryptionUtil.decrypt(inputStream, outputStream, this.secretKey);
+        }
+    }
 	@Override
 	public void init() throws Exception {
 		try {
@@ -236,4 +249,16 @@ private String getFileExtension(String filename) {
 	public List<FileManager> getFilesInStore() {
 		return fileRepository.findAll();
 	}
+
+    public FileManager getFileByID(Long id) {
+        return fileRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public FileManager updateFile(FileManager fileManager) {
+    FileManager file = fileRepository.findByHashName(fileManager.getHashName()).orElseThrow();
+    file.setMetadata(fileManager.getMetadata());
+    fileRepository.save(file);
+    return file;
+    }
 }

@@ -39,5 +39,21 @@ public class EncryptionUtil {
             output.write(outputBytes);
         }
     }
-}
 
+    public static void decrypt(InputStream input, OutputStream output, SecretKey key) throws Exception {
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            byte[] outputBytes = cipher.update(buffer, 0, bytesRead);
+            if (outputBytes != null) {
+                output.write(outputBytes);
+            }
+        }
+        byte[] outputBytes = cipher.doFinal();
+        if (outputBytes != null) {
+            output.write(outputBytes);
+        }
+    }
+}
