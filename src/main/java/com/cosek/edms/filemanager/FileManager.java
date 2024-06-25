@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.cosek.edms.helper.JsonMapConverter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -30,6 +31,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FileManager {
 
     @Id
@@ -40,6 +42,7 @@ public class FileManager {
     private String filename;
     private String documentType;
     private String hashName;
+    private String fileLink;
     @Convert(converter = JsonMapConverter.class)
     @Column(columnDefinition = "nvarchar(max)")
     private Map<String, Object> metadata;

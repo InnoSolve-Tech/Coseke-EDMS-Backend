@@ -11,7 +11,6 @@ public class HashUtil {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String input = filename + createdDate.toString();
         byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-        return Base64.getEncoder().encodeToString(hash);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
     }
 }
-
