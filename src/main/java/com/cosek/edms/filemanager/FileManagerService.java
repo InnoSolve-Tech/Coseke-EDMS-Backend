@@ -130,6 +130,8 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         } else {
             Directory newDirectory = Directory.builder().Name(data.getDocumentType()).build();
             newDirectory = directoryService.creaDirectoryWithName(newDirectory);
+            newDirectory.setParentFolderID((int) newDirectory.getFolderID());
+            directoryRepository.save(newDirectory);
             fileManager = FileManager.builder()
                 .documentType(data.getDocumentType())
                 .folderID(newDirectory.getFolderID())
@@ -137,6 +139,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 .metadata(data.getMetadata())
                 .build();
             fileRepository.save(fileManager);
+
         }
 
         // Generate the file hash
@@ -162,8 +165,51 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         fileRepository.save(fileManager);
     }
 
+    public void storeById(FileManager data, MultipartFile file, Long folderId) throws Exception {
+        if (file.isEmpty()) {
+            throw new Exception("Failed to store empty file.");
+        }
 
-private String getFileExtension(String filename) {
+        // Fetch or create the directory entity
+        Optional<Directory> directory = directoryRepository.findById(folderId);
+        FileManager fileManager;
+        if (directory.isPresent()) {
+            fileManager = FileManager.builder()
+                    .documentType(data.getDocumentType())
+                    .folderID(directory.get().getFolderID())
+                    .filename(file.getOriginalFilename())
+                    .metadata(data.getMetadata())
+                    .build();
+            fileRepository.save(fileManager);
+        } else {
+           throw  new Exception("Folder with id " + folderId +" doesn't exist!");
+        }
+
+        // Generate the file hash
+        String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+
+        // Resolve the destination file within the folder path
+        Path destinationFile = Paths.get(this.rootLocation)
+                .resolve(hash + getFileExtension(file.getOriginalFilename()))
+                .normalize()
+                .toAbsolutePath();
+
+        // Create directories if they don't exist
+        Files.createDirectories(destinationFile.getParent());
+
+        // Encrypt the file before storing it
+        try (InputStream inputStream = file.getInputStream();
+             OutputStream outputStream = Files.newOutputStream(destinationFile)) {
+            EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+        }
+
+        // Save the file hash name
+        fileManager.setHashName(hash);
+        fileRepository.save(fileManager);
+    }
+
+
+    private String getFileExtension(String filename) {
     if (filename == null) {
         return "";
     }
@@ -183,8 +229,11 @@ private String getFileExtension(String filename) {
 		catch (IOException e) {
 			throw new Exception("Failed to read stored files", e);
 		}
-
 	}
+
+    public  List<FileManager> getAllFiles(Long folderId) {
+        return fileRepository.findByFolderID(folderId).orElseThrow();
+    }
     
 	@Override
 	public Path load(String filename, Long folderID) {
