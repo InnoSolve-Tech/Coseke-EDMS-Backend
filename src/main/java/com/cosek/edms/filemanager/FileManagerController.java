@@ -33,11 +33,8 @@ public class FileManagerController {
     }
 
     @GetMapping("/folder/{folderID}")
-    public List<String> listUploadedFiles(@PathVariable Long folderID) throws Exception {
-        return fileService.loadAll(folderID).map(
-                path -> MvcUriComponentsBuilder.fromMethodName(FileManagerController.class,
-                        "serveFile", path.getFileName().toString(), folderID).build().toUri().toString())
-                .collect(Collectors.toList());
+    public List<FileManager> listFilesByFolderId(@PathVariable Long folderID) throws Exception {
+        return fileService.getAllFiles(folderID);
     }
 
     @GetMapping("/download/{hash}")
@@ -73,6 +70,12 @@ public class FileManagerController {
     @PostMapping("/")
     public ResponseEntity<String> handleFileUpload(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file) throws Exception {
         fileService.store(fileData, file);
+        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
+    }
+
+    @PostMapping("/{folderId}")
+    public ResponseEntity<String> handleFileUploadById(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file, @PathVariable("folderId") Long folderId) throws Exception {
+        fileService.storeById(fileData, file, folderId);
         return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
 
