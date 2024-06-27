@@ -41,6 +41,7 @@ public class FileManager {
     private Long folderID;
     private String filename;
     private String documentType;
+    private String documentName;
     private String hashName;
     private String fileLink;
     @Convert(converter = JsonMapConverter.class)
