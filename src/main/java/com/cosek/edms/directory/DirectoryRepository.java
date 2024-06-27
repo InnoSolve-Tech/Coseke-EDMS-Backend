@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface DirectoryRepository extends JpaRepository<Directory, Long> {
-     @Query(value = "SELECT * FROM Directory ORDER BY FolderID DESC LIMIT 1", nativeQuery = true)
+     @Query(value = "SELECT * FROM Directory ORDER BY FolderID DESC", nativeQuery = true)
     List<Directory> findByLastInput();
 
     @Query(value = "SELECT * FROM Directory WHERE Name = :name", nativeQuery = true)
