@@ -79,6 +79,12 @@ public class FileManagerController {
         return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
 
+    @PostMapping("/bulk/{folderId}")
+    public ResponseEntity<String> handleBulkFileUploadById(@RequestPart("files") MultipartFile[] files, @PathVariable("folderId") Long folderId) throws Exception {
+        fileService.bulkStoreById(files, folderId);
+        return ResponseEntity.ok().body("You successfully uploaded " + files.length+ " files!");
+    }
+
     @PostMapping("/file-update")
     public  ResponseEntity<FileManager> handleFileUpdate(@RequestBody FileManager fileManager) {
         return ResponseEntity.ok(fileService.updateFile(fileManager));

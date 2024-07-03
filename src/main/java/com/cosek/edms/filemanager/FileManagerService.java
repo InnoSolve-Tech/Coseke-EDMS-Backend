@@ -111,6 +111,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         throw new Exception("Failed to store files.", e);
     }
 }
+
 @Override
  public void store(FileManager data, MultipartFile file) throws Exception {
         if (file.isEmpty()) {
@@ -178,6 +179,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         if (directory.isPresent()) {
             fileManager = FileManager.builder()
                     .documentType(data.getDocumentType())
+                    .documentName(data.getDocumentName())
                     .folderID(directory.get().getFolderID())
                     .filename(file.getOriginalFilename())
                     .metadata(data.getMetadata())
@@ -208,6 +210,51 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         // Save the file hash name
         fileManager.setHashName(hash);
         fileRepository.save(fileManager);
+    }
+
+    public void bulkStoreById(MultipartFile[] files, Long folderId) throws Exception {
+        List<String> fileNames = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) {
+                    throw new Exception("Failed to store empty file.");
+                }
+                fileNames.add(file.getOriginalFilename());
+            }
+            for (int x = 0; x < files.length; x++) {
+                Optional<Directory> directory = directoryRepository.findById(folderId);
+                FileManager fileManager;
+                if (directory.isPresent()) {
+                    fileManager = FileManager.builder()
+                            .folderID(directory.get().getFolderID())
+                            .filename(files[x].getOriginalFilename())
+                            .build();
+                    fileRepository.save(fileManager);
+                } else {
+                    throw  new Exception("Folder with id " + folderId +" doesn't exist!");
+                }
+                String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+                // Resolve the destination file within the folder path
+                Path destinationFile = Paths.get(this.rootLocation)
+                        .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
+                        .normalize()
+                        .toAbsolutePath();
+
+
+                // Create directories if they don't exist
+                Files.createDirectories(destinationFile.getParent());
+
+                // Encrypt the file before storing it
+                try (InputStream inputStream = files[x].getInputStream();
+                     OutputStream outputStream = Files.newOutputStream(destinationFile)) {
+                    EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+                }
+                fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
+                fileRepository.save(fileManager);
+            }
+        } catch (Exception e) {
+            throw new Exception("Failed to store files.", e);
+        }
     }
 
 
@@ -309,6 +356,9 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     public FileManager updateFile(FileManager fileManager) {
     FileManager file = fileRepository.findByHashName(fileManager.getHashName()).orElseThrow();
     file.setMetadata(fileManager.getMetadata());
+    if(fileManager.getDocumentType() != null) {
+        file.setDocumentType(fileManager.getDocumentType());
+    }
     file.setDocumentName(fileManager.getDocumentName());
     fileRepository.save(file);
     return file;

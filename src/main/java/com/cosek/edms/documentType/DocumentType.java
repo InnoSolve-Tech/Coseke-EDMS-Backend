@@ -1,38 +1,36 @@
-package com.cosek.edms.directory;
+package com.cosek.edms.documentType;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.cosek.edms.documentType.DocumentType;
+import com.cosek.edms.directory.Directory;
+import com.cosek.edms.metadata.Metadata;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@Service
-@Data
-@Builder
 @Entity
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Directory {
+public class DocumentType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long FolderID;
-    private String Name;
-    private int ParentFolderID;
-    private long documentTypeID;
+    private long id;
+    private String documentType;
+    private long metadata;
+    private long folderId;
     @CreatedDate
     @Column(name = "createdDate", nullable = false, updatable = false)
     private LocalDateTime createdDate;
@@ -47,11 +45,5 @@ public class Directory {
 
     @CreatedBy
     @Column(name="createdBy", nullable = false, updatable = false)
-    private Long createdBy;  
-
-    @Override
-    public String toString() {
-        return "Folders [FolderID=" + FolderID + ", Name=" + Name + ", ParentFolderID=" + ParentFolderID + "]";
-    }
-
+    private Long createdBy;
 }
