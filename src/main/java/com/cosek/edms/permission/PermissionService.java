@@ -14,10 +14,6 @@ public class PermissionService {
         return permissionRepository.save(permission);
     }
 
-    public List<Permission> fetchAllPermissions() {
-        return permissionRepository.findAll();
-    }
-
     public Permission findOnePermission(Long permID) throws NotFoundException {
         return permissionRepository.findById(permID)
                 .orElseThrow(() -> new NotFoundException("Permission with ID: " + permID + " not found"));
@@ -27,5 +23,9 @@ public class PermissionService {
         Permission permission = findOnePermission(permID);
         permission.setName(request.getName());
         return permissionRepository.save(permission);
+    }
+
+    public List<Permission> getAllPermissions() {
+        return permissionRepository.findAll();
     }
 }
