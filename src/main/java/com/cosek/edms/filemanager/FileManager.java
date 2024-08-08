@@ -44,6 +44,7 @@ public class FileManager {
     private String documentName;
     private String hashName;
     private String fileLink;
+    private String mimeType;
     @Convert(converter = JsonMapConverter.class)
     @Column(columnDefinition = "nvarchar(max)")
     private Map<String, Object> metadata;

@@ -75,6 +75,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                     .documentType(data[x].getDocumentType())
                     .folderID(directory.get().getFolderID())
                     .filename(files[x].getOriginalFilename())
+                        .mimeType(data[x].getMimeType())
                     .build();
                 fileRepository.save(fileManager);
             } else {
@@ -139,6 +140,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 .folderID(newDirectory.getFolderID())
                 .filename(file.getOriginalFilename())
                     .documentName(data.getDocumentName())
+                    .mimeType(data.getMimeType())
                 .metadata(data.getMetadata())
                 .build();
             fileRepository.save(fileManager);
@@ -183,6 +185,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                     .folderID(directory.get().getFolderID())
                     .filename(file.getOriginalFilename())
                     .metadata(data.getMetadata())
+                    .mimeType(data.getMimeType())
                     .build();
             fileRepository.save(fileManager);
         } else {
@@ -228,6 +231,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                     fileManager = FileManager.builder()
                             .folderID(directory.get().getFolderID())
                             .filename(files[x].getOriginalFilename())
+                            .mimeType(files[x].getContentType())
                             .build();
                     fileRepository.save(fileManager);
                 } else {
