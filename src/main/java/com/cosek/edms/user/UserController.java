@@ -1,6 +1,8 @@
 package com.cosek.edms.user;
 
 import com.cosek.edms.exception.NotFoundException;
+import com.cosek.edms.role.Role;
+import com.cosek.edms.user.Models.CreateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +30,13 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User request) {
-        User response = userService.createUser(request);
+    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
+        User response = null;
+        try {
+            response = userService.createUser(request);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -46,7 +53,20 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        return ResponseEntity.ok(userService.updateUser(user, id));
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody CreateUserRequest user) {
+        try {
+            return ResponseEntity.ok(userService.updateUser(user, id));
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PutMapping("/users/roles-update/{id}")
+    public  ResponseEntity<User> updateRoles(@PathVariable Long id, @RequestBody List<Role> roles) {
+        try {
+            return ResponseEntity.ok(userService.updateRoles(id, roles));
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

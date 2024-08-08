@@ -3,6 +3,7 @@ package com.cosek.edms.user;
 import com.cosek.edms.exception.NotFoundException;
 import com.cosek.edms.role.Role;
 import com.cosek.edms.role.RoleService;
+import com.cosek.edms.user.Models.CreateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,16 @@ public class UserService {
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public User createUser(User request) {
+    public User createUser(CreateUserRequest request) throws NotFoundException {
+        List<Long> rolesFromRequest = request.getRoles();
+        Set<Role> roles = new HashSet<>();
+
+        for (Long roleId : rolesFromRequest) {
+            Role fetchedRole = roleService.findOneRole(roleId);
+            if (fetchedRole != null) {
+                roles.add(fetchedRole);
+            }
+        }
         User user = User
                 .builder()
                 .email(request.getEmail())
@@ -28,18 +38,29 @@ public class UserService {
                 .first_name(request.getFirst_name())
                 .last_name(request.getLast_name())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(new HashSet<>())
+                .roles(roles)
                 .build();
         return userRepository.save(user);
     }
 
-    public User updateUser(User request, Long id) {
+    public User updateUser(CreateUserRequest request, Long id) throws NotFoundException {
         User user = userRepository.findById(id).orElse(null);
+        List<Long> rolesFromRequest = request.getRoles();
+        Set<Role> roles = new HashSet<>();
+
+        for (Long roleId : rolesFromRequest) {
+            Role fetchedRole = roleService.findOneRole(roleId);
+            if (fetchedRole != null) {
+                roles.add(fetchedRole);
+            }
+        }
+
         assert user != null;
         user.setFirst_name(request.getFirst_name());
         user.setLast_name(request.getLast_name());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
+        user.setRoles(roles);
         user.setAddress(request.getAddress());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         return userRepository.save(user);
@@ -61,6 +82,22 @@ public class UserService {
         user.setRoles(roles);
         return userRepository.save(user);
     }
+
+    public User updateRoles(Long userID, List<Role> roles) throws NotFoundException {
+        Set<Role> newRoles = new HashSet<>();
+        User user = findOneUser(userID);
+
+        for (Role role : roles) {
+            Role fetchedRole = roleService.findOneRole(role.getId());
+            if (fetchedRole != null) {
+                newRoles.add(fetchedRole);
+            }
+        }
+
+        user.setRoles(newRoles);
+        return userRepository.save(user);
+    }
+
 
     public Map<String, Object> deleteUser(Long id) {
 
