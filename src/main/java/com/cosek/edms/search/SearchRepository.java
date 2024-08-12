@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface SearchRepository extends JpaRepository<Search, Long> {
 
-    @Query(value="select id,folderid,document_name,document_type,last_modified_date,file_link,filename from file_manager where filename LIKE %:keyword% OR document_name LIKE %:keyword%",nativeQuery=true)
+    @Query(value="select id,folderid,document_name,document_type,last_modified_date, created_date, file_link,filename, mime_type from file_manager where filename LIKE %:keyword% OR document_name LIKE %:keyword%",nativeQuery=true)
     Optional<List<Search>> searchFiles(@Param("keyword") String keyword);
 
     

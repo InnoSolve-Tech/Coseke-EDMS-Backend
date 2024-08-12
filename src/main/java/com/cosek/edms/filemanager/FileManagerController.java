@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.cosek.edms.search.Search;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -131,4 +132,10 @@ public class FileManagerController {
             }
         }
     }
+
+    @GetMapping("/search")
+    public List<FileManager> searchFiles(@RequestParam String keyword) {
+        return fileService.searchFiles(keyword);
+    }
+
 }

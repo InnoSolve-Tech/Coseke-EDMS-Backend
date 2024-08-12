@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import javax.crypto.SecretKey;
 
+import com.cosek.edms.exception.ResourceNotFoundException;
+import com.cosek.edms.search.Search;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -54,7 +56,7 @@ public class FileManagerService implements StorageService  {
             throw new Exception("File upload location can not be Empty."); 
         }
 		this.rootLocation = properties.getLocation();
-        this.secretKey = EncryptionUtil.generateSecretKey();
+        this.secretKey = EncryptionUtil.generateOrLoadSecretKey();
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
          // Encrypt the file before storing it
         try (InputStream inputStream = files[x].getInputStream();
         OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-        EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+        EncryptionUtil.encrypt(inputStream, outputStream);
     }
             fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
             fileRepository.save(fileManager);
@@ -162,7 +164,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         // Encrypt the file before storing it
         try (InputStream inputStream = file.getInputStream();
              OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-            EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+            EncryptionUtil.encrypt(inputStream, outputStream);
         }
 
         // Save the file hash name
@@ -207,7 +209,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         // Encrypt the file before storing it
         try (InputStream inputStream = file.getInputStream();
              OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-            EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+            EncryptionUtil.encrypt(inputStream, outputStream);
         }
 
         // Save the file hash name
@@ -251,7 +253,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 // Encrypt the file before storing it
                 try (InputStream inputStream = files[x].getInputStream();
                      OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-                    EncryptionUtil.encrypt(inputStream, outputStream, this.secretKey);
+                    EncryptionUtil.encrypt(inputStream, outputStream);
                 }
                 fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
                 fileRepository.save(fileManager);
@@ -334,7 +336,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
     public void decryptFile(Path encryptedFilePath, OutputStream outputStream) throws Exception {
         try (InputStream inputStream = Files.newInputStream(encryptedFilePath)) {
-            EncryptionUtil.decrypt(inputStream, outputStream, this.secretKey);
+            EncryptionUtil.decrypt(inputStream, outputStream);
         }
     }
 	@Override
@@ -366,5 +368,11 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     file.setDocumentName(fileManager.getDocumentName());
     fileRepository.save(file);
     return file;
+    }
+
+    public List<FileManager> searchFiles(String keyword) {
+        Optional<List<FileManager>> optionalFiles = fileRepository.searchFiles(keyword);
+        return optionalFiles.orElseThrow(() -> new ResourceNotFoundException("No files found with keyword: " + keyword));
+
     }
 }

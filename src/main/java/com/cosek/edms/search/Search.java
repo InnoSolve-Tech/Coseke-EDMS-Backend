@@ -22,15 +22,17 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Search {
-        @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    private long id;
 
-    private Long folderid;
+    private Long folderID;
     private String filename;
     private String document_type;
     private String document_name;
-    private String last_modified_date;
+    private String mimeType;
+    private String lastModifiedDate;
+    private String createdDate;
     private String file_link;
     
 }
