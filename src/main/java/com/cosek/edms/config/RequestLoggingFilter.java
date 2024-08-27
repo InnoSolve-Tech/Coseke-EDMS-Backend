@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -24,9 +25,16 @@ public class RequestLoggingFilter extends GenericFilterBean {
 
         // Get authentication details
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User)
-                ? ((org.springframework.security.core.userdetails.User) authentication.getPrincipal()).getUsername()
-                : "anonymous";
+        String username = "anonymous";
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else {
+                username = principal.toString();
+            }
+        }
 
         logger.info("Request URL: {}", httpServletRequest.getRequestURL());
         logger.info("Request Method: {}", httpServletRequest.getMethod());
