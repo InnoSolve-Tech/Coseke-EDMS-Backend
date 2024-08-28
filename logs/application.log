@@ -1,26 +1,942 @@
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
-2024-08-27 08:43:08 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
-2024-08-27 08:43:08 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:43:39 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 
+2024-08-27 14:43:39 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated... 
+2024-08-27 14:43:39 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed. 
+2024-08-27 14:43:44 [restartedMain] INFO  com.cosek.edms.EdmsApplication - Starting EdmsApplication using Java 22.0.1 with PID 37012 (C:\Users\COSEKE\Desktop\Code\coseke-edms\target\classes started by COSEKE in C:\Users\COSEKE\Desktop\Code\coseke-edms) 
+2024-08-27 14:43:44 [restartedMain] INFO  com.cosek.edms.EdmsApplication - No active profile set, falling back to 1 default profile: "default" 
+2024-08-27 14:43:44 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable 
+2024-08-27 14:43:44 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG' 
+2024-08-27 14:43:45 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 
+2024-08-27 14:43:45 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 106 ms. Found 8 JPA repository interfaces. 
+2024-08-27 14:43:47 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7777 (http) 
+2024-08-27 14:43:47 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-7777"] 
+2024-08-27 14:43:47 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat] 
+2024-08-27 14:43:47 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20] 
+2024-08-27 14:43:47 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext 
+2024-08-27 14:43:47 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2831 ms 
+2024-08-27 14:43:47 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] 
+2024-08-27 14:43:47 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.8.Final 
+2024-08-27 14:43:47 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled 
+2024-08-27 14:43:48 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 
+2024-08-27 14:43:48 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... 
+2024-08-27 14:43:48 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: dae680ff-2cda-423d-9569-bdb18bb69998 
+2024-08-27 14:43:48 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. 
+2024-08-27 14:43:48 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default) 
+2024-08-27 14:43:50 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 
+2024-08-27 14:43:51 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 
+2024-08-27 14:43:52 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used. 
+2024-08-27 14:43:53 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning 
+2024-08-27 14:43:53 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 39 mappings in 'requestMappingHandlerMapping' 
+2024-08-27 14:43:53 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping' 
+2024-08-27 14:43:54 [restartedMain] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6d4c5a86, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@23ae13b8, org.springframework.security.web.context.SecurityContextHolderFilter@f76a59d, org.springframework.security.web.header.HeaderWriterFilter@736555c1, org.springframework.web.filter.CorsFilter@325b47ef, org.springframework.security.web.authentication.logout.LogoutFilter@5d3bc4db, com.cosek.edms.config.RequestLoggingFilter@6395a870, com.cosek.edms.config.JwtAuthenticationFilter@a22f6a2, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@50fb34e4, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6cc2aa09, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7de2e3, org.springframework.security.web.session.SessionManagementFilter@61bbb255, org.springframework.security.web.access.ExceptionTranslationFilter@1e589bd9, org.springframework.security.web.access.intercept.AuthorizationFilter@362f107f] 
+2024-08-27 14:43:54 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice 
+2024-08-27 14:43:54 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice 
+2024-08-27 14:43:54 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729 
+2024-08-27 14:43:54 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-7777"] 
+2024-08-27 14:43:54 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 7777 (http) with context path '' 
+2024-08-27 14:43:54 [restartedMain] INFO  com.cosek.edms.EdmsApplication - Started EdmsApplication in 11.024 seconds (process running for 11.802) 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet' 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet' 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@79a87c12 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@5c80c99a 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data 
+2024-08-27 14:44:10 [http-nio-7777-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms 
+2024-08-27 14:44:10 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:44:10 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:44:10 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:44:10 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:44:10 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:44:10 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:44:10 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:44:10 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:44:11 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:44:11 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:46:00 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:48:32 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:49:10 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:50:07 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:50:24 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:55:15 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 14:55:15 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:09:42 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:09:42 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:42 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:42 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:09:42 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:09:42 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:42 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:42 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:09:43 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:09:43 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:09:43 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:09:43 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:09:43 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:09:43 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:13:13 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:13 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:13:13 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:13:13 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:13:13 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:13:13 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:13:36 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:13:36 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:13:36 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:13:43 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:13:43 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:13:43 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:54 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:13:55 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:13:55 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:13:55 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:14:39 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:14:39 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:14:39 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:14:49 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:14:49 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:14:49 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:15:12 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:15:12 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:15:12 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:15:46 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:15:46 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:15:47 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:15:47 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:15:47 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:15:47 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:16:04 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:16:04 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:16:04 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:19:21 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:19:21 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:19:21 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:20:19 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:20:19 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:20:19 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:22:34 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:22:34 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:22:34 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:24:48 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:24:48 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:24:48 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:27:02 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:27:02 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:27:02 [http-nio-7777-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:27:06 [http-nio-7777-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:27:06 [http-nio-7777-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:27:07 [http-nio-7777-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:27:07 [http-nio-7777-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:27:07 [http-nio-7777-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:07 [http-nio-7777-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/logging 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/logging", parameters={} 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.logging.LoggingController#getAllLogs() 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[Logging(date=2024-08-27 14:43:39, type=INFO, message= o.s.o.j.LocalContainerEntityManagerFactoryBea (truncated)...] 
+2024-08-27 15:27:43 [http-nio-7777-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/files/stored 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/files/stored", parameters={} 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.filemanager.FileManagerController#getFilesInStore() 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[FileManager(id=1, folderID=1, filename=MEMBERS OF THE 11TH PARLIAMENT (2021-2026) .pdf, documentTyp (truncated)...] 
+2024-08-27 15:27:43 [http-nio-7777-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: anonymous 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request URL: http://localhost:7777/api/v1/directories/ 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request Method: GET 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Request IP: 127.0.0.1 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] INFO  c.c.edms.config.RequestLoggingFilter - Authenticated User: admin@example.com 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/directories/", parameters={} 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.cosek.edms.directory.DirectoryController#getAllDirectories() 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json] 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [[Folders [FolderID=1, Name=Pdfs, ParentFolderID=1], Folders [FolderID=2, Name=Videos, ParentFolderID (truncated)...] 
+2024-08-27 15:27:43 [http-nio-7777-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK 
