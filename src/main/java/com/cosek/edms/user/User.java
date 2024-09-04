@@ -1,6 +1,8 @@
 package com.cosek.edms.user;
 
+import com.cosek.edms.WorkflowComments.WorkflowComments;
 import com.cosek.edms.role.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +34,11 @@ public class User implements UserDetails {
     private String phone;
     private String address;
     private String password;
+
+    @OneToMany(cascade = CascadeType.DETACH)
+    @Column(name = "user")
+    @JsonIgnore
+    private Collection<WorkflowComments> workflowComments;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

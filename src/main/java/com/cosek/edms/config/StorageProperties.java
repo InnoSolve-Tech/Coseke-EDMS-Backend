@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("storage")
 public class StorageProperties {
 
-	private String location = "private-file";
+	private String location = "C:\\Users\\COSEKE\\Desktop\\Test";
 
 	public String getLocation() {
 		return location;
