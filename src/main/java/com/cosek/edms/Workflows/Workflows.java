@@ -21,7 +21,7 @@ public class Workflows {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long name;
+    private String name;
     private String documentType;
     @Convert(converter = JsonMapConverter.class)
     @Column(columnDefinition = "nvarchar(max)")

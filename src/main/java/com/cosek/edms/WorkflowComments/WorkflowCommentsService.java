@@ -1,6 +1,10 @@
 package com.cosek.edms.WorkflowComments;
 
 import com.cosek.edms.Workflows.Workflows;
+import com.cosek.edms.Workflows.WorkflowsRepository;
+import com.cosek.edms.user.User;
+import com.cosek.edms.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +18,22 @@ public class WorkflowCommentsService {
 
     private final WorkflowCommentsRepository workflowCommentsRepository;
 
-    @Transactional
+    private final WorkflowsRepository workflowsRepository;
+
+    private final UserRepository userRepository;
+
     public WorkflowComments createWorkflowComment(WorkflowComments workflowComment) {
+        // Find workflow by ID
+        Workflows workflows = workflowsRepository.findById(workflowComment.getWorkflows().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Workflow not found with id: " + workflowComment.getWorkflows().getId()));
+
+        User user = userRepository.findById(workflowComment.getUser().getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + workflowComment.getUser().getId()));
+
+        workflowComment.setWorkflows(workflows);
+
+        workflowComment.setUser(user);
+
         return workflowCommentsRepository.save(workflowComment);
     }
 
