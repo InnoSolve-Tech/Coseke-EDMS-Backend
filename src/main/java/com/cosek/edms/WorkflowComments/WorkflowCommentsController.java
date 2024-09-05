@@ -1,5 +1,6 @@
 package com.cosek.edms.WorkflowComments;
 
+import com.cosek.edms.ActiveWorkflows.ActiveWorkflows;
 import com.cosek.edms.Workflows.Workflows;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class WorkflowCommentsController {
     // Get all comments for a specific workflow
     @GetMapping("/by-workflow/{workflowId}")
     public ResponseEntity<List<WorkflowComments>> getCommentsByWorkflow(@PathVariable Long workflowId) {
-        Workflows workflows = new Workflows();  // Assume you get this from some service or repository
+        ActiveWorkflows workflows = new ActiveWorkflows();  // Assume you get this from some service or repository
         workflows.setId(workflowId);
         List<WorkflowComments> comments = workflowCommentsService.findCommentsByWorkflow(workflows);
         return ResponseEntity.ok(comments);

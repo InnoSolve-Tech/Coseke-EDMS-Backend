@@ -2,6 +2,7 @@ package com.cosek.edms.Workflows;
 
 import com.cosek.edms.WorkflowComments.WorkflowComments;
 import com.cosek.edms.helper.JsonMapConverter;
+import com.cosek.edms.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,8 +28,4 @@ public class Workflows {
     @Column(columnDefinition = "nvarchar(max)")
     private Map<String, Object> metadata;
     private List<String> processPath;
-    @OneToMany(cascade = CascadeType.DETACH)
-    @Column(name = "workflows")
-    private Collection<WorkflowComments> workflowComments;
-
 }

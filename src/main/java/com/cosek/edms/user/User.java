@@ -1,5 +1,6 @@
 package com.cosek.edms.user;
 
+import com.cosek.edms.ActiveWorkflows.ActiveWorkflows;
 import com.cosek.edms.WorkflowComments.WorkflowComments;
 import com.cosek.edms.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,6 +40,9 @@ public class User implements UserDetails {
     @Column(name = "user")
     @JsonIgnore
     private Collection<WorkflowComments> workflowComments;
+    @OneToOne(mappedBy = "user")
+    @JsonIgnore
+    private ActiveWorkflows activeWorkflows;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
