@@ -1,6 +1,7 @@
 package com.cosek.edms.ActiveWorkflows;
 
 import com.cosek.edms.WorkflowComments.WorkflowComments;
+import com.cosek.edms.filemanager.FileManager;
 import com.cosek.edms.helper.JsonMapConverter;
 import com.cosek.edms.user.User;
 import jakarta.persistence.*;
@@ -28,6 +29,9 @@ public class ActiveWorkflows {
     @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "file_manager_id", referencedColumnName = "id")
+    private FileManager fileManager;
     @OneToMany(cascade = CascadeType.DETACH)
     @Column(name = "activeWorkflows")
     private Collection<WorkflowComments> workflowComments;

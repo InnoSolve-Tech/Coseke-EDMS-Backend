@@ -1,5 +1,8 @@
 package com.cosek.edms.filemanager;
 
+import com.cosek.edms.ActiveWorkflows.ActiveWorkflows;
+import com.cosek.edms.WorkflowComments.WorkflowComments;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -9,20 +12,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.cosek.edms.helper.JsonMapConverter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Map;
 
 @Data
@@ -64,5 +60,9 @@ public class FileManager {
     @CreatedBy
     @Column(name="createdBy", nullable = false, updatable = false)
     private Long createdBy;
+
+    @OneToMany(cascade = CascadeType.DETACH)
+    @Column(name = "fileManager")
+    private Collection<ActiveWorkflows> activeWorkflows;
 
 }
