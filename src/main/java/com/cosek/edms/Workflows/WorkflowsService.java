@@ -49,7 +49,6 @@ public class WorkflowsService {
             Workflows existingWorkflow = existingWorkflowOpt.get();
             existingWorkflow.setName(newWorkflow.getName());
             existingWorkflow.setDocumentType(newWorkflow.getDocumentType());
-            existingWorkflow.setMetadata(newWorkflow.getMetadata());
             return workflowsRepository.save(existingWorkflow);
         } else {
             throw new RuntimeException("Workflow not found with id: " + newWorkflow.getId());

@@ -24,8 +24,5 @@ public class Workflows {
     private Long id;
     private String name;
     private String documentType;
-    @Convert(converter = JsonMapConverter.class)
-    @Column(columnDefinition = "nvarchar(max)")
-    private Map<String, Object> metadata;
     private List<String> processPath;
 }
