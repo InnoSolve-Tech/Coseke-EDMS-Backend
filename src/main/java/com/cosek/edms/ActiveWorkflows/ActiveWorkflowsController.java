@@ -45,14 +45,22 @@ public class ActiveWorkflowsController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // Change the stage of an ActiveWorkflow
-    @PatchMapping("/{id}/stage")
-    public ResponseEntity<ActiveWorkflows> changeStage(@PathVariable Long id, @RequestParam String newStage) {
+    @PutMapping("/stage/{id}")
+    public ResponseEntity<ActiveWorkflows> changeStage(@PathVariable Long id) {
+        System.out.println("Received request to change stage for workflow id: " + id);
         try {
-            ActiveWorkflows updatedWorkflow = activeWorkflowsService.changeStage(id, newStage);
+            ActiveWorkflows updatedWorkflow = activeWorkflowsService.changeStage(id);
             return new ResponseEntity<>(updatedWorkflow, HttpStatus.OK);
         } catch (RuntimeException e) {
+            System.err.println("Error changing stage: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+
+    @GetMapping("/user")
+    public ResponseEntity<List<ActiveWorkflows>> getByUserId() {
+        List<ActiveWorkflows> workflows = activeWorkflowsService.findByUserId();
+        return new ResponseEntity<>(workflows, HttpStatus.OK);
     }
 }

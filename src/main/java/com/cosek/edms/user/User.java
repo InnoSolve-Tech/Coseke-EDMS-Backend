@@ -40,9 +40,9 @@ public class User implements UserDetails {
     @Column(name = "user")
     @JsonIgnore
     private Collection<WorkflowComments> workflowComments;
-    @OneToOne(mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private ActiveWorkflows activeWorkflows;
+    private Collection<ActiveWorkflows> activeWorkflows;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
