@@ -1,0 +1,18 @@
+services:
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "8080:8080"
+
+  file-management:
+    build:
+      context: ./file-management
+    ports:
+      - "8081:8081"
+
+  workflows:
+    build:
+      context: ./workflows
+    ports:
+      - "8082:8082"
