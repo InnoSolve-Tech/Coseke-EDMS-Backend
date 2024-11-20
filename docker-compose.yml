@@ -1,18 +1,20 @@
+version: '3.8'
+
 services:
-  gateway:
-    build:
-      context: ./gateway
+  edms-gateway:
+    image: benzidarwin/gateway:latest
     ports:
-      - "8787:8787"
+      - "8080:8080"
+    depends_on:
+      - file-management
+      - workflows
 
   file-management:
-    build:
-      context: ./file-management
+    image: benzidarwin/file-management:latest
     ports:
       - "8081:8081"
 
   workflows:
-    build:
-      context: ./workflows
+    image: benzidarwin/workflows:latest
     ports:
       - "8082:8082"
