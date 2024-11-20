@@ -1,5 +1,7 @@
 package com.edms.file_management.documentType;
 
+//import com.cosek.edms.directory.Directory;
+//import com.cosek.edms.metadata.Metadata;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
