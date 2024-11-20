@@ -28,16 +28,16 @@ public class DocumentTypeService {
     }
 
     // Update a document type
-    public DocumentType updateDocumentType(Long id, DocumentType updatedDocumentType) {
-        return documentTypeRepository.findById(id)
-                .map(existing -> {
-                    existing.setDocumentType(updatedDocumentType.getDocumentType());
-                    existing.setMetadata(updatedDocumentType.getMetadata());
-                    existing.setFolderId(updatedDocumentType.getFolderId());
-                    return documentTypeRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("DocumentType not found with id: " + id));
-    }
+//    public DocumentType updateDocumentType(Long id, DocumentType updatedDocumentType) {
+//        return documentTypeRepository.findById(id)
+//                .map(existing -> {
+//                    existing.setDocumentType(updatedDocumentType.getDocumentType());
+//                    existing.setMetadata(updatedDocumentType.getMetadata());
+//                    existing.setFolderId(updatedDocumentType.getFolderId());
+//                    return documentTypeRepository.save(existing);
+//                })
+//                .orElseThrow(() -> new RuntimeException("DocumentType not found with id: " + id));
+//    }
 
     // Delete a document type by ID
     public void deleteDocumentType(Long id) {
