@@ -6,7 +6,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,7 +18,6 @@ public class ProxyController {
 
     private final RestTemplate restTemplate;
 
-    // Load the proxy secret from application.properties
     @Value("${proxy.secret}")
     private String proxySecret;
 
@@ -31,6 +29,11 @@ public class ProxyController {
     public ResponseEntity<String> proxyRequest(HttpServletRequest request) {
         String path = request.getRequestURI();
         String backendUrl = getBackendUrl(path);
+
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            backendUrl += "?" + queryString;
+        }
 
         // Set up headers with the proxy secret
         HttpHeaders headers = new HttpHeaders();
@@ -44,11 +47,10 @@ public class ProxyController {
     private String getBackendUrl(String path) {
         // Determine which service to forward the request to based on the path
         if (path.startsWith("/file-management")) {
-            return "http://localhost:8081" + path;
-        }else if (path.startsWith("/workflows")) {
-            return "http://localhost:8082" + path;
-        }
-        else {
+            return "http://host.docker.internal:8081" + path;
+        } else if (path.startsWith("/workflows")) {
+            return "http://host.docker.internal:8082" + path;
+        } else {
             throw new IllegalArgumentException("Unknown service");
         }
     }

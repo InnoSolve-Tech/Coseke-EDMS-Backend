@@ -1,0 +1,18 @@
+services:
+  edms-gateway:
+    image: benzidarwin/gateway:latest
+    ports:
+      - "8787:8787"
+    depends_on:
+      - file-management
+      - workflows
+
+  file-management:
+    image: benzidarwin/file-management:latest
+    ports:
+      - "8081:8081"
+
+  workflows:
+    image: benzidarwin/workflows:latest
+    ports:
+      - "8082:8082"

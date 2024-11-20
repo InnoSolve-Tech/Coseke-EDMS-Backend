@@ -1,0 +1,29 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - push
+
+build-and-push:
+  stage: build
+  before_script:
+    # Log in to Docker Hub using credentials from CI/CD variables
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  script:
+    # Build and push edms-gateway image
+    - docker build -t "$DOCKER_USERNAME/gateway:latest" ./gateway
+    - docker push "$DOCKER_USERNAME/gateway:latest"
+    
+    # Build and push file-management image
+    - docker build -t "$DOCKER_USERNAME/file-management:latest" ./file-management
+    - docker push "$DOCKER_USERNAME/file-management:latest"
+    
+    # Build and push workflows image
+    - docker build -t "$DOCKER_USERNAME/workflows:latest" ./workflows
+    - docker push "$DOCKER_USERNAME/workflows:latest"
+  after_script:
+    # Log out of Docker Hub
+    - docker logout
