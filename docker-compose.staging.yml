@@ -2,7 +2,7 @@ services:
   edms-gateway:
     image: benzidarwin/staging-gateway:latest
     ports:
-      - "8788:8787" # Exposed port is different for staging
+      - "8787:8787" # Exposed port is different for staging
     depends_on:
       - file-management
       - workflows
