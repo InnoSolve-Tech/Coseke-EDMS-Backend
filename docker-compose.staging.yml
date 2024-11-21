@@ -10,9 +10,9 @@ services:
   file-management:
     image: benzidarwin/staging-file-management:latest
     ports:
-      - "8083:8081" # Exposed port is different for staging
+      - "8081:8081" # Exposed port is different for staging
 
   workflows:
     image: benzidarwin/staging-workflows:latest
     ports:
-      - "8084:8082" # Exposed port is different for staging
+      - "8082:8082" # Exposed port is different for staging
