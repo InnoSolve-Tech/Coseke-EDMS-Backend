@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/document-types")
-@CrossOrigin(origins = "http://localhost:3000")
 public class DocumentTypeController {
 
     @Autowired
