@@ -17,13 +17,15 @@ public class DocumentTypeMetadataValue {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "document_type_id")
+    @JoinColumn(name = "document_type_id", nullable = false)
     private DocumentType documentType;
 
-    @ManyToOne
-    @JoinColumn(name = "metadata_field_id")
-    private MetadataField metadataField;
+    @Column(name = "name", nullable = false)
+    private String name; // Metadata key
 
-    private String value; // Value corresponding to the metadata key
+    @Column(name = "type", nullable = false)
+    private String type; // Metadata type (e.g., "string", "number")
+
+    @Column(name = "value", nullable = false)
+    private String value; // Metadata value
 }
-
