@@ -33,11 +33,9 @@ public class DocumentType {
 
     private String documentType;
 
-    @ElementCollection
-    @CollectionTable(name = "document_type_metadata", joinColumns = @JoinColumn(name = "document_type_id"))
-    @MapKeyColumn(name = "metadata_field")
-    @Column(name = "metadata_value")
-    private Map<String, String> metadata = new HashMap<>();
+    // Updated metadata relationship
+    @OneToMany(mappedBy = "documentType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DocumentTypeMetadataValue> metadata;
 
     @CreatedDate
     @Column(name = "createdDate", nullable = false, updatable = false)
