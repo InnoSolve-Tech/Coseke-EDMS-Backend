@@ -26,6 +26,6 @@ public class DocumentTypeMetadataValue {
     @Column(name = "type", nullable = false)
     private String type; // Metadata type (e.g., "string", "number")
 
-    @Column(name = "value", nullable = false)
-    private String value; // Metadata value
+    @Column(name = "value")
+    private String value; // Metadata value (nullable to allow null in the payload)
 }

@@ -1,7 +1,5 @@
 package com.edms.file_management.documentType;
 
-//import com.cosek.edms.directory.Directory;
-//import com.cosek.edms.metadata.Metadata;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,9 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Data
@@ -31,25 +27,26 @@ public class DocumentType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "document_type", nullable = false)
     private String documentType;
 
-    // Updated metadata relationship
+    // Metadata relationship
     @OneToMany(mappedBy = "documentType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentTypeMetadataValue> metadata;
 
     @CreatedDate
-    @Column(name = "createdDate", nullable = false, updatable = false)
+    @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = "lastModifiedDate", nullable = true)
+    @Column(name = "last_modified_date", nullable = true)
     private LocalDateTime lastModifiedDateTime;
 
     @LastModifiedBy
-    @Column(name = "lastModifiedBy", nullable = true)
+    @Column(name = "last_modified_by", nullable = true)
     private Long lastModifiedBy;
 
     @CreatedBy
-    @Column(name = "createdBy", nullable = false, updatable = false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     private Long createdBy;
 }

@@ -17,10 +17,16 @@ public class DocumentTypeService {
 
     public DocumentType createDocumentType(DocumentType documentType) {
         if (documentType.getMetadata() != null) {
-            documentType.getMetadata().forEach(metadata -> metadata.setDocumentType(documentType));
+            for (DocumentTypeMetadataValue metadata : documentType.getMetadata()) {
+                if (metadata.getValue() == null || metadata.getValue().isEmpty()) {
+                    throw new IllegalArgumentException("Metadata value cannot be null or empty");
+                }
+                metadata.setDocumentType(documentType);
+            }
         }
         return documentTypeRepository.save(documentType);
     }
+
 
 
     // Get all document types
