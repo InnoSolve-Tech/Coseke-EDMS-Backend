@@ -1,0 +1,21 @@
+services:
+  edms-gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "8787:8787" # Exposed port is different for staging
+    depends_on:
+      - file-management
+      - workflows
+
+  file-management:
+    build:
+      context: ./file-management
+    ports:
+      - "8081:8081" # Exposed port is different for staging
+
+  workflows:
+    build:
+      context: ./workflows
+    ports:
+      - "8082:8082" # Exposed port is different for staging
