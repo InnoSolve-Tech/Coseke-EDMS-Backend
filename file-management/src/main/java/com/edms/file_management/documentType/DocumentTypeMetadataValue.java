@@ -30,6 +30,6 @@ public class DocumentTypeMetadataValue {
     @Column(name = "type", nullable = false)
     private String type;
 
-    @Column(name = "value",nullable = true)
+    @Column(name = "value")
     private String value;
 }
