@@ -78,7 +78,7 @@ public class DocumentType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "documentType", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     // Remove this line if it exists
