@@ -24,7 +24,7 @@ public class DocumentTypeMetadataValue {
     @JoinColumn(name = "document_type_id")
     private DocumentType documentType;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "documentType", nullable = false)
     private String name;
 
     @Column(name = "type", nullable = false)
