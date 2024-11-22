@@ -15,10 +15,13 @@ public class DocumentTypeService {
     @Autowired
     private DocumentTypeMetadataValueRepository metadataValueRepository;
 
-    // Create a new document type
     public DocumentType createDocumentType(DocumentType documentType) {
+        if (documentType.getMetadata() != null) {
+            documentType.getMetadata().forEach(metadata -> metadata.setDocumentType(documentType));
+        }
         return documentTypeRepository.save(documentType);
     }
+
 
     // Get all document types
     public List<DocumentType> getAllDocumentTypes() {
