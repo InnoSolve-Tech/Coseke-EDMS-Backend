@@ -1,5 +1,7 @@
 package com.edms.file_management.documentType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,21 +13,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DocumentTypeMetadataValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "document_type_id", nullable = false)
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_type_id")
     private DocumentType documentType;
 
     @Column(name = "name", nullable = false)
-    private String name; // Metadata key
+    private String name;
 
     @Column(name = "type", nullable = false)
-    private String type; // Metadata type (e.g., "string", "number")
+    private String type;
 
-    @Column(name = "value")
-    private String value; // Metadata value (nullable to allow null in the payload)
+    @Column(name = "value",nullable = true)
+    private String value;
 }

@@ -18,7 +18,8 @@ public class DocumentTypeController {
     // Create a new document type
     @PostMapping("/create")
     public ResponseEntity<DocumentType> createDocumentType(@RequestBody DocumentType documentType) {
-        return ResponseEntity.ok(documentTypeService.createDocumentType(documentType));
+        DocumentType savedDocumentType = documentTypeService.createDocumentType(documentType);
+        return ResponseEntity.ok(savedDocumentType);
     }
 
     // Get all document types
@@ -36,16 +37,16 @@ public class DocumentTypeController {
     }
 
     // Update a document type's basic information
-    @PutMapping("/update/{id}")
-    public ResponseEntity<DocumentType> updateDocumentType(
-            @PathVariable Long id,
-            @RequestBody DocumentType updatedDocumentType) {
-        try {
-            return ResponseEntity.ok(documentTypeService.updateDocumentType(id, updatedDocumentType));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<DocumentType> updateDocumentType(
+//            @PathVariable Long id,
+//            @RequestBody DocumentType updatedDocumentType) {
+//        try {
+//            return ResponseEntity.ok(documentTypeService.updateDocumentType(id, updatedDocumentType));
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 
     // Add a metadata entry to a document type
     @PostMapping("/{id}/add-metadata")

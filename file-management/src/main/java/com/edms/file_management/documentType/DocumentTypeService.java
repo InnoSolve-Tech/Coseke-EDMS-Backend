@@ -17,16 +17,10 @@ public class DocumentTypeService {
 
     public DocumentType createDocumentType(DocumentType documentType) {
         if (documentType.getMetadata() != null) {
-            for (DocumentTypeMetadataValue metadata : documentType.getMetadata()) {
-                if (metadata.getValue() == null || metadata.getValue().isEmpty()) {
-                    throw new IllegalArgumentException("Metadata value cannot be null or empty");
-                }
-                metadata.setDocumentType(documentType);
-            }
+            documentType.getMetadata().forEach(metadata -> metadata.setDocumentType(documentType));
         }
         return documentTypeRepository.save(documentType);
     }
-
 
 
     // Get all document types
@@ -40,14 +34,14 @@ public class DocumentTypeService {
     }
 
     // Update a document type's basic information
-    public DocumentType updateDocumentType(Long id, DocumentType updatedDocumentType) {
-        return documentTypeRepository.findById(id)
-                .map(existing -> {
-                    existing.setDocumentType(updatedDocumentType.getDocumentType());
-                    return documentTypeRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("DocumentType not found with id: " + id));
-    }
+//    public DocumentType updateDocumentType(Long id, DocumentType updatedDocumentType) {
+//        return documentTypeRepository.findById(id)
+//                .map(existing -> {
+//                    existing.setDocumentType(updatedDocumentType.getDocumentType());
+//                    return documentTypeRepository.save(existing);
+//                })
+//                .orElseThrow(() -> new RuntimeException("DocumentType not found with id: " + id));
+//    }
 
     // Add a metadata entry
     public DocumentType addMetadata(long documentTypeId, DocumentTypeMetadataValue metadataValue) {
