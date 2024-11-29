@@ -1,5 +1,6 @@
 package com.edms.file_management.filemanager;
 
+import com.edms.file_management.documentType.DocumentType;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;

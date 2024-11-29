@@ -4,6 +4,7 @@ import com.edms.file_management.config.StorageProperties;
 import com.edms.file_management.directory.Directory;
 import com.edms.file_management.directory.DirectoryRepository;
 import com.edms.file_management.directory.DirectoryService;
+import com.edms.file_management.documentType.DocumentType;
 import com.edms.file_management.exception.ResourceNotFoundException;
 import com.edms.file_management.helper.EncryptionUtil;
 import com.edms.file_management.helper.HashUtil;
@@ -78,7 +79,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                     .build();
                 fileRepository.save(fileManager);
             } else {
-                Directory newDirectory = Directory.builder().Name(data[x].getDocumentType()).build();
+                Directory newDirectory = Directory.builder().name(data[x].getDocumentType()).build();
                 newDirectory = directoryService.creaDirectoryWithName(newDirectory);
                 fileManager = FileManager.builder()
                     .documentType(data[x].getDocumentType())
@@ -130,7 +131,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 .build();
             fileRepository.save(fileManager);
         } else {
-            Directory newDirectory = Directory.builder().Name(data.getDocumentType()).build();
+            Directory newDirectory = Directory.builder().name(data.getDocumentType()).build();
             newDirectory = directoryService.creaDirectoryWithName(newDirectory);
             newDirectory.setParentFolderID((int) newDirectory.getFolderID());
             directoryRepository.save(newDirectory);
@@ -372,4 +373,5 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         return optionalFiles.orElseThrow(() -> new ResourceNotFoundException("No files found with keyword: " + keyword));
 
     }
+
 }

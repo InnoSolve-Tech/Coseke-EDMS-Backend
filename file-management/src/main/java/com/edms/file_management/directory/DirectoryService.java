@@ -4,6 +4,7 @@ import com.edms.file_management.config.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,4 +72,24 @@ public class DirectoryService {
         directory.setParentFolderID(directoryRequest.getParentFolderID());
         return directoryRepository.save(directory);
     }
+
+    public List<Directory> getDirectoriesByParentId(int parentId, int maxDepth) {
+        List<Directory> result = new ArrayList<>();
+        recursivelyFindChildDirectories(parentId, result, 0, maxDepth);
+        return result;
+    }
+
+    private void recursivelyFindChildDirectories(int parentId, List<Directory> result, int currentDepth, int maxDepth) {
+        if (currentDepth >= maxDepth) {
+            return;
+        }
+
+        List<Directory> childDirectories = directoryRepository.findByParentFolderID(parentId);
+        result.addAll(childDirectories);
+
+        for (Directory child : childDirectories) {
+            recursivelyFindChildDirectories(child.getFolderID(), result, currentDepth + 1, maxDepth);
+        }
+    }
+
 }

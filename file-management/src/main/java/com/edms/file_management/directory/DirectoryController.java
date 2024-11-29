@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/directories")
-@CrossOrigin(origins = "http://localhost:3000")
 public class DirectoryController {
 
     @Autowired
@@ -17,7 +16,7 @@ public class DirectoryController {
     @Autowired
     private DirectoryService directoryService;
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public List<Directory> getAllDirectories() {
         return directoryService.getAllDirectories();
     }
@@ -29,13 +28,13 @@ public class DirectoryController {
         return ResponseEntity.ok().body(directory);
     }
 
-    @PostMapping("/")
+    @PostMapping("/create")
     public Directory createDirectory(@RequestBody Directory directory) {
         System.out.println("Created Directory: " + directory);
         return directoryService.createDirectory(directory);
     }
     
-    @PostMapping("/create")
+    @PostMapping("/create-with-name")
     public Directory createDirectoryWithName(@RequestBody Directory directory) {
        return directoryService.creaDirectoryWithName(directory);
     }
@@ -58,5 +57,15 @@ public class DirectoryController {
     @GetMapping("/directory/delete/{directoryId}")
     public void deleteFolder(@PathVariable Long directoryID) {
         directoryService.deleteDirectoryById(directoryID);
-    } 
+    }
+
+    @GetMapping("/by-parent/{parentId}/{maxDepth}")
+    public ResponseEntity<List<Directory>> getDirectoriesByParentId(
+            @PathVariable(value = "parentId") int parentId,
+            @PathVariable(value = "maxDepth") int maxDepth) {
+        List<Directory> childDirectories = directoryService.getDirectoriesByParentId(parentId, maxDepth);
+        return ResponseEntity.ok().body(childDirectories);
+    }
+
 }
+
