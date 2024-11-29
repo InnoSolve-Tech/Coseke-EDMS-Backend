@@ -30,7 +30,7 @@ public class FileManager {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long folderID;
+    private Integer folderID;
     private String filename;
     private String documentType;
     private String documentName;

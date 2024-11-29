@@ -12,4 +12,7 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
 
     @Query(value = "SELECT * FROM Directory WHERE Name = :name", nativeQuery = true)
     Optional<Directory> findByName(String name);
+
+    List<Directory> findByParentFolderID(int parentFolderID);
+
 }

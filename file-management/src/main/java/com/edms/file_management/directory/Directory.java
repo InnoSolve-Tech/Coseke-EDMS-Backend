@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
+@Entity
 @Data
 @Builder
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -26,16 +26,21 @@ import java.time.LocalDateTime;
 public class Directory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long FolderID;
-    private String Name;
-    private int ParentFolderID;
+    private int folderID;
+
+    private String name;
+
+    @Column(name = "parent_folderid") // Maps to the database column
+    private int parentFolderID;
+
     private long documentTypeID;
+
     @CreatedDate
     @Column(name = "createdDate", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name="lastModifiedDate", nullable = true)
+    @Column(name = "lastModifiedDate", nullable = true)
     private LocalDateTime lastModifiedDateTime;
 
     @LastModifiedBy
@@ -43,12 +48,11 @@ public class Directory {
     private Long lastModifiedBy;
 
     @CreatedBy
-    @Column(name="createdBy", nullable = false, updatable = false)
-    private Long createdBy;  
+    @Column(name = "createdBy", nullable = false, updatable = false)
+    private Long createdBy;
 
     @Override
     public String toString() {
-        return "Folders [FolderID=" + FolderID + ", Name=" + Name + ", ParentFolderID=" + ParentFolderID + "]";
+        return "Directory [folderID=" + folderID + ", name=" + name + ", parentFolderID=" + parentFolderID + "]";
     }
-
 }
