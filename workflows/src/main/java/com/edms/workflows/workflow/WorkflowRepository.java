@@ -1,8 +1,8 @@
-package com.edms.workflows.Workflows;
+package com.edms.workflows.workflow;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WorkflowsRepository extends JpaRepository<Workflows, Long> {
-}
+public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
+} 
