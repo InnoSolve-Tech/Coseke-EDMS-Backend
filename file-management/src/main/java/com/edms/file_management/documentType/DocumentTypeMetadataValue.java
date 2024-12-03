@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -15,21 +17,26 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocumentTypeMetadataValue {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_type_id")
-    private DocumentType documentType;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "type", nullable = false)
-    private String type;
+    private String type; // e.g., "text" or "select"
 
     @Column(name = "value")
-    private String value;
+    private String value; // For text type
+
+    @ElementCollection
+    @CollectionTable(name = "metadata_options", joinColumns = @JoinColumn(name = "metadata_id"))
+    @Column(name = "option_value")
+    private List<String> options; // For select type
+
+    @ManyToOne
+    @JoinColumn(name = "document_type_id", nullable = false)
+    private DocumentType documentType;
 }

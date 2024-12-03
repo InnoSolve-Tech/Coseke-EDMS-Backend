@@ -74,16 +74,13 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DocumentType {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
-
-    // Remove this line if it exists
-    // @Column(name = "created_by", nullable = false)
-    // private String createdBy;
 
     @OneToMany(mappedBy = "documentType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentTypeMetadataValue> metadata;
