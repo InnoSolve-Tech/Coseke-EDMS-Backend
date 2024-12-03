@@ -7,10 +7,11 @@ import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "edge")
 public class Edge {
     @Id
-    private String id;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String type;
     private Boolean animated;
     private String source;

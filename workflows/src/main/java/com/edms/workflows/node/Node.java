@@ -6,9 +6,11 @@ import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "node")
 public class Node {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
     private String type;
     
