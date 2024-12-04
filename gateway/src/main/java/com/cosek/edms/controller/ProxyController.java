@@ -50,17 +50,19 @@ public class ProxyController {
             // Send the proxied request
             return restTemplate.exchange(backendUrl, method, forwardedRequest, String.class);
         } catch (Exception e) {
+            // Log the full stack trace for debugging
+            e.printStackTrace();
             // Log and handle the error
             return ResponseEntity.status(500).body("Proxy error: " + e.getMessage());
         }
     }
 
     private String getBackendUrl(String path) {
-        // Determine which service to forward the request to based on the path
+        // Use the exact service names from docker-compose.yml
         if (path.startsWith("/file-management")) {
-            return "http://host.docker.internal:8081" + path;
+            return "http://file-management:8081" + path;
         } else if (path.startsWith("/workflows")) {
-            return "http://host.docker.internal:8082" + path;
+            return "http://workflows:8082" + path;
         } else {
             throw new IllegalArgumentException("Unknown service");
         }
