@@ -23,6 +23,14 @@ services:
       - "8082:8082" # Exposed port is different for staging
     networks:
       - edms-network
+  
+  tasks:
+    build:
+      context: ./tasks
+    ports:
+      - "8083:8083" # Exposed port is different for staging
+    networks:
+      - edms-network
 
 networks:
   edms-network:

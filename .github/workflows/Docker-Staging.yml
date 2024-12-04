@@ -31,5 +31,10 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-workflows:latest ./workflows
           docker push ${{ secrets.DOCKER_USERNAME }}/staging-workflows:latest
 
+      - name: Build and Push tasks Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-tasks:latest ./tasks
+          docker push ${{ secrets.DOCKER_USERNAME }}/staging-tasks:latest
+
       - name: Log out of Docker Hub
         run: docker logout
