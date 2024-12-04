@@ -63,6 +63,8 @@ public class ProxyController {
             return "http://file-management:8081" + path;
         } else if (path.startsWith("/workflows")) {
             return "http://workflows:8082" + path;
+        }  else if (path.startsWith("/tasks")) {
+            return "http://tasks:8083" + path;
         } else {
             throw new IllegalArgumentException("Unknown service");
         }
