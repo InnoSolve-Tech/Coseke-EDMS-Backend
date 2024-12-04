@@ -15,7 +15,9 @@ public class DocumentTypeService {
     @Autowired
     private DocumentTypeMetadataValueRepository metadataValueRepository;
 
+
     public DocumentType createDocumentType(DocumentType documentType) {
+        // Ensure each metadata item references the correct document type
         if (documentType.getMetadata() != null) {
             documentType.getMetadata().forEach(metadata -> metadata.setDocumentType(documentType));
         }

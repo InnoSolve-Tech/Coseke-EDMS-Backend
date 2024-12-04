@@ -15,17 +15,16 @@ public class DocumentTypeController {
     @Autowired
     private DocumentTypeService documentTypeService;
 
-    // Create a new document type
     @PostMapping("/create")
     public ResponseEntity<DocumentType> createDocumentType(@RequestBody DocumentType documentType) {
         DocumentType savedDocumentType = documentTypeService.createDocumentType(documentType);
         return ResponseEntity.ok(savedDocumentType);
     }
 
-    // Get all document types
     @GetMapping("/all")
     public ResponseEntity<List<DocumentType>> getAllDocumentTypes() {
-        return ResponseEntity.ok(documentTypeService.getAllDocumentTypes());
+        List<DocumentType> documentTypes = documentTypeService.getAllDocumentTypes();
+        return ResponseEntity.ok(documentTypes);
     }
 
     // Get a document type by ID
