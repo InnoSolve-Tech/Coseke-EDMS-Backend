@@ -7,6 +7,7 @@ services:
     depends_on:
       - file-management
       - workflows
+      - tasks
     networks:
       - edms-network
 
@@ -15,6 +16,8 @@ services:
       context: ./file-management
     ports:
       - "8081:8081" # Exposed port is different for staging
+    networks:
+      - edms-network
 
   workflows:
     build:

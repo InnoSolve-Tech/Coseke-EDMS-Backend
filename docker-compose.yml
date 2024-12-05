@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   edms-gateway:
     image: benzidarwin/gateway:latest
@@ -6,13 +8,31 @@ services:
     depends_on:
       - file-management
       - workflows
+      - tasks
+    networks:
+      - edms-network
 
   file-management:
     image: benzidarwin/file-management:latest
     ports:
       - "8081:8081"
+    networks:
+      - edms-network
 
   workflows:
     image: benzidarwin/workflows:latest
     ports:
       - "8082:8082"
+    networks:
+      - edms-network
+
+  tasks:
+    image: benzidarwin/tasks:latest
+    ports:
+      - "8083:8083"
+    networks:
+      - edms-network
+
+networks:
+  edms-network:
+    driver: bridge

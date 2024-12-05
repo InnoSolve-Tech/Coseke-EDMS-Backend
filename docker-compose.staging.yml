@@ -1,18 +1,38 @@
+version: "3.8"
+
 services:
   edms-gateway:
     image: benzidarwin/staging-gateway:latest
     ports:
-      - "8787:8787" # Exposed port is different for staging
+      - "8787:8787"
     depends_on:
       - file-management
       - workflows
+      - tasks
+    networks:
+      - edms-network
 
   file-management:
     image: benzidarwin/staging-file-management:latest
     ports:
-      - "8081:8081" # Exposed port is different for staging
+      - "8081:8081"
+    networks:
+      - edms-network
 
   workflows:
     image: benzidarwin/staging-workflows:latest
     ports:
-      - "8082:8082" # Exposed port is different for staging
+      - "8082:8082"
+    networks:
+      - edms-network
+
+  tasks:
+    image: benzidarwin/staging-tasks:latest
+    ports:
+      - "8083:8083"
+    networks:
+      - edms-network
+
+networks:
+  edms-network:
+    driver: bridge
