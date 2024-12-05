@@ -113,48 +113,36 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     }
 }
 
-@Override
- public void store(FileManager data, MultipartFile file) throws Exception {
+    public void store(FileManager data, MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
 
-        // Fetch or create the directory entity
-        Optional<Directory> directory = directoryRepository.findByName(data.getDocumentType());
-        FileManager fileManager;
-        if (directory.isPresent()) {
-            fileManager = FileManager.builder()
+        // Fetch the directory entity using folderID
+        Optional<Directory> directory = directoryRepository.findById(Long.valueOf(data.getFolderID()));
+        if (!directory.isPresent()) {
+            throw new Exception("Directory not found for folderID: " + data.getFolderID());
+        }
+
+        FileManager fileManager = FileManager.builder()
                 .documentType(data.getDocumentType())
                 .folderID(directory.get().getFolderID())
                 .filename(file.getOriginalFilename())
+                .documentName(data.getDocumentName())
+                .mimeType(data.getMimeType())
                 .metadata(data.getMetadata())
                 .build();
-            fileRepository.save(fileManager);
-        } else {
-            Directory newDirectory = Directory.builder().name(data.getDocumentType()).build();
-            newDirectory = directoryService.creaDirectoryWithName(newDirectory);
-            newDirectory.setParentFolderID((int) newDirectory.getFolderID());
-            directoryRepository.save(newDirectory);
-            fileManager = FileManager.builder()
-                .documentType(data.getDocumentType())
-                .folderID(newDirectory.getFolderID())
-                .filename(file.getOriginalFilename())
-                    .documentName(data.getDocumentName())
-                    .mimeType(data.getMimeType())
-                .metadata(data.getMetadata())
-                .build();
-            fileRepository.save(fileManager);
-
-        }
+        fileRepository.save(fileManager);
 
         // Generate the file hash
         String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
 
         // Resolve the destination file within the folder path
         Path destinationFile = Paths.get(this.rootLocation)
-            .resolve(hash + getFileExtension(file.getOriginalFilename()))
-            .normalize()
-            .toAbsolutePath();
+                .resolve(directory.get().getName())
+                .resolve(hash + getFileExtension(file.getOriginalFilename()))
+                .normalize()
+                .toAbsolutePath();
 
         // Create directories if they don't exist
         Files.createDirectories(destinationFile.getParent());

@@ -37,6 +37,7 @@ public class FileManager {
     private String hashName;
     private String fileLink;
     private String mimeType;
+
     @Convert(converter = JsonMapConverter.class)
     @Column(columnDefinition = "nvarchar(max)")
     private Map<String, Object> metadata;
@@ -56,5 +57,4 @@ public class FileManager {
     @CreatedBy
     @Column(name="createdBy", nullable = false, updatable = false)
     private Long createdBy;
-
 }

@@ -63,7 +63,7 @@ public class FileManagerController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PostMapping("/")
+    @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file) throws Exception {
         fileService.store(fileData, file);
         return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
