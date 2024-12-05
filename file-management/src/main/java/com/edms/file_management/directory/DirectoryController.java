@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/directories")
+@RequestMapping("/api/v1/folders")
 public class DirectoryController {
 
     @Autowired
