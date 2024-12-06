@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,69 +74,74 @@ public class FileManagerController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> handleFileUpload(
-            @RequestParam("filename") String filename,
-            @RequestParam("documentType") String documentType,
-            @RequestParam("documentName") String documentName,
-            @RequestParam("folderID") Integer folderID,
-            @RequestParam("metadata") String metadataJson,
-            @RequestParam("mimeType") String mimeType,
-            @RequestParam("fileContent") String fileContent
+            @RequestPart("filename") String filename,
+            @RequestPart("documentType") String documentType,
+            @RequestPart("documentName") String documentName,
+            @RequestPart("folderID") String folderID,
+            @RequestPart("metadata") String metadataJson,
+            @RequestPart("mimeType") String mimeType,
+            @RequestPart("fileContent") String fileContent
     ) throws Exception {
-        // Decode base64 file content
-        byte[] decodedFile = Base64.getDecoder().decode(fileContent);
+        try {
+            // Decode base64 file content
+            byte[] decodedFile = Base64.getDecoder().decode(fileContent);
 
-        // Create MultipartFile
-        MultipartFile multipartFile = new MultipartFile() {
-            @Override
-            public String getName() { return filename; }
+            // Create MultipartFile
+            MultipartFile multipartFile = new MultipartFile() {
+                @Override
+                public String getName() { return filename; }
 
-            @Override
-            public String getOriginalFilename() { return filename; }
+                @Override
+                public String getOriginalFilename() { return filename; }
 
-            @Override
-            public String getContentType() { return mimeType; }
+                @Override
+                public String getContentType() { return mimeType; }
 
-            @Override
-            public boolean isEmpty() { return decodedFile == null || decodedFile.length == 0; }
+                @Override
+                public boolean isEmpty() { return decodedFile == null || decodedFile.length == 0; }
 
-            @Override
-            public long getSize() { return decodedFile.length; }
+                @Override
+                public long getSize() { return decodedFile.length; }
 
-            @Override
-            public byte[] getBytes() throws IOException { return decodedFile; }
+                @Override
+                public byte[] getBytes() throws IOException { return decodedFile; }
 
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return new ByteArrayInputStream(decodedFile);
-            }
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new ByteArrayInputStream(decodedFile);
+                }
 
-            @Override
-            public void transferTo(File dest) throws IOException, IllegalStateException {
-                Files.write(dest.toPath(), decodedFile);
-            }
-        };
+                @Override
+                public void transferTo(File dest) throws IOException, IllegalStateException {
+                    Files.write(dest.toPath(), decodedFile);
+                }
+            };
 
-        // Parse metadata
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> metadata = objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
+            // Parse metadata
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> metadata = objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
 
-        // Create FileManager object
-        FileManager fileManager = FileManager.builder()
-                .documentType(documentType)
-                .folderID(folderID)
-                .filename(filename)
-                .documentName(documentName)
-                .mimeType(mimeType)
-                .metadata(metadata)
-                .build();
+            // Create FileManager object
+            FileManager fileManager = FileManager.builder()
+                    .documentType(documentType)
+                    .folderID(Integer.parseInt(folderID))
+                    .filename(filename)
+                    .documentName(documentName)
+                    .mimeType(mimeType)
+                    .metadata(metadata)
+                    .build();
 
-        // Store the file
-        fileService.store(fileManager, multipartFile);
+            // Store the file
+            fileService.store(fileManager, multipartFile);
 
-        return ResponseEntity.ok().body("Successfully uploaded " + filename);
+            return ResponseEntity.ok().body("Successfully uploaded " + filename);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Upload failed: " + e.getMessage());
+        }
     }
+
     @PostMapping("/{folderId}")
     public ResponseEntity<String> handleFileUploadById(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file, @PathVariable("folderId") Long folderId) throws Exception {
         fileService.storeById(fileData, file, folderId);
