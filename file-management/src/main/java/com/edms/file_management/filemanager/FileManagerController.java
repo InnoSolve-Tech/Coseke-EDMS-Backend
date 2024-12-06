@@ -82,16 +82,13 @@ public class FileManagerController {
             @RequestParam("folderID") String folderID,
             @RequestParam("metadata") String metadataJson,
             @RequestParam("mimeType") String mimeType,
-            @RequestParam("fileContent") String fileContent,
             @RequestParam("file") MultipartFile file
     ) {
         try {
-            // Decode base64 file content (if needed)
-            byte[] decodedFile = Base64.getDecoder().decode(fileContent);
-
             // Parse metadata
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> metadata = objectMapper.readValue(metadataJson, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> metadata = objectMapper.readValue(metadataJson,
+                    new TypeReference<Map<String, Object>>() {});
 
             // Create FileManager object
             FileManager fileManager = FileManager.builder()
@@ -106,9 +103,13 @@ public class FileManagerController {
             // Store the file
             fileService.store(fileManager, file);
 
-            return ResponseEntity.ok().body(Map.of("message", "Successfully uploaded " + filename));
+            return ResponseEntity.ok().body(Map.of(
+                    "message", "Successfully uploaded " + filename,
+                    "fileId", fileManager.getId()
+            ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
+            e.printStackTrace(); // For debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "error", "Upload failed",
                     "details", e.getMessage()
             ));
