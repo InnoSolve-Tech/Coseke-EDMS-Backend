@@ -75,49 +75,19 @@ public class FileManagerController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> handleFileUpload(
-            @RequestPart("filename") String filename,
-            @RequestPart("documentType") String documentType,
-            @RequestPart("documentName") String documentName,
-            @RequestPart("folderID") String folderID,
-            @RequestPart("metadata") String metadataJson,
-            @RequestPart("mimeType") String mimeType,
-            @RequestPart("fileContent") String fileContent
-    ) throws Exception {
+    public ResponseEntity<?> handleFileUpload(
+            @RequestParam("filename") String filename,
+            @RequestParam("documentType") String documentType,
+            @RequestParam("documentName") String documentName,
+            @RequestParam("folderID") String folderID,
+            @RequestParam("metadata") String metadataJson,
+            @RequestParam("mimeType") String mimeType,
+            @RequestParam("fileContent") String fileContent,
+            @RequestParam("file") MultipartFile file
+    ) {
         try {
-            // Decode base64 file content
+            // Decode base64 file content (if needed)
             byte[] decodedFile = Base64.getDecoder().decode(fileContent);
-
-            // Create MultipartFile
-            MultipartFile multipartFile = new MultipartFile() {
-                @Override
-                public String getName() { return filename; }
-
-                @Override
-                public String getOriginalFilename() { return filename; }
-
-                @Override
-                public String getContentType() { return mimeType; }
-
-                @Override
-                public boolean isEmpty() { return decodedFile == null || decodedFile.length == 0; }
-
-                @Override
-                public long getSize() { return decodedFile.length; }
-
-                @Override
-                public byte[] getBytes() throws IOException { return decodedFile; }
-
-                @Override
-                public InputStream getInputStream() throws IOException {
-                    return new ByteArrayInputStream(decodedFile);
-                }
-
-                @Override
-                public void transferTo(File dest) throws IOException, IllegalStateException {
-                    Files.write(dest.toPath(), decodedFile);
-                }
-            };
 
             // Parse metadata
             ObjectMapper objectMapper = new ObjectMapper();
@@ -134,11 +104,14 @@ public class FileManagerController {
                     .build();
 
             // Store the file
-            fileService.store(fileManager, multipartFile);
+            fileService.store(fileManager, file);
 
-            return ResponseEntity.ok().body("Successfully uploaded " + filename);
+            return ResponseEntity.ok().body(Map.of("message", "Successfully uploaded " + filename));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Upload failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Upload failed",
+                    "details", e.getMessage()
+            ));
         }
     }
 
