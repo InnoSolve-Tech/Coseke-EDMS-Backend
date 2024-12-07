@@ -8,4 +8,5 @@ import lombok.Data;
 public class NodeData {
     private String label;
     private String description;
+    private String nodeId;
 } 

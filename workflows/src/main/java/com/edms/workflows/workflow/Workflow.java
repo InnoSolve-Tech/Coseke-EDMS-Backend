@@ -1,5 +1,6 @@
 package com.edms.workflows.workflow;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
@@ -8,6 +9,7 @@ import com.edms.workflows.edge.Edge;
 
 @Entity
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Workflow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

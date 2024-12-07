@@ -1,6 +1,8 @@
 package com.edms.workflows.node;
 
 import com.edms.workflows.workflow.Workflow;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -9,8 +11,7 @@ import lombok.Data;
 @Table(name = "node")
 public class Node {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     
     private String type;
     
@@ -35,5 +36,6 @@ public class Node {
     
     @ManyToOne
     @JoinColumn(name = "workflow_id")
+    @JsonIgnore
     private Workflow workflow;
 } 

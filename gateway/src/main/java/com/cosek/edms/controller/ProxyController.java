@@ -2,14 +2,8 @@ package com.cosek.edms.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
@@ -23,15 +17,21 @@ public class ProxyController {
 
     public ProxyController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+        
     }
 
     @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
-    public ResponseEntity<String> proxyRequest(HttpServletRequest request, HttpEntity<String> httpEntity) {
+    public ResponseEntity<String> proxyRequest(HttpServletRequest request, @RequestBody(required = false) String body) {
         try {
-            // Forward the request method
-            HttpMethod method = HttpMethod.valueOf(request.getMethod());
+            // Extract HTTP method
+            HttpMethod method;
+            try {
+                method = HttpMethod.valueOf(request.getMethod());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Unsupported HTTP method: " + request.getMethod());
+            }
 
-            // Construct the backend URL
+            // Construct backend URL
             String path = request.getRequestURI();
             String backendUrl = getBackendUrl(path);
 
@@ -40,33 +40,42 @@ public class ProxyController {
                 backendUrl += "?" + queryString;
             }
 
-            // Include headers and body from the incoming request
+            // Prepare headers
             HttpHeaders headers = new HttpHeaders();
-            headers.putAll(httpEntity.getHeaders()); // Copy all headers from incoming request
-            headers.set("X-Proxy-Secret", proxySecret); // Add custom proxy secret header if needed
+            request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+                headers.add(headerName, request.getHeader(headerName));
+            });
+            headers.set("X-Proxy-Secret", proxySecret);
 
-            HttpEntity<String> forwardedRequest = new HttpEntity<>(httpEntity.getBody(), headers);
+            // Prepare forwarded request
+            HttpEntity<String> forwardedRequest = new HttpEntity<>(body, headers);
 
-            // Send the proxied request
+            // Execute proxied request
+            System.out.println("Forwarding request to: " + backendUrl);
+            System.out.println("HTTP Method: " + method);
+            System.out.println("Forwarded Request: " + forwardedRequest);
             return restTemplate.exchange(backendUrl, method, forwardedRequest, String.class);
-        } catch (Exception e) {
-            // Log the full stack trace for debugging
+
+        } catch (IllegalArgumentException e) {
+            // Log known issues
             e.printStackTrace();
-            // Log and handle the error
-            return ResponseEntity.status(500).body("Proxy error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid proxy configuration: " + e.getMessage());
+        } catch (Exception e) {
+            // Log unexpected issues
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Proxy error: " + e.getMessage());
         }
     }
 
     private String getBackendUrl(String path) {
-        // Use the exact service names from docker-compose.yml
         if (path.startsWith("/file-management")) {
             return "http://file-management:8081" + path;
         } else if (path.startsWith("/workflows")) {
             return "http://workflows:8082" + path;
-        }  else if (path.startsWith("/tasks")) {
+        } else if (path.startsWith("/tasks")) {
             return "http://tasks:8083" + path;
         } else {
-            throw new IllegalArgumentException("Unknown service");
+            throw new IllegalArgumentException("Unknown service path: " + path);
         }
     }
 }
