@@ -18,9 +18,9 @@ public class Workflow {
     private String name;
     private String description;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workflow")
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Node> nodes;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workflow")
-    private List<Edge> edges;
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Edge> edges;    
 } 

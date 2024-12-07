@@ -6,12 +6,17 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.edms.workflows.node.NodeRepository;
+import com.edms.workflows.edge.EdgeRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
+    private final NodeRepository nodeRepository;
+    private final EdgeRepository edgeRepository;
 
     @Transactional
     public Workflow createWorkflow(Workflow workflow) {
@@ -42,27 +47,43 @@ public class WorkflowService {
         // Fetch the existing workflow
         Workflow existingWorkflow = workflowRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Workflow not found"));
-
+    
         // Update properties
         existingWorkflow.setName(updatedWorkflow.getName());
         existingWorkflow.setDescription(updatedWorkflow.getDescription());
-
+    
         // Update nodes
         if (updatedWorkflow.getNodes() != null) {
-            updatedWorkflow.getNodes().forEach(node -> node.setWorkflow(existingWorkflow));
-            existingWorkflow.setNodes(updatedWorkflow.getNodes());
+            // Remove nodes that are no longer in the updated list
+            existingWorkflow.getNodes().removeIf(node -> !updatedWorkflow.getNodes().contains(node));
+            
+            // Add new nodes from updatedWorkflow to existingWorkflow
+            updatedWorkflow.getNodes().forEach(node -> {
+                if (!existingWorkflow.getNodes().contains(node)) {
+                    existingWorkflow.getNodes().add(node);
+                    node.setWorkflow(existingWorkflow);  // Make sure the bidirectional relationship is maintained
+                }
+            });
         }
-
+    
         // Update edges
         if (updatedWorkflow.getEdges() != null) {
-            updatedWorkflow.getEdges().forEach(edge -> edge.setWorkflow(existingWorkflow));
-            existingWorkflow.setEdges(updatedWorkflow.getEdges());
+            // Remove edges that are no longer in the updated list
+            existingWorkflow.getEdges().removeIf(edge -> !updatedWorkflow.getEdges().contains(edge));
+            
+            // Add new edges from updatedWorkflow to existingWorkflow
+            updatedWorkflow.getEdges().forEach(edge -> {
+                if (!existingWorkflow.getEdges().contains(edge)) {
+                    existingWorkflow.getEdges().add(edge);
+                    edge.setWorkflow(existingWorkflow);  // Make sure the bidirectional relationship is maintained
+                }
+            });
         }
-
+    
         // Save and return the updated workflow
         return workflowRepository.save(existingWorkflow);
     }
-
+    
     @Transactional
     public HashMap<String,String> deleteWorkflow(Long id) {
         workflowRepository.deleteById(id);
