@@ -1,6 +1,7 @@
 package com.edms.file_management.filemanager;
 
 import com.edms.file_management.documentType.DocumentType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -76,27 +77,35 @@ public class FileManagerController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> handleFileUpload(
-            @RequestParam("filename") String filename,
-            @RequestParam("documentType") String documentType,
-            @RequestParam("documentName") String documentName,
-            @RequestParam("folderID") String folderID,
-            @RequestParam("metadata") String metadataJson,
-            @RequestParam("mimeType") String mimeType,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("metadata") String metadataJson
     ) {
         try {
-            // Parse metadata
+            // Validate file is not empty
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "File cannot be empty"
+                ));
+            }
+
+            // Validate file size (e.g., max 10MB)
+            if (file.getSize() > 10 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "File size exceeds 10MB limit"
+                ));
+            }
+
+            // Parse metadata with validation
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> metadata = objectMapper.readValue(metadataJson,
                     new TypeReference<Map<String, Object>>() {});
 
-            // Create FileManager object
+            // Create FileManager object with robust defaults
             FileManager fileManager = FileManager.builder()
-                    .documentType(documentType)
-                    .folderID(Integer.parseInt(folderID))
-                    .filename(filename)
-                    .documentName(documentName)
-                    .mimeType(mimeType)
+                    .filename(sanitizeFilename(file.getOriginalFilename()))
+                    .documentType(metadata.getOrDefault("company name", "Unspecified").toString())
+                    .documentName(metadata.getOrDefault("description", file.getOriginalFilename()).toString())
+                    .mimeType(file.getContentType())
                     .metadata(metadata)
                     .build();
 
@@ -104,16 +113,27 @@ public class FileManagerController {
             fileService.store(fileManager, file);
 
             return ResponseEntity.ok().body(Map.of(
-                    "message", "Successfully uploaded " + filename,
+                    "message", "Successfully uploaded " + fileManager.getFilename(),
                     "fileId", fileManager.getId()
             ));
-        } catch (Exception e) {
-            e.printStackTrace(); // For debugging
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "error", "Upload failed",
+
+        } catch (JsonProcessingException e) {
+            // Specific handling for metadata parsing errors
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Invalid metadata format",
                     "details", e.getMessage()
             ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "error", "Upload failed",
+                    "details", "An unexpected error occurred"
+            ));
         }
+    }
+
+    // Helper method to sanitize filename
+    private String sanitizeFilename(String originalFilename) {
+        return originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
     }
 
     @PostMapping("/{folderId}")
