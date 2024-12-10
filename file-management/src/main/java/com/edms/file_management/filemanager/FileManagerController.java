@@ -78,7 +78,7 @@ public class FileManagerController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(
-            @RequestParam("file") MultipartFile file,
+            @RequestParam("file") String binaryString,
             @RequestParam("author") String author,
             @RequestParam("version") String version,
             @RequestParam("description") String description,
@@ -88,6 +88,50 @@ public class FileManagerController {
             @RequestParam("mimeType") String mimeType,
             @RequestParam("hashName") String hashName
     ) throws Exception {
+        // Convert binary string to MultipartFile
+        byte[] fileBytes = Base64.getDecoder().decode(binaryString);
+        MultipartFile file = new MultipartFile() {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return "";
+            }
+
+            @Override
+            public String getContentType() {
+                return "";
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
+
         // Create FileManager object with the received metadata
         FileManager fileData = FileManager.builder()
                 .documentType(companyName)
@@ -107,9 +151,8 @@ public class FileManagerController {
         // Call service to store the file
         fileService.store(fileData, file);
 
-        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
+        return ResponseEntity.ok().body("You successfully uploaded " + hashName + "!");
     }
-
 
     // Helper method to sanitize filename
     private String sanitizeFilename(String originalFilename) {
