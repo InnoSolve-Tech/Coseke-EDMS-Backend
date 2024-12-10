@@ -35,6 +35,14 @@ services:
     networks:
       - edms-network
 
+  forms:
+    build:
+      context: ./forms
+    ports:
+      - "8084:8084" # Exposed port is different for staging
+    networks:
+      - edms-network
+
 networks:
   edms-network:
     driver: bridge

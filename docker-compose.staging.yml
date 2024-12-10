@@ -33,6 +33,13 @@ services:
     networks:
       - edms-network
 
+  forms:
+    image: benzidarwin/staging-forms:latest
+    ports:
+      - "8084:8084"
+    networks:
+      - edms-network
+
 networks:
   edms-network:
     driver: bridge
