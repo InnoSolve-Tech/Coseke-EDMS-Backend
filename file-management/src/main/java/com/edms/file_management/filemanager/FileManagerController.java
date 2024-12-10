@@ -1,6 +1,7 @@
 package com.edms.file_management.filemanager;
 
 import com.edms.file_management.documentType.DocumentType;
+import com.edms.file_management.helper.CustomMultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,72 +88,45 @@ public class FileManagerController {
             @RequestParam("folderID") String folderID,
             @RequestParam("mimeType") String mimeType,
             @RequestParam("hashName") String hashName
-    ) throws Exception {
-        // Convert binary string to MultipartFile
-        byte[] fileBytes = Base64.getDecoder().decode(binaryString);
-        MultipartFile file = new MultipartFile() {
-            @Override
-            public String getName() {
-                return "";
-            }
+    ) {
+        try {
+            // Decode Base64 to byte array
+            byte[] fileBytes = Base64.getDecoder().decode(binaryString);
 
-            @Override
-            public String getOriginalFilename() {
-                return "";
-            }
+            // Create CustomMultipartFile
+            MultipartFile file = new CustomMultipartFile(
+                    hashName, // name
+                    hashName, // originalFilename
+                    mimeType, // contentType
+                    fileBytes // file content
+            );
 
-            @Override
-            public String getContentType() {
-                return "";
-            }
+            // Create FileManager object
+            FileManager fileData = FileManager.builder()
+                    .documentType(companyName)
+                    .documentName(hashName)
+                    .mimeType(mimeType)
+                    .folderID(Integer.parseInt(folderID))
+                    .hashName(hashName)
+                    .metadata(Map.of(
+                            "author", author,
+                            "version", version,
+                            "description", description,
+                            "tags", tags,
+                            "folderID", folderID
+                    ))
+                    .build();
 
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
+            // Store file
+            fileService.store(fileData, file);
 
-            @Override
-            public long getSize() {
-                return 0;
-            }
-
-            @Override
-            public byte[] getBytes() throws IOException {
-                return new byte[0];
-            }
-
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return null;
-            }
-
-            @Override
-            public void transferTo(File dest) throws IOException, IllegalStateException {
-
-            }
-        };
-
-        // Create FileManager object with the received metadata
-        FileManager fileData = FileManager.builder()
-                .documentType(companyName)
-                .documentName(hashName)
-                .mimeType(mimeType)
-                .folderID(Integer.parseInt(folderID))
-                .hashName(hashName)
-                .metadata(Map.of(
-                        "author", author,
-                        "version", version,
-                        "description", description,
-                        "tags", tags,
-                        "folderID", folderID
-                ))
-                .build();
-
-        // Call service to store the file
-        fileService.store(fileData, file);
-
-        return ResponseEntity.ok().body("You successfully uploaded " + hashName + "!");
+            return ResponseEntity.ok().body("You successfully uploaded " + hashName + "!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("File upload failed: " + e.getMessage());
+        }
     }
+
 
     // Helper method to sanitize filename
     private String sanitizeFilename(String originalFilename) {
