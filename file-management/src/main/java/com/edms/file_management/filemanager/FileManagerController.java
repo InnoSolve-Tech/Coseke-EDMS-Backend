@@ -75,61 +75,41 @@ public class FileManagerController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> handleFileUpload(
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> handleFileUpload(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("metadata") String metadataJson
-    ) {
-        try {
-            // Validate file is not empty
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "error", "File cannot be empty"
-                ));
-            }
+            @RequestParam("author") String author,
+            @RequestParam("version") String version,
+            @RequestParam("description") String description,
+            @RequestParam("tags") String tags,
+            @RequestParam("company_name") String companyName,
+            @RequestParam("folderID") String folderID,
+            @RequestParam("mimeType") String mimeType,
+            @RequestParam("hashName") String hashName
+    ) throws Exception {
+        // Create FileManager object with the received metadata
+        FileManager fileData = FileManager.builder()
+                .documentType(companyName)
+                .documentName(hashName)
+                .mimeType(mimeType)
+                .folderID(Integer.parseInt(folderID))
+                .hashName(hashName)
+                .metadata(Map.of(
+                        "author", author,
+                        "version", version,
+                        "description", description,
+                        "tags", tags,
+                        "folderID", folderID
+                ))
+                .build();
 
-            // Validate file size (e.g., max 10MB)
-            if (file.getSize() > 10 * 1024 * 1024) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "error", "File size exceeds 10MB limit"
-                ));
-            }
+        // Call service to store the file
+        fileService.store(fileData, file);
 
-            // Parse metadata with validation
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> metadata = objectMapper.readValue(metadataJson,
-                    new TypeReference<Map<String, Object>>() {});
-
-            // Create FileManager object with robust defaults
-            FileManager fileManager = FileManager.builder()
-                    .filename(sanitizeFilename(file.getOriginalFilename()))
-                    .documentType(metadata.getOrDefault("company name", "Unspecified").toString())
-                    .documentName(metadata.getOrDefault("description", file.getOriginalFilename()).toString())
-                    .mimeType(file.getContentType())
-                    .metadata(metadata)
-                    .build();
-
-            // Store the file
-            fileService.store(fileManager, file);
-
-            return ResponseEntity.ok().body(Map.of(
-                    "message", "Successfully uploaded " + fileManager.getFilename(),
-                    "fileId", fileManager.getId()
-            ));
-
-        } catch (JsonProcessingException e) {
-            // Specific handling for metadata parsing errors
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", "Invalid metadata format",
-                    "details", e.getMessage()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "error", "Upload failed",
-                    "details", "An unexpected error occurred"
-            ));
-        }
+        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
+
 
     // Helper method to sanitize filename
     private String sanitizeFilename(String originalFilename) {
