@@ -9,14 +9,15 @@ import java.io.File;
 @ConfigurationProperties("storage")
 public class StorageProperties {
 
-	private String location = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "test";
+    private String location = System.getenv("STORAGE_LOCATION") != null ?
+        System.getenv("STORAGE_LOCATION") : "/app/storage"; // Default to the mapped Docker volume location
 
-	public String getLocation() {
-		return location;
-	}
+    public String getLocation() {
+        return location;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
 }

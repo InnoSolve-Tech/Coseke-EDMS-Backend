@@ -1,22 +1,5 @@
 package com.edms.file_management.filemanager;
 
-import com.edms.file_management.config.StorageProperties;
-import com.edms.file_management.directory.Directory;
-import com.edms.file_management.directory.DirectoryRepository;
-import com.edms.file_management.directory.DirectoryService;
-import com.edms.file_management.documentType.DocumentType;
-import com.edms.file_management.exception.ResourceNotFoundException;
-import com.edms.file_management.helper.EncryptionUtil;
-import com.edms.file_management.helper.HashUtil;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,6 +11,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.edms.file_management.config.StorageProperties;
+import com.edms.file_management.directory.Directory;
+import com.edms.file_management.directory.DirectoryRepository;
+import com.edms.file_management.directory.DirectoryService;
+import com.edms.file_management.exception.ResourceNotFoundException;
+import com.edms.file_management.helper.EncryptionUtil;
+import com.edms.file_management.helper.HashUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.transaction.Transactional;
 
 
 
@@ -45,8 +46,8 @@ public class FileManagerService implements StorageService  {
 
    @Autowired
    private FileManagerRepository fileRepository;
-
-   private final SecretKey secretKey;
+    @Autowired
+   private final ObjectMapper objectMapper;
 
 	@Autowired
 	public FileManagerService(StorageProperties properties) throws Exception {
@@ -54,7 +55,7 @@ public class FileManagerService implements StorageService  {
             throw new Exception("File upload location can not be Empty."); 
         }
 		this.rootLocation = properties.getLocation();
-        this.secretKey = EncryptionUtil.generateOrLoadSecretKey();
+        objectMapper = new ObjectMapper();
 	}
 
 	@Override
@@ -372,6 +373,15 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         Optional<List<FileManager>> optionalFiles = fileRepository.searchFiles(keyword);
         return optionalFiles.orElseThrow(() -> new ResourceNotFoundException("No files found with keyword: " + keyword));
 
+    }
+
+    public FileManager convertStringToDataManager(String fileData) {
+        try {
+            // Convert the JSON string to a FileManager object
+            return objectMapper.readValue(fileData, FileManager.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error converting JSON string to FileManager: " + e.getMessage(), e);
+        }
     }
 
 }

@@ -3,21 +3,23 @@ package com.cosek.edms.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.logging.Logger;
 
 @RestController
 @CrossOrigin(origins = "*")
 public class ProxyController {
+
+    private static final Logger logger = Logger.getLogger(ProxyController.class.getName());
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -33,104 +35,102 @@ public class ProxyController {
     @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
     public ResponseEntity<String> proxyRequest(HttpServletRequest request) {
         try {
-            // Handle multipart requests (file uploads)
             if (request instanceof MultipartHttpServletRequest) {
-                MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+                return handleMultipartRequest((MultipartHttpServletRequest) request);
+            } else {
+                return handleStandardRequest(request);
+            }
+        } catch (IOException e) {
+            logger.severe("Proxy error: File processing failed - " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Proxy error: File processing failed - " + e.getMessage());
+        } catch (Exception e) {
+            logger.severe("Proxy error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Proxy error: " + e.getMessage());
+        }
+    }
 
-                // Extract HTTP method
-                HttpMethod method = HttpMethod.valueOf(request.getMethod());
+    private ResponseEntity<String> handleMultipartRequest(MultipartHttpServletRequest request) throws IOException {
+        HttpMethod method = HttpMethod.valueOf(request.getMethod());
+        String path = request.getRequestURI();
+        String backendUrl = getBackendUrl(path);
 
-                // Construct backend URL
-                String path = request.getRequestURI();
-                String backendUrl = getBackendUrl(path);
+        // Append query parameters to the backend URL if any
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            backendUrl += "?" + queryString;
+        }
 
-                String queryString = request.getQueryString();
-                if (queryString != null) {
-                    backendUrl += "?" + queryString;
-                }
+        // Prepare headers
+        HttpHeaders headers = new HttpHeaders();
+        request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+            headers.add(headerName, request.getHeader(headerName));
+        });
+        headers.set("X-Proxy-Secret", proxySecret);
 
-                // Prepare headers
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-                
-                Enumeration<String> headerNames = request.getHeaderNames();
-                while (headerNames.hasMoreElements()) {
-                    String headerName = headerNames.nextElement();
-                    headers.add(headerName, request.getHeader(headerName));
-                }
-                headers.set("X-Proxy-Secret", proxySecret);
+        // Prepare multipart data
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        request.getMultiFileMap().forEach((key, files) -> {
+            for (MultipartFile file : files) {
+                try {
+                    body.add(key, new InputStreamResource(file.getInputStream()) {
+                        @Override
+                        public long contentLength() {
+                            return file.getSize();
+                        }
 
-                // Create MultiValueMap for request parts
-                MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-                // Get fileData and file
-                String fileDataJson = multipartRequest.getParameter("fileData");
-                MultipartFile file = multipartRequest.getFile("file");
-
-                if (fileDataJson != null && file != null) {
-                    // Convert file to ByteArrayResource to ensure full data transmission
-                    ByteArrayResource fileResource = new ByteArrayResource(file.getBytes()) {
                         @Override
                         public String getFilename() {
                             return file.getOriginalFilename();
                         }
-                    };
-
-                    // Add fileData as JSON string
-                    body.add("fileData", fileDataJson);
-                    
-                    // Add file part using ByteArrayResource
-                    body.add("file", fileResource);
-                } else {
-                    throw new IllegalArgumentException("Missing fileData or file in the request");
+                    });
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-
-                // Prepare HttpEntity with the MultiValueMap
-                HttpEntity<MultiValueMap<String, Object>> forwardedRequest = new HttpEntity<>(body, headers);
-
-                // Forward the multipart request to the backend
-                ResponseEntity<String> response = restTemplate.exchange(backendUrl, method, forwardedRequest, String.class);
-
-                // Log the response for debugging
-                System.out.println("Backend Response Status: " + response.getStatusCode());
-                System.out.println("Backend Response Body: " + response.getBody());
-
-                return response;
-
-            } else {
-                // Existing non-multipart request handling remains the same
-                HttpMethod method = HttpMethod.valueOf(request.getMethod());
-                String path = request.getRequestURI();
-                String backendUrl = getBackendUrl(path);
-
-                String queryString = request.getQueryString();
-                if (queryString != null) {
-                    backendUrl += "?" + queryString;
-                }
-
-                // Prepare headers
-                HttpHeaders headers = new HttpHeaders();
-                request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
-                    headers.add(headerName, request.getHeader(headerName));
-                });
-                headers.set("X-Proxy-Secret", proxySecret);
-
-                // Prepare forwarded request
-                HttpEntity<String> forwardedRequest = new HttpEntity<>(null, headers);
-
-                // Execute proxied request
-                return restTemplate.exchange(backendUrl, method, forwardedRequest, String.class);
             }
+        });
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Proxy error: File processing failed - " + e.getMessage());
+        request.getParameterMap().forEach((key, values) -> {
+            for (String value : values) {
+                body.add(key, value);
+            }
+        });
+
+        // Forward the multipart request
+        HttpEntity<MultiValueMap<String, Object>> forwardedRequest = new HttpEntity<>(body, headers);
+        try {
+            return restTemplate.exchange(backendUrl, method, forwardedRequest, String.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.severe("Error while forwarding multipart request: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Proxy error: " + e.getMessage());
+                    .body("Error while forwarding multipart request: " + e.getMessage());
         }
+    }
+
+    private ResponseEntity<String> handleStandardRequest(HttpServletRequest request) {
+        HttpMethod method = HttpMethod.valueOf(request.getMethod());
+        String path = request.getRequestURI();
+        String backendUrl = getBackendUrl(path);
+
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            backendUrl += "?" + queryString;
+        }
+
+        // Prepare headers
+        HttpHeaders headers = new HttpHeaders();
+        request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+            headers.add(headerName, request.getHeader(headerName));
+        });
+        headers.set("X-Proxy-Secret", proxySecret);
+
+        // Prepare forwarded request
+        HttpEntity<String> forwardedRequest = new HttpEntity<>(null, headers);
+
+        // Execute proxied request
+        return restTemplate.exchange(backendUrl, method, forwardedRequest, String.class);
     }
 
     private String getBackendUrl(String path) {

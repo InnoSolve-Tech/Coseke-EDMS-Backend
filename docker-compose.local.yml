@@ -14,6 +14,10 @@ services:
   file-management:
     build:
       context: ./file-management
+    environment:
+      - STORAGE_LOCATION=/app/storage
+    volumes:
+      - ./storage:/app/storage
     ports:
       - "8081:8081" # Exposed port is different for staging
     networks:
