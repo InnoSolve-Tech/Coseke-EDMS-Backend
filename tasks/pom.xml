@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.edms</groupId>
-	<artifactId>file-management</artifactId>
+	<artifactId>tasks</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>file-management</name>
+	<name>tasks</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
