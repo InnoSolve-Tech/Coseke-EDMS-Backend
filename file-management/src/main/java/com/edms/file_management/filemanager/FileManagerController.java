@@ -78,55 +78,11 @@ public class FileManagerController {
 
 
     @PostMapping("/upload")
-    public ResponseEntity<String> handleFileUpload(
-            @RequestParam("file") String binaryString,
-            @RequestParam("author") String author,
-            @RequestParam("version") String version,
-            @RequestParam("description") String description,
-            @RequestParam("tags") String tags,
-            @RequestParam("company_name") String companyName,
-            @RequestParam("folderID") String folderID,
-            @RequestParam("mimeType") String mimeType,
-            @RequestParam("hashName") String hashName
-    ) {
-        try {
-            // Decode Base64 to byte array
-            byte[] fileBytes = Base64.getDecoder().decode(binaryString);
-
-            // Create CustomMultipartFile
-            MultipartFile file = new CustomMultipartFile(
-                    hashName, // name
-                    hashName, // originalFilename
-                    mimeType, // contentType
-                    fileBytes // file content
-            );
-
-            // Create FileManager object
-            FileManager fileData = FileManager.builder()
-                    .documentType(companyName)
-                    .documentName(hashName)
-                    .mimeType(mimeType)
-                    .folderID(Integer.parseInt(folderID))
-                    .hashName(hashName)
-                    .metadata(Map.of(
-                            "author", author,
-                            "version", version,
-                            "description", description,
-                            "tags", tags,
-                            "folderID", folderID
-                    ))
-                    .build();
-
-            // Store file
-            fileService.store(fileData, file);
-
-            return ResponseEntity.ok().body("You successfully uploaded " + hashName + "!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("File upload failed: " + e.getMessage());
-        }
+    public ResponseEntity<String> handleFileUpload(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file) throws Exception {
+        fileService.store(fileData, file);
+        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
-
+    
 
     // Helper method to sanitize filename
     private String sanitizeFilename(String originalFilename) {
