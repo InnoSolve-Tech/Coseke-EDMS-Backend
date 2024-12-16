@@ -17,7 +17,6 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
    private String title;
-   private int  amount;
    private LocalDateTime date;
    private  String status;
    private String priority;
@@ -27,5 +26,7 @@ public class Task {
    private String timelineReason;
    private String assignees;
    private String roles;
+   private String deadline;
+
 
 }

@@ -27,8 +27,8 @@ public class TaskService {
                 .map(task -> {
                     task.setTitle(taskDetails.getTitle());
                     task.setDate(taskDetails.getDate());
+                    task.setDeadline(taskDetails.getDeadline());
                     task.setStatus(taskDetails.getStatus());
-                    task.setAmount(taskDetails.getAmount());
                     task.setDescription(taskDetails.getDescription());
                     task.setPriority(taskDetails.getPriority());
                     task.setAssignees(taskDetails.getAssignees());
