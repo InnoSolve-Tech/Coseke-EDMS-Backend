@@ -18,7 +18,7 @@ public class TaskController {
     @Autowired
     private final TaskRepository taskRepository;
 
-    @PostMapping("create")
+    @PostMapping("/create")
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         Task createdTask = taskService.createTask(task);
         if (task.getStatus() == null || task.getStatus().isEmpty()) {
@@ -28,7 +28,7 @@ public class TaskController {
         return ResponseEntity.ok(createdTask);
     }
 
-    @GetMapping("all")
+    @GetMapping("/all")
     public List<Task> getAllTask() {
         return taskService.getAllTask();
     }
