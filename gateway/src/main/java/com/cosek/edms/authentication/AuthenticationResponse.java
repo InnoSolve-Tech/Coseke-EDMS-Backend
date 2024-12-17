@@ -13,6 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 public class AuthenticationResponse {
+    private Long id;
     private String token;
     private String first_name;
     private String last_name;

@@ -23,6 +23,9 @@ services:
     image: benzidarwin/workflows:latest
     ports:
       - "8082:8082"
+    environment:
+      - STORAGE_LOCATION=/app/storage
+      - SECRET_KEY=/app/key/keyfile.key
     networks:
       - edms-network
 

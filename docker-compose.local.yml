@@ -16,8 +16,10 @@ services:
       context: ./file-management
     environment:
       - STORAGE_LOCATION=/app/storage
+      - SECRET_KEY=/app/key/keyfile.key
     volumes:
       - ./storage:/app/storage
+      - ./key:/app/key
     ports:
       - "8081:8081" # Exposed port is different for staging
     networks:

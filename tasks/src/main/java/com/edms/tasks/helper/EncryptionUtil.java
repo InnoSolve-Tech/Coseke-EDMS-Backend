@@ -15,7 +15,8 @@ public class EncryptionUtil {
 
     private static final String ALGORITHM = "AES";
     private static final int KEY_SIZE = 256;
-    private static final String KEY_FILE_PATH = "./secrets/keyfile.key"; // Example path, adjust as necessary
+    private static final String KEY_FILE_PATH = System.getenv("SECRET_KEY") != null ?
+    System.getenv("SECRET_KEY") : "/app/key/keyfile.key"; // Example path, adjust as necessary
 
     private static final SecretKey secretKey;
 
@@ -34,8 +35,8 @@ public class EncryptionUtil {
                 byte[] keyBytes = Files.readAllBytes(keyFilePath);
                 secretKey = getSecretKey(keyBytes);
             } else {
-                secretKey = generateOrLoadSecretKey(); // Generate new key if not exist
-                Files.write(keyFilePath, secretKey.getEncoded()); // Save the key
+                secretKey = generateOrLoadSecretKey();
+                Files.write(keyFilePath, secretKey.getEncoded());
             }
         } catch (Exception e) {
             e.printStackTrace();

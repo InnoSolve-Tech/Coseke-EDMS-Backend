@@ -16,6 +16,9 @@ services:
     image: benzidarwin/staging-file-management:latest
     ports:
       - "8081:8081"
+    environment:
+      - STORAGE_LOCATION=/app/storage
+      - SECRET_KEY=/app/key/keyfile.key    
     networks:
       - edms-network
 
