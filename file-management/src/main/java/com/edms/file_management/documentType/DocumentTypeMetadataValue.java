@@ -1,6 +1,7 @@
 package com.edms.file_management.documentType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,7 @@ public class DocumentTypeMetadataValue {
     private List<String> options; // For select type
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "document_type_id", nullable = false)
     private DocumentType documentType;
 }

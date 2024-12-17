@@ -114,8 +114,8 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     }
 }
 
-@Override
- public void store(FileManager data, MultipartFile file) throws Exception {
+    @Override
+    public void store(FileManager data, MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
@@ -123,29 +123,38 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         // Fetch or create the directory entity
         Optional<Directory> directory = directoryRepository.findByName(data.getDocumentType());
         FileManager fileManager;
+
         if (directory.isPresent()) {
             fileManager = FileManager.builder()
-                .documentType(data.getDocumentType())
-                .folderID(directory.get().getFolderID())
-                .filename(file.getOriginalFilename())
-                .metadata(data.getMetadata())
-                .build();
+                    .documentType(data.getDocumentType())
+                    .folderID(directory.get().getFolderID())
+                    .filename(file.getOriginalFilename())
+                    .documentName(data.getDocumentName())
+                    .mimeType(data.getMimeType())
+                    .hashName(data.getHashName())
+                    .metadata(data.getMetadata())
+                    .build();
             fileRepository.save(fileManager);
         } else {
-            Directory newDirectory = Directory.builder().name(data.getDocumentType()).build();
+            // Create new directory if it doesn't exist
+            Directory newDirectory = Directory.builder()
+                    .name(data.getDocumentType())
+                    .build();
+
             newDirectory = directoryService.creaDirectoryWithName(newDirectory);
             newDirectory.setParentFolderID((int) newDirectory.getFolderID());
             directoryRepository.save(newDirectory);
+
             fileManager = FileManager.builder()
-                .documentType(data.getDocumentType())
-                .folderID(newDirectory.getFolderID())
-                .filename(file.getOriginalFilename())
+                    .documentType(data.getDocumentType())
+                    .folderID(newDirectory.getFolderID())
+                    .filename(file.getOriginalFilename())
                     .documentName(data.getDocumentName())
                     .mimeType(data.getMimeType())
-                .metadata(data.getMetadata())
-                .build();
+                    .hashName(data.getHashName())
+                    .metadata(data.getMetadata())
+                    .build();
             fileRepository.save(fileManager);
-
         }
 
         // Generate the file hash
@@ -153,9 +162,9 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
         // Resolve the destination file within the folder path
         Path destinationFile = Paths.get(this.rootLocation)
-            .resolve(hash + getFileExtension(file.getOriginalFilename()))
-            .normalize()
-            .toAbsolutePath();
+                .resolve(hash + getFileExtension(file.getOriginalFilename()))
+                .normalize()
+                .toAbsolutePath();
 
         // Create directories if they don't exist
         Files.createDirectories(destinationFile.getParent());
