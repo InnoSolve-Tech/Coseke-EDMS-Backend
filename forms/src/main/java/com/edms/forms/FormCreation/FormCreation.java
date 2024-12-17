@@ -1,11 +1,12 @@
 package com.edms.forms.FormCreation;
 
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.edms.forms.FormField.FormField;
 
 @Entity
 @Data
@@ -23,9 +24,6 @@ public class FormCreation {
     @Column(length = 500)
     private String description;
 
-    @ElementCollection
-    @CollectionTable(name = "form_fields", joinColumns = @JoinColumn(name = "form_fields_id"))
-    @MapKeyColumn(name = "field_name")
-    @Column(name = "field_type")
-    private Map<String, String> fieldDefinitions = new HashMap<>();
+    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FormField> fieldDefinitions = new ArrayList<>();
 }
