@@ -23,12 +23,12 @@ jobs:
 
       - name: Build and Push file-management Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/file-management:latest ./file-managemen
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/file-management:latest ./file-management
+          docker push ${{ secrets.DOCKER_USERNAME }}/file-management:latest
 
       - name: Build and Push workflows Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/workflows:latest ./wot
-          docker push ${{ secrets.DOCKER_USERNAME }}/file-management:latestrkflows
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/workflows:latest ./workflows
           docker push ${{ secrets.DOCKER_USERNAME }}/workflows:latest
 
       - name: Build and Push tasks Image
