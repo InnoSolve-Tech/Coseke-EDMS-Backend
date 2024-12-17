@@ -1,5 +1,6 @@
 package com.edms.file_management.filemanager;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,8 +30,6 @@ import com.edms.file_management.helper.HashUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
-
-
 
 
 @Service
@@ -343,10 +342,27 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     }
 
     public void decryptFile(Path encryptedFilePath, OutputStream outputStream) throws Exception {
-        try (InputStream inputStream = Files.newInputStream(encryptedFilePath)) {
-            EncryptionUtil.decrypt(inputStream, outputStream);
+        try {
+            // Validate input paths
+            if (encryptedFilePath == null || !Files.exists(encryptedFilePath)) {
+                throw new FileNotFoundException("Encrypted file not found: " + encryptedFilePath);
+            }
+
+            try (InputStream inputStream = Files.newInputStream(encryptedFilePath)) {
+                // Add additional validation for input stream
+                if (inputStream == null) {
+                    throw new IOException("Unable to create input stream for encrypted file");
+                }
+
+                // Consider adding logging or more detailed exception handling
+                EncryptionUtil.decrypt(inputStream, outputStream);
+            }
+        } catch (Exception e) {
+            // Rethrow with a more informative message
+            throw new Exception("Failed to decrypt file: " + e.getMessage(), e);
         }
     }
+
 	@Override
 	public void init() throws Exception {
 		try {

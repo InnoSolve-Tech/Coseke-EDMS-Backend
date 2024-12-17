@@ -1,6 +1,8 @@
 package com.edms.file_management.directory;
 
+import com.edms.file_management.filemanager.FileManager;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +16,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Entity
@@ -55,4 +59,8 @@ public class Directory {
     public String toString() {
         return "Directory [folderID=" + folderID + ", name=" + name + ", parentFolderID=" + parentFolderID + "]";
     }
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "directory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<FileManager> files = new ArrayList<>();
 }
