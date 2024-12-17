@@ -2,9 +2,7 @@ package com.edms.file_management.filemanager;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -20,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.edms.file_management.helper.CustomMultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 @RestController
@@ -73,61 +69,10 @@ public class FileManagerController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-
-    @PostMapping("/upload")
-    public ResponseEntity<String> handleFileUpload(
-            @RequestParam("file") String binaryString,
-            @RequestParam("author") String author,
-            @RequestParam("version") String version,
-            @RequestParam("description") String description,
-            @RequestParam("tags") String tags,
-            @RequestParam("company_name") String companyName,
-            @RequestParam("folderID") String folderID,
-            @RequestParam("mimeType") String mimeType,
-            @RequestParam("hashName") String hashName
-    ) {
-        try {
-            // Decode Base64 to byte array
-            byte[] fileBytes = Base64.getDecoder().decode(binaryString);
-
-            // Create CustomMultipartFile
-            MultipartFile file = new CustomMultipartFile(
-                    hashName, // name
-                    hashName, // originalFilename
-                    mimeType, // contentType
-                    fileBytes // file content
-            );
-
-            // Create FileManager object
-            FileManager fileData = FileManager.builder()
-                    .documentType(companyName)
-                    .documentName(hashName)
-                    .mimeType(mimeType)
-                    .folderID(Integer.parseInt(folderID))
-                    .hashName(hashName)
-                    .metadata(Map.of(
-                            "author", author,
-                            "version", version,
-                            "description", description,
-                            "tags", tags,
-                            "folderID", folderID
-                    ))
-                    .build();
-
-            // Store file
-            fileService.store(fileData, file);
-
-            return ResponseEntity.ok().body("You successfully uploaded " + hashName + "!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("File upload failed: " + e.getMessage());
-        }
-    }
-
-
-    // Helper method to sanitize filename
-    private String sanitizeFilename(String originalFilename) {
-        return originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
+    @PostMapping("/")
+    public ResponseEntity<String> handleFileUpload(@RequestPart("fileData") FileManager fileData, @RequestPart("file") MultipartFile file) throws Exception {
+        fileService.store(fileData, file);
+        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
 
     @PostMapping("/{folderId}")

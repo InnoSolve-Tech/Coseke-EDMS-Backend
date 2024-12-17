@@ -15,4 +15,7 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
 
     List<Directory> findByParentFolderID(int parentFolderID);
 
+    @Query("SELECT DISTINCT d FROM Directory d LEFT JOIN FETCH d.files")
+    List<Directory> findAllWithFiles();
+
 }

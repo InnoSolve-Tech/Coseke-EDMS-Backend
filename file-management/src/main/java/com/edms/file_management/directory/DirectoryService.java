@@ -39,8 +39,12 @@ public class DirectoryService {
                 .orElseThrow(() -> new Exception("Directory not found for this id :: " + folderID));
     }
 
+//    public List<Directory> getAllDirectories() {
+//        return directoryRepository.findAll();
+//    }
+
     public List<Directory> getAllDirectories() {
-        return directoryRepository.findAll();
+        return directoryRepository.findAllWithFiles();
     }
 
     public Directory createDirectory(Directory directory) {

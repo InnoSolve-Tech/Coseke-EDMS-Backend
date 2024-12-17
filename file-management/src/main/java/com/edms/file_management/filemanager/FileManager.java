@@ -3,6 +3,9 @@ package com.edms.file_management.filemanager;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import com.edms.file_management.directory.Directory;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -12,13 +15,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.edms.file_management.helper.JsonMapConverter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -64,4 +60,9 @@ public class FileManager {
     @CreatedBy
     @Column(name="createdBy", nullable = false, updatable = false)
     private Long createdBy;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "folderID", insertable = false, updatable = false)
+    private Directory directory;
 }
