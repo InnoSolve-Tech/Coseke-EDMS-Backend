@@ -1,10 +1,13 @@
 package com.edms.file_management.filemanager;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.edms.file_management.directory.Directory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -50,7 +53,7 @@ public class FileManager {
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name="lastModifiedDate", nullable = true)
+    @Column(name = "lastModifiedDate", nullable = true)
     private LocalDateTime lastModifiedDateTime;
 
     @LastModifiedBy
@@ -58,11 +61,24 @@ public class FileManager {
     private Long lastModifiedBy;
 
     @CreatedBy
-    @Column(name="createdBy", nullable = false, updatable = false)
+    @Column(name = "createdBy", nullable = false, updatable = false)
     private Long createdBy;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folderID", insertable = false, updatable = false)
     private Directory directory;
+
+    @JsonSetter("metadata")
+    public void setMetadata(Object metadata) {
+        if (metadata instanceof List) {
+            this.metadata = ((List<Map<String, Object>>) metadata).stream()
+                    .collect(Collectors.toMap(
+                            map -> (String) map.get("name"),
+                            map -> map.get("value")
+                    ));
+        } else if (metadata instanceof Map) {
+            this.metadata = (Map<String, Object>) metadata;
+        }
+    }
 }

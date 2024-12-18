@@ -76,11 +76,16 @@ public class FileManagerController {
     }
 
     @PostMapping("/{folderId}")
-    public ResponseEntity<String> handleFileUploadById(@RequestPart("fileData") String fileData, @RequestPart("file") MultipartFile file, @PathVariable("folderId") Long folderId) throws Exception {
+    public ResponseEntity<String> handleFileUploadById(
+            @RequestPart("fileData") String fileData,
+            @RequestPart("file") MultipartFile file,
+            @PathVariable("folderId") Long folderId) throws Exception {
+        System.out.println("Received fileData: " + fileData); // Log for debugging
         FileManager dataManager = fileService.convertStringToDataManager(fileData);
         fileService.storeById(dataManager, file, folderId);
         return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
+
 
     @PostMapping("/bulk/{folderId}")
     public ResponseEntity<String> handleBulkFileUploadById(@RequestPart("files") MultipartFile[] files, @PathVariable("folderId") Long folderId) throws Exception {
@@ -113,17 +118,13 @@ public class FileManagerController {
     @GetMapping("/file/hash/{hashname}")
     public void getFileByHashName(@PathVariable String hashname, HttpServletResponse response) {
         try {
-            // Get the encrypted file path using the hashname
             Path encryptedFilePath = fileService.getEncryptedFilePath(hashname);
 
-            // Set the response headers
             response.setHeader("Content-Disposition", "attachment; filename=\"" + hashname + "\"");
             response.setContentType("application/octet-stream");
 
-            // Decrypt and write the file to the response's output stream
             fileService.decryptFile(encryptedFilePath, response.getOutputStream());
         } catch (Exception e) {
-            // Handle errors
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType("text/plain");
             try {

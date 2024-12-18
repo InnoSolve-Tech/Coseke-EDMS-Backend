@@ -342,23 +342,14 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     }
 
     public void decryptFile(Path encryptedFilePath, OutputStream outputStream) throws Exception {
-        try {
-            // Validate input paths
-            if (encryptedFilePath == null || !Files.exists(encryptedFilePath)) {
-                throw new FileNotFoundException("Encrypted file not found: " + encryptedFilePath);
+        try (InputStream inputStream = Files.newInputStream(encryptedFilePath)) {
+            if (inputStream == null) {
+                throw new IOException("Unable to create input stream for encrypted file");
             }
 
-            try (InputStream inputStream = Files.newInputStream(encryptedFilePath)) {
-                // Add additional validation for input stream
-                if (inputStream == null) {
-                    throw new IOException("Unable to create input stream for encrypted file");
-                }
-
-                // Consider adding logging or more detailed exception handling
-                EncryptionUtil.decrypt(inputStream, outputStream);
-            }
+            // Use the decryption logic from EncryptionUtil
+            EncryptionUtil.decrypt(inputStream, outputStream);
         } catch (Exception e) {
-            // Rethrow with a more informative message
             throw new Exception("Failed to decrypt file: " + e.getMessage(), e);
         }
     }
