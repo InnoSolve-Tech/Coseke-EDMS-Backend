@@ -26,6 +26,10 @@ services:
     environment:
       - STORAGE_LOCATION=/app/storage
       - SECRET_KEY=/app/key/keyfile.key
+      
+    volumes:
+      - ./storage:/app/storage
+      - ./key:/app/key
     networks:
       - edms-network
 
