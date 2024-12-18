@@ -1,4 +1,4 @@
-package com.edms.workflows.helper;
+package com.edms.forms.helper;
 
 public class Constants {
     public static final String GENERAL_ROUTE = "/api/v1";

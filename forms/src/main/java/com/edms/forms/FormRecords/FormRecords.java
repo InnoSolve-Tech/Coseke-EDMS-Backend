@@ -2,11 +2,12 @@ package com.edms.forms.FormRecords;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.edms.forms.FormCreation.FormCreation;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.edms.forms.Form.Form;
 
 @Entity
 @Data
@@ -20,7 +21,7 @@ public class FormRecords {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_creation_id", nullable = false)
-    private FormCreation formCreation;
+    private Form formCreation;
 
     @ElementCollection
     @CollectionTable(name = "form_record_values", joinColumns = @JoinColumn(name = "form_record_id"))

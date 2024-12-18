@@ -1,36 +1,50 @@
 package com.edms.forms.FormField;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
 
-import com.edms.forms.FormCreation.FormCreation;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "form_fields")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "form_fields")
+@Builder
 public class FormField {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String fieldName;
+    private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private FieldType type;
 
     @ElementCollection
-    @CollectionTable(name = "field_select_options", joinColumns = @JoinColumn(name = "field_id"))
-    @Column(name = "option_value")
-    private List<String> selectOptions;
+    @Column(name = "select_option")
+    private List<SelectOptionDto> selectOptions;
 
-    @ManyToOne
-    @JoinColumn(name = "form_id", nullable = false)
-    @JsonIgnore
-    private FormCreation form;
+    // Nested DTO for select options
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SelectOptionDto {
+        private String label;
+        private String value;
+    }
 }
