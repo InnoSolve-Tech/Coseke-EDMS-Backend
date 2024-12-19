@@ -7,6 +7,8 @@ import com.edms.forms.Form.Form;
 import com.edms.forms.Form.FormRepository;
 import com.edms.forms.FormField.FormFieldRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +27,10 @@ public class FormRecordService {
     }
 
     // Create or Update FormRecord
+    @Transactional
     public FormRecord saveFormRecord(FormRecord formRecord) {
+        Form form = formRepository.findById(formRecord.getForm().getId()).orElseThrow();
+        formRecord.setForm(form);
         // Reset the FormField for each FormFieldValue
         formRecord.getFormFieldValues().forEach(fieldValue -> {
             if (fieldValue.getFormField() != null && fieldValue.getFormField().getId() != null) {

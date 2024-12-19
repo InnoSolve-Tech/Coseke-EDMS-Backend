@@ -64,7 +64,6 @@ public class FormService {
         if (formDto.getSelectOptions() != null) {
             SelectOption selectOptions = new SelectOption();
             selectOptions.setOptions(formDto.getSelectOptions().getOptions());
-            existingForm.setSelectOptions(selectOptions);
         }
         
         // Save and return
@@ -90,13 +89,6 @@ public class FormService {
                         .map(this::convertToFormField)
                         .collect(Collectors.toList())
                 )
-                .selectOptions(
-                    formDto.getSelectOptions() != null 
-                        ? SelectOption.builder()
-                            .options(formDto.getSelectOptions().getOptions())
-                            .build() 
-                        : null
-                )
                 .build();
     }
 
@@ -109,13 +101,6 @@ public class FormService {
                     formEntity.getFormFields().stream()
                         .map(this::convertToFormFieldDto)
                         .collect(Collectors.toList())
-                )
-                .selectOptions(
-                    formEntity.getSelectOptions() != null
-                        ? FormDto.SelectOptionsDto.builder()
-                            .options(formEntity.getSelectOptions().getOptions())
-                            .build()
-                        : null
                 )
                 .build();
     }

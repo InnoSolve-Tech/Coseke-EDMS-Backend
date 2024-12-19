@@ -3,7 +3,6 @@ package com.edms.forms.Form;
 import java.util.List;
 
 import com.edms.forms.FormField.FormField;
-import com.edms.forms.SelectOption.SelectOption;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -13,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,8 +38,4 @@ public class Form {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "form_id")
     private List<FormField> formFields;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "select_options_id")
-    private SelectOption selectOptions;
 }
