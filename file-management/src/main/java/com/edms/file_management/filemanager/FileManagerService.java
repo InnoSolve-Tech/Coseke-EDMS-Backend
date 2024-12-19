@@ -400,4 +400,26 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         }
     }
 
+    public void deleteFileById(Long id) throws Exception {
+        // Find the file in the repository
+        FileManager file = fileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + id));
+
+        // Get the physical file's path
+        Path filePath = Paths.get(this.rootLocation)
+                .resolve(file.getHashName() + getFileExtension(file.getFilename()))
+                .normalize()
+                .toAbsolutePath();
+
+        // Delete the file from the filesystem
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new Exception("Failed to delete the file from the filesystem.", e);
+        }
+
+        // Remove the file from the repository
+        fileRepository.delete(file);
+    }
+
 }
