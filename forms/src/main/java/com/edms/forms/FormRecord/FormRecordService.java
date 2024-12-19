@@ -3,6 +3,8 @@ package com.edms.forms.FormRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.edms.forms.Form.Form;
+import com.edms.forms.Form.FormRepository;
 import com.edms.forms.FormField.FormFieldRepository;
 
 import java.util.List;
@@ -11,13 +13,15 @@ import java.util.Optional;
 @Service
 public class FormRecordService {
 
+    private final FormRepository formRepository;
     private final FormRecordRepository formRecordRepository;
     private final FormFieldRepository formFieldRepository;
 
     @Autowired
-    public FormRecordService(FormRecordRepository formRecordRepository, FormFieldRepository formFieldRepository) {
+    public FormRecordService(FormRecordRepository formRecordRepository, FormFieldRepository formFieldRepository, FormRepository formRepository) {
         this.formRecordRepository = formRecordRepository;
         this.formFieldRepository = formFieldRepository;
+        this.formRepository = formRepository;
     }
 
     // Create or Update FormRecord
@@ -46,7 +50,8 @@ public class FormRecordService {
 
       // Get form record by Form ID
       public List<FormRecord> getFormRecordByForm(Long id) {
-        return formRecordRepository.findByForm(id);
+        Form form = formRepository.findById(id).orElseThrow();
+        return formRecordRepository.findByForm(form);
     }
 
     // Delete form record by ID
