@@ -26,6 +26,7 @@ public class SelectOption {
     private Long id;
 
     @ElementCollection
-    @Column(name = "option")
+    @Column(name = "select_option_value")  // Renamed the column to avoid conflict with the reserved keyword
     private List<String> options;
 }
+
