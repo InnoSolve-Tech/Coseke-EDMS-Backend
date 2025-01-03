@@ -22,13 +22,11 @@ public class TaskController {
         if (task.getStatus() == null || task.getStatus().isEmpty()) {
             task.setStatus("contracted");
         }
-
-        return ResponseEntity.ok("Task created successfully");
+        return ResponseEntity.ok(createdTask);
     }
 
     @GetMapping("/all")
     public List<Task> getAllTask() {
-
         return taskService.getAllTask();
     }
 
