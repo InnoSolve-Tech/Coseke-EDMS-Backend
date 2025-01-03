@@ -12,37 +12,43 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/roles")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
 
-    @PostMapping("/roles")
+    @PostMapping()
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Role response = roleService.createRole(role);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @GetMapping("/roles")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Role> deleteRole(@PathVariable Long id) {
+        Role response = roleService.deleteRole(id);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
+    }
+
+    @GetMapping()
     public ResponseEntity<List<Role>> listRoles() {
         List<Role> response = roleService.listRoles();
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @PutMapping("roles/{roleID}/add/{permID}")
+    @PutMapping("/{roleID}/add/{permID}")
     public ResponseEntity<Role> addPermissionToRole(@PathVariable Long roleID, @PathVariable Long permID) throws NotFoundException {
         Role response = roleService.addPermissionToRole(roleID, permID);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @PutMapping("roles/{roleID}/remove/{permID}")
+    @PutMapping("/{roleID}/remove/{permID}")
     public ResponseEntity<Role> removePermissionToRole(@PathVariable Long roleID, @PathVariable Long permID) throws NotFoundException {
         Role response = roleService.removePermissionFromRole(roleID, permID);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @PutMapping("roles/{roleId}/update-permissions")
+    @PutMapping("/{roleId}/update-permissions")
     public ResponseEntity<Role> addMultiplePermissions(@PathVariable Long roleId, @RequestBody MultipleUpdate update) {
         try {
             // Extract permission IDs from the list of permissions

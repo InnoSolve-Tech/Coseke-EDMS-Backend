@@ -1,4 +1,4 @@
-package com.edms.workflows.helper;
+package com.edms.forms.helper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

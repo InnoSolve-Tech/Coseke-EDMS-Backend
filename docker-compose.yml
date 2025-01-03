@@ -9,6 +9,7 @@ services:
       - file-management
       - workflows
       - tasks
+      - forms
     networks:
       - edms-network
 
