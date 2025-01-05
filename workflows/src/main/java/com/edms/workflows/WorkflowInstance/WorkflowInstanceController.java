@@ -62,5 +62,18 @@ public class WorkflowInstanceController {
         workflowInstanceService.deleteWorkflowInstanceById(id);
         return ResponseEntity.ok("WorkflowInstance with ID " + id + " has been deleted");
     }
+
+    /**
+     * Update a WorkflowInstance by ID
+     *
+     * @param id the ID of the workflow instance to update
+     * @param workflowInstance the updated workflow instance
+     * @return the updated workflow instance
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<WorkflowInstance> updateWorkflowInstance(@PathVariable Long id, @RequestBody WorkflowInstance workflowInstance) {
+        WorkflowInstance updatedInstance = workflowInstanceService.updateWorkflowInstance(id, workflowInstance);
+        return ResponseEntity.ok(updatedInstance);
+    }
 }
 
