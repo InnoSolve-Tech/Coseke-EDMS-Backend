@@ -13,6 +13,8 @@ public class NodeData {
     
     @Embedded
     private Assignee assignee;
+
+    private String formId;
     
     private String dueDate;
 } 
