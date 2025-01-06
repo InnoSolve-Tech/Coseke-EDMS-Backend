@@ -1,6 +1,7 @@
 package com.edms.file_management.directory;
 
 import com.edms.file_management.config.StorageProperties;
+import com.edms.file_management.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -94,6 +95,21 @@ public class DirectoryService {
         for (Directory child : childDirectories) {
             recursivelyFindChildDirectories(child.getFolderID(), result, currentDepth + 1, maxDepth);
         }
+    }
+
+    public void renameDirectory(Long folderId, String newName) throws Exception {
+        // Validate new folder name
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Folder name cannot be empty.");
+        }
+
+        // Find the directory by ID
+        Directory directory = directoryRepository.findById(folderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Folder not found with ID: " + folderId));
+
+        // Update the folder name
+        directory.setName(newName);
+        directoryRepository.save(directory);
     }
 
 }
