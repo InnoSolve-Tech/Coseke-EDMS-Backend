@@ -3,6 +3,7 @@ package com.edms.file_management.filemanager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -143,5 +144,25 @@ public class FileManagerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting file: " + e.getMessage());
         }
     }
+
+    @PostMapping("/{fileId}/metadata")
+    public ResponseEntity<FileManager> updateMetadata(
+            @PathVariable Long fileId,
+            @RequestBody Map<String, Object> newMetadata) {
+        return ResponseEntity.ok(fileService.updateMetadata(fileId, newMetadata));
+    }
+
+    @DeleteMapping("/{fileId}/metadata")
+    public ResponseEntity<FileManager> deleteMetadata(
+            @PathVariable Long fileId,
+            @RequestBody List<String> keys) {
+        return ResponseEntity.ok(fileService.deleteMetadata(fileId, keys));
+    }
+
+    @DeleteMapping("/{fileId}/metadata/all")
+    public ResponseEntity<FileManager> clearMetadata(@PathVariable Long fileId) {
+        return ResponseEntity.ok(fileService.clearMetadata(fileId));
+    }
+
 
 }
