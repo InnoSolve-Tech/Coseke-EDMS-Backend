@@ -36,6 +36,9 @@ public class WorkflowInstance {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name = "current_step", nullable = false)
+    private String currentStep;
+
     @ElementCollection
     @CollectionTable(name = "workflow_metadata", joinColumns = @JoinColumn(name = "workflow_instance_id"))
     @MapKeyColumn(name = "meta_key")

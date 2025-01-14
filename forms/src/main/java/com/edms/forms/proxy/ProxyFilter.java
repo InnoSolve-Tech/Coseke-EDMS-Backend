@@ -1,4 +1,4 @@
-package com.edms.workflows.proxy;
+package com.edms.forms.proxy;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

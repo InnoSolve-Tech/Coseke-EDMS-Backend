@@ -74,6 +74,8 @@ public class ProxyController {
             return "http://workflows:8082" + path;
         } else if (path.startsWith("/tasks")) {
             return "http://tasks:8083" + path;
+        }  else if (path.startsWith("/forms")) {
+            return "http://forms:8084" + path;
         } else {
             throw new IllegalArgumentException("Unknown service path: " + path);
         }

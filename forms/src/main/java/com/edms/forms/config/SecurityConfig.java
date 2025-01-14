@@ -1,6 +1,6 @@
-package com.edms.workflows.config;
+package com.edms.forms.config;
 
-import com.edms.workflows.proxy.ProxyFilter;
+import com.edms.forms.proxy.ProxyFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

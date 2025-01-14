@@ -1,4 +1,4 @@
-package com.edms.workflows.exception;
+package com.edms.forms.exception;
 
 public class NotFoundException extends Exception {
     public NotFoundException(String message) {

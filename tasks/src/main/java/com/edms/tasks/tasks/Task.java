@@ -1,5 +1,6 @@
 package com.edms.tasks.tasks;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
@@ -20,12 +21,12 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private LocalDateTime date;
+    private LocalDate date;
     private  String status;
     private String priority;
     private String description;
-    private LocalDateTime startDate;
-    private LocalDateTime dueDate;
+    private LocalDate startDate;
+    private LocalDate dueDate;
     private String timelineReason;
     private String assignees;
     private String roles;

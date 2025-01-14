@@ -21,6 +21,14 @@ public class RoleService {
         return roleRepository.save(request);
     }
 
+    public Role deleteRole(Long roleId) {
+        Role role = roleRepository.findById(roleId).orElse(null);
+        if (role != null) {
+            roleRepository.delete(role);
+        }
+        return role;
+    }
+    
     public Role findOneRole(Long roleId) throws NotFoundException {
         return roleRepository.findById(roleId).orElse(null);
     }

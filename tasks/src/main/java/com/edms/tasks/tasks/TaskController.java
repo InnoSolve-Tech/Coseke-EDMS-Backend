@@ -20,9 +20,8 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         Task createdTask = taskService.createTask(task);
         if (task.getStatus() == null || task.getStatus().isEmpty()) {
-            task.setStatus("contacted");
+            task.setStatus("contracted");
         }
-
         return ResponseEntity.ok(createdTask);
     }
 
