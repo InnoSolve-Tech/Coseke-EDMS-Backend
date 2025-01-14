@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -421,5 +422,38 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         // Remove the file from the repository
         fileRepository.delete(file);
     }
+
+    @Transactional
+    public FileManager updateMetadata(Long fileId, Map<String, Object> newMetadata) {
+        FileManager file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + fileId));
+
+        file.getMetadata().putAll(newMetadata); // Add or update metadata
+        fileRepository.save(file);
+        return file;
+    }
+
+    @Transactional
+    public FileManager deleteMetadata(Long fileId, List<String> keys) {
+        FileManager file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + fileId));
+
+        for (String key : keys) {
+            file.getMetadata().remove(key); // Remove metadata keys
+        }
+        fileRepository.save(file);
+        return file;
+    }
+
+    @Transactional
+    public FileManager clearMetadata(Long fileId) {
+        FileManager file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + fileId));
+
+        file.setMetadata(null); // Clear all metadata
+        fileRepository.save(file);
+        return file;
+    }
+
 
 }
