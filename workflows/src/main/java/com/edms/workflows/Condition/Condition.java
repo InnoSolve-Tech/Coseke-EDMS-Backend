@@ -1,6 +1,8 @@
 package com.edms.workflows.Condition;
 
-import ch.qos.logback.core.pattern.parser.Node;
+import com.edms.workflows.node.Node;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,5 +26,6 @@ public class Condition {
 
     @ManyToOne
     @JoinColumn(name = "node_id")
+    @JsonIgnore
     private Node node;
 }

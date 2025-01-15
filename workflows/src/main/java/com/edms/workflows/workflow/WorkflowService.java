@@ -6,17 +6,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.edms.workflows.node.NodeRepository;
-import com.edms.workflows.edge.EdgeRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
-    private final NodeRepository nodeRepository;
-    private final EdgeRepository edgeRepository;
 
     @Transactional
     public Workflow createWorkflow(Workflow workflow) {
@@ -30,7 +25,14 @@ public class WorkflowService {
             workflow.getEdges().forEach(edge -> edge.setWorkflow(workflow));
         }
 
-        return workflowRepository.save(workflow);
+        Workflow newWorkflow = workflowRepository.save(workflow);
+
+        newWorkflow.getNodes().forEach(node -> {
+            if (node.getType() == "decision") {
+                node.getData().getCondition().forEach(condition -> condition.setNode(node));
+            }
+        });
+        return newWorkflow;
     }
 
     public List<Workflow> getAllWorkflows() {
@@ -79,6 +81,12 @@ public class WorkflowService {
                 }
             });
         }
+
+        updatedWorkflow.getNodes().forEach(node -> {
+            if (node.getType() != "decision") {
+                node.getData().getCondition().forEach(condition -> condition.setNode(node));
+            }
+        });
     
         // Save and return the updated workflow
         return workflowRepository.save(existingWorkflow);
