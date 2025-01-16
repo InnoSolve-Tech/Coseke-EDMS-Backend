@@ -1,13 +1,19 @@
 package com.edms.workflows.WorkflowInstance;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.edms.workflows.workflow.Workflow;
 import com.edms.workflows.workflow.WorkflowRepository;
+import com.edms.workflows.Condition.Condition;
+import com.edms.workflows.helper.Microservice;
+import com.edms.workflows.helper.OperatorPicker;
+import com.edms.workflows.helper.OperatorPicker.Operator;
 import com.edms.workflows.node.Node;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -51,6 +57,113 @@ public class WorkflowInstanceService {
     
         workflowInstance.setCurrentStep(startNode.get().getId());
         return workflowInstanceRepository.save(workflowInstance);
+    }
+
+    public WorkflowInstance changeCurrentStep(Long id, String step) {
+        WorkflowInstance instance = workflowInstanceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("WorkflowInstance with ID " + id + " not found"));
+    
+        List<Node> nodes = instance.getWorkflow().getNodes();
+    
+        // Handle "Completed" step
+        if (step.equals("Completed")) {
+            return updateInstanceStep(instance, step, "Completed");
+        }
+    
+        // Validate node existence for non-"Completed" steps
+        final String stepFinal = step;
+        if (!nodes.stream().anyMatch(node -> node.getId().equals(stepFinal))) {
+            throw new IllegalArgumentException("Node with ID " + step + " not found in the workflow");
+        }
+
+        Node currentNode = getCurrentNode(nodes, step);
+        if (currentNode.getType().equals("decision")) {
+            List<Node> formNodes = nodes.stream().filter(node -> node.getType().equals("form"))
+                    .filter(node -> node.getData().getFormId().equals(currentNode.getData().getFormId())
+                            && instance.getMetadata().get(node.getId()) != null)
+                    .collect(Collectors.toList());
+    
+            if (formNodes.isEmpty()) {
+                throw new IllegalStateException("No form nodes found.");
+            }
+    
+            boolean allConditionsMet = evaluateConditions(instance, currentNode, formNodes);
+            if (allConditionsMet) {
+                step = currentNode.getData().getIfTrue();
+                return updateInstanceStep(instance, step, getCurrentNode(nodes, currentNode.getData().getIfTrue()).getType());
+            } else {
+                step = currentNode.getData().getIfFalse();
+                return updateInstanceStep(instance, step, getCurrentNode(nodes, currentNode.getData().getIfFalse()).getType());
+            }
+        }
+    
+        return updateInstanceStep(instance, step, getCurrentNode(nodes, step).getType());
+    }
+    
+    private Node getCurrentNode(List<Node> nodes, String currentStep) {
+        return nodes.stream()
+                .filter(node -> node.getId().equals(currentStep))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Current step not found in the workflow"));
+    }
+    
+    private boolean evaluateConditions(WorkflowInstance instance, Node currentNode, List<Node> formNodes) {
+        // Use dependency injection for Microservice instead of creating a new instance here
+        Microservice microservice = new Microservice();
+    
+        // Get the ID of the first form node
+        String formNodeId = formNodes.get(0).getId();
+        String url = microservice.getFormsRoute("/form-records/" + instance.getMetadata().get(formNodeId));
+        System.out.println("Constructed URL: " + url);
+    
+        // Make GET request to retrieve the form data
+        ResponseEntity<HashMap> response = microservice.get(url, HashMap.class);
+    
+        if (response.getBody() == null) {
+            throw new IllegalStateException("Response body is null.");
+        }
+    
+        // Retrieve formFieldValues
+        List<HashMap> formFieldValues = (List<HashMap>) response.getBody().get("formFieldValues");
+        if (formFieldValues == null) {
+            throw new IllegalStateException("Form field Values are null.");
+        }
+    
+        // Evaluate each condition in the current node
+        for (Condition condition : currentNode.getData().getCondition()) {
+            OperatorPicker operatorPicker = new OperatorPicker();
+            Operator operator = operatorPicker.pickOperator(condition.getOperator());
+    
+            // Find the form field that matches the condition's field
+            HashMap matchedField = formFieldValues.stream()
+                .filter(formFieldMap -> {
+                    HashMap formField = (HashMap) formFieldMap.get("formField");
+                    return formField != null && condition.getField().equals(formField.get("name"));
+                })
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Form field with ID " + condition.getField() + " not found"));
+    
+            // Extract the value of the matched field
+            String value = (String) matchedField.get("value");
+    
+            // Apply the operator to check the condition
+            boolean conditionMet = operator.apply(value, condition.getValue());
+    
+            if (!conditionMet) {
+                return false; // Exit early if any condition is not met
+            }
+        }
+    
+        // Return true if all conditions are met
+        return true;
+    }
+    
+    
+    private WorkflowInstance updateInstanceStep(WorkflowInstance instance, String step, String status) {
+        instance.setCurrentStep(step);
+        instance.setStatus(status);
+        return workflowInstanceRepository.save(instance);
     }
     
     /**
