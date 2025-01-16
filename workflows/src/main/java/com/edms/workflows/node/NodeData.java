@@ -24,6 +24,10 @@ public class NodeData {
 
     @OneToMany(mappedBy = "node", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Condition> condition;
+
+    private String ifFalse;
+
+    private String ifTrue;
     
     private String dueDate;
 } 
