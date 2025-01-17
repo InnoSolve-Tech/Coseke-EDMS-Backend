@@ -83,7 +83,7 @@ public class WorkflowService {
         }
 
         updatedWorkflow.getNodes().forEach(node -> {
-            if (node.getType() != "decision") {
+            if (node.getType().equals("decision")) {
                 node.getData().getCondition().forEach(condition -> condition.setNode(node));
             }
         });

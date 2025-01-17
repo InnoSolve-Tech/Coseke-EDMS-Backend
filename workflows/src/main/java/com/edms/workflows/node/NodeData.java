@@ -9,6 +9,7 @@ import lombok.Data;
 import java.util.List;
 
 import com.edms.workflows.Condition.Condition;
+import com.edms.workflows.Notification.Notification;
 
 @Embeddable
 @Data
@@ -24,6 +25,9 @@ public class NodeData {
 
     @OneToMany(mappedBy = "node", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Condition> condition;
+
+    @OneToMany(mappedBy = "node", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notification;
 
     private String ifFalse;
 
