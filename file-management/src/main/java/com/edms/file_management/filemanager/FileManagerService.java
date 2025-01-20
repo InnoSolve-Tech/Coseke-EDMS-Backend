@@ -455,5 +455,8 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         return file;
     }
 
+    public List<FileManager> getAllFiles() {
+        return fileRepository.findAll(); // Assuming the repository has a findAll() method.
+    }
 
 }
