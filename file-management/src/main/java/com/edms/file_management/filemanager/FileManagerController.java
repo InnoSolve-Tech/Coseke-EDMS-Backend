@@ -2,6 +2,7 @@ package com.edms.file_management.filemanager;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,18 @@ public class FileManagerController {
         this.fileService = fileService;
         this.fileRepository = fileRepository;
     }
+
+    @GetMapping("/allfiles")
+    public ResponseEntity<List<FileManager>> getAllFiles() {
+        try {
+            List<FileManager> files = fileService.getAllFiles();
+            return ResponseEntity.ok(files);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
+    }
+
 
     @GetMapping("/folder/{folderID}")
     public List<FileManager> listFilesByFolderId(@PathVariable Long folderID) throws Exception {
