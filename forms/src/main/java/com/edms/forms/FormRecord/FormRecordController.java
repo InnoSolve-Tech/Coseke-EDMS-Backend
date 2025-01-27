@@ -22,7 +22,7 @@ public class FormRecordController {
     // Create a new form record
     @PostMapping
     public ResponseEntity<FormRecord> createFormRecord(@RequestBody FormRecord formRecord) {
-        FormRecord savedFormRecord = formRecordService.saveFormRecord(formRecord);
+        FormRecord savedFormRecord = formRecordService.createFormRecord(formRecord);
         return new ResponseEntity<>(savedFormRecord, HttpStatus.CREATED);
     }
 
@@ -60,6 +60,12 @@ public class FormRecordController {
     public ResponseEntity<List<FormRecord>> getFormRecordsByUserId(@PathVariable Long userId) {
         List<FormRecord> formRecords = formRecordService.getFormRecordsByUserId(userId);
         return new ResponseEntity<>(formRecords, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FormRecord> updateFormRecord(@PathVariable Long id, @RequestBody FormRecord formRecord) {
+        FormRecord updatedFormRecord = formRecordService.updateFormRecord(id, formRecord);
+        return new ResponseEntity<>(updatedFormRecord, HttpStatus.OK);
     }
 }
 
