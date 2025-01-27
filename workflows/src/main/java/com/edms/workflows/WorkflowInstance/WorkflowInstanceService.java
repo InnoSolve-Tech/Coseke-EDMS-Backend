@@ -135,6 +135,7 @@ public class WorkflowInstanceService {
             Operator operator = operatorPicker.pickOperator(condition.getOperator());
     
             // Find the form field that matches the condition's field
+            System.out.println("Form Field Values: " + formFieldValues);
             HashMap matchedField = formFieldValues.stream()
                 .filter(formFieldMap -> {
                     HashMap formField = (HashMap) formFieldMap.get("formField");
