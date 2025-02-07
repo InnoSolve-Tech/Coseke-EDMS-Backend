@@ -21,9 +21,6 @@ public class NodeData {
     @Embedded
     private Assignee assignee;
 
-    @Embedded
-    private Delegate delegate;
-
     private String formId;
 
     @OneToMany(mappedBy = "node", cascade = CascadeType.ALL, orphanRemoval = true)
