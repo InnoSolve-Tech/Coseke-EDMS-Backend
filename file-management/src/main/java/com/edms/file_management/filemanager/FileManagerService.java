@@ -227,6 +227,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
     public void bulkStoreById(MultipartFile[] files, Long folderId) throws Exception {
         List<String> fileNames = new ArrayList<>();
+
         try {
             for (MultipartFile file : files) {
                 if (file.isEmpty()) {
@@ -234,36 +235,42 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 }
                 fileNames.add(file.getOriginalFilename());
             }
-            for (int x = 0; x < files.length; x++) {
+
+            for (MultipartFile file : files) {
                 Optional<Directory> directory = directoryRepository.findById(folderId);
-                FileManager fileManager;
-                if (directory.isPresent()) {
-                    fileManager = FileManager.builder()
-                            .folderID(directory.get().getFolderID())
-                            .filename(files[x].getOriginalFilename())
-                            .mimeType(files[x].getContentType())
-                            .build();
-                    fileRepository.save(fileManager);
-                } else {
-                    throw  new Exception("Folder with id " + folderId +" doesn't exist!");
+
+                if (directory.isEmpty()) {
+                    throw new Exception("Folder with ID " + folderId + " not found.");
                 }
+
+                // Create FileManager entry
+                FileManager fileManager = FileManager.builder()
+                        .documentType("Unknown") // You may want to pass the document type from the frontend
+                        .folderID(directory.get().getFolderID())
+                        .filename(file.getOriginalFilename())
+                        .mimeType(file.getContentType())
+                        .build();
+
+                fileRepository.save(fileManager);
+
+                // Generate hash for the filename
                 String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
-                // Resolve the destination file within the folder path
+
+                // Store the file in the directory
                 Path destinationFile = Paths.get(this.rootLocation)
-                        .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
+                        .resolve(hash + getFileExtension(file.getOriginalFilename()))
                         .normalize()
                         .toAbsolutePath();
 
-
-                // Create directories if they don't exist
                 Files.createDirectories(destinationFile.getParent());
 
-                // Encrypt the file before storing it
-                try (InputStream inputStream = files[x].getInputStream();
+                // Encrypt and store the file
+                try (InputStream inputStream = file.getInputStream();
                      OutputStream outputStream = Files.newOutputStream(destinationFile)) {
                     EncryptionUtil.encrypt(inputStream, outputStream);
                 }
-                fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
+
+                fileManager.setHashName(hash);
                 fileRepository.save(fileManager);
             }
         } catch (Exception e) {

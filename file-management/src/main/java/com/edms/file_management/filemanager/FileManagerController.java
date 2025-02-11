@@ -95,10 +95,19 @@ public class FileManagerController {
 
 
     @PostMapping("/bulk/{folderId}")
-    public ResponseEntity<String> handleBulkFileUploadById(@RequestPart("files") MultipartFile[] files, @PathVariable("folderId") Long folderId) throws Exception {
+    public ResponseEntity<String> handleBulkFileUploadById(
+            @RequestPart("files") MultipartFile[] files,
+            @PathVariable("folderId") Long folderId) throws Exception {
+
+        if (files == null || files.length == 0) {
+            return ResponseEntity.badRequest().body("No files received for upload.");
+        }
+
         fileService.bulkStoreById(files, folderId);
-        return ResponseEntity.ok().body("You successfully uploaded " + files.length+ " files!");
+
+        return ResponseEntity.ok().body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
     }
+
 
     @PostMapping("/file-update")
     public  ResponseEntity<FileManager> handleFileUpdate(@RequestBody FileManager fileManager) {
