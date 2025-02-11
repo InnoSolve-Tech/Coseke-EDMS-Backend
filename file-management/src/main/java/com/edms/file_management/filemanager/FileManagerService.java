@@ -225,45 +225,60 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         fileRepository.save(fileManager);
     }
 
-    public void bulkStoreById(MultipartFile[] files, Long folderId) throws Exception {
+    public void bulkStoreById(List<FileManager> fileDataList, MultipartFile[] files, Long folderId) throws Exception {
+        if (files.length != fileDataList.size()) {
+            throw new Exception("Mismatch between file count and metadata count.");
+        }
+
         List<String> fileNames = new ArrayList<>();
+
         try {
-            for (MultipartFile file : files) {
+            for (int i = 0; i < files.length; i++) {
+                MultipartFile file = files[i];
+                FileManager fileData = fileDataList.get(i); // Get corresponding metadata
+
                 if (file.isEmpty()) {
-                    throw new Exception("Failed to store empty file.");
+                    throw new Exception("Failed to store empty file: " + file.getOriginalFilename());
                 }
+
                 fileNames.add(file.getOriginalFilename());
-            }
-            for (int x = 0; x < files.length; x++) {
+
+                // Find the directory based on folder ID
                 Optional<Directory> directory = directoryRepository.findById(folderId);
-                FileManager fileManager;
-                if (directory.isPresent()) {
-                    fileManager = FileManager.builder()
-                            .folderID(directory.get().getFolderID())
-                            .filename(files[x].getOriginalFilename())
-                            .mimeType(files[x].getContentType())
-                            .build();
-                    fileRepository.save(fileManager);
-                } else {
-                    throw  new Exception("Folder with id " + folderId +" doesn't exist!");
+                if (directory.isEmpty()) {
+                    throw new Exception("Folder with ID " + folderId + " not found.");
                 }
+
+                // Create FileManager entry with correct metadata
+                FileManager fileManager = FileManager.builder()
+                        .documentType(fileData.getDocumentType())  // Use document type from metadata
+                        .folderID(directory.get().getFolderID())
+                        .filename(file.getOriginalFilename())
+                        .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                        .documentName(fileData.getDocumentName())  // Use document name from metadata
+                        .metadata(fileData.getMetadata()) // Store additional metadata
+                        .build();
+
+                fileRepository.save(fileManager);
+
+                // Generate hash for filename
                 String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
-                // Resolve the destination file within the folder path
+
+                // Define file storage path
                 Path destinationFile = Paths.get(this.rootLocation)
-                        .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
+                        .resolve(hash + getFileExtension(file.getOriginalFilename()))
                         .normalize()
                         .toAbsolutePath();
 
-
-                // Create directories if they don't exist
                 Files.createDirectories(destinationFile.getParent());
 
-                // Encrypt the file before storing it
-                try (InputStream inputStream = files[x].getInputStream();
+                // Encrypt and store file
+                try (InputStream inputStream = file.getInputStream();
                      OutputStream outputStream = Files.newOutputStream(destinationFile)) {
                     EncryptionUtil.encrypt(inputStream, outputStream);
                 }
-                fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
+
+                fileManager.setHashName(hash);
                 fileRepository.save(fileManager);
             }
         } catch (Exception e) {

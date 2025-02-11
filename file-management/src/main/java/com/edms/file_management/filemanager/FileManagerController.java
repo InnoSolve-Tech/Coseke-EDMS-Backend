@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -95,10 +97,19 @@ public class FileManagerController {
 
 
     @PostMapping("/bulk/{folderId}")
-    public ResponseEntity<String> handleBulkFileUploadById(@RequestPart("files") MultipartFile[] files, @PathVariable("folderId") Long folderId) throws Exception {
-        fileService.bulkStoreById(files, folderId);
-        return ResponseEntity.ok().body("You successfully uploaded " + files.length+ " files!");
+    public ResponseEntity<String> handleBulkFileUploadById(
+            @RequestPart("files") MultipartFile[] files,
+            @RequestPart("fileData") String fileData,
+            @PathVariable("folderId") Long folderId) throws Exception {
+
+        List<FileManager> fileDataList = new ObjectMapper().readValue(fileData, new TypeReference<>() {});
+
+        fileService.bulkStoreById(fileDataList, files, folderId);
+
+        return ResponseEntity.ok().body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
     }
+
+
 
     @PostMapping("/file-update")
     public  ResponseEntity<FileManager> handleFileUpdate(@RequestBody FileManager fileManager) {
