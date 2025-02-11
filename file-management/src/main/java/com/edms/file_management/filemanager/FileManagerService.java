@@ -225,38 +225,46 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         fileRepository.save(fileManager);
     }
 
-    public void bulkStoreById(MultipartFile[] files, Long folderId) throws Exception {
+    public void bulkStoreById(List<FileManager> fileDataList, MultipartFile[] files, Long folderId) throws Exception {
+        if (files.length != fileDataList.size()) {
+            throw new Exception("Mismatch between file count and metadata count.");
+        }
+
         List<String> fileNames = new ArrayList<>();
 
         try {
-            for (MultipartFile file : files) {
+            for (int i = 0; i < files.length; i++) {
+                MultipartFile file = files[i];
+                FileManager fileData = fileDataList.get(i); // Get corresponding metadata
+
                 if (file.isEmpty()) {
-                    throw new Exception("Failed to store empty file.");
+                    throw new Exception("Failed to store empty file: " + file.getOriginalFilename());
                 }
+
                 fileNames.add(file.getOriginalFilename());
-            }
 
-            for (MultipartFile file : files) {
+                // Find the directory based on folder ID
                 Optional<Directory> directory = directoryRepository.findById(folderId);
-
                 if (directory.isEmpty()) {
                     throw new Exception("Folder with ID " + folderId + " not found.");
                 }
 
-                // Create FileManager entry
+                // Create FileManager entry with correct metadata
                 FileManager fileManager = FileManager.builder()
-                        .documentType("Unknown") // You may want to pass the document type from the frontend
+                        .documentType(fileData.getDocumentType())  // Use document type from metadata
                         .folderID(directory.get().getFolderID())
                         .filename(file.getOriginalFilename())
-                        .mimeType(file.getContentType())
+                        .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                        .documentName(fileData.getDocumentName())  // Use document name from metadata
+                        .metadata(fileData.getMetadata()) // Store additional metadata
                         .build();
 
                 fileRepository.save(fileManager);
 
-                // Generate hash for the filename
+                // Generate hash for filename
                 String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
 
-                // Store the file in the directory
+                // Define file storage path
                 Path destinationFile = Paths.get(this.rootLocation)
                         .resolve(hash + getFileExtension(file.getOriginalFilename()))
                         .normalize()
@@ -264,7 +272,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
                 Files.createDirectories(destinationFile.getParent());
 
-                // Encrypt and store the file
+                // Encrypt and store file
                 try (InputStream inputStream = file.getInputStream();
                      OutputStream outputStream = Files.newOutputStream(destinationFile)) {
                     EncryptionUtil.encrypt(inputStream, outputStream);
