@@ -32,7 +32,7 @@ public class DocumentTypeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<DocumentType> updateDocumentType(@PathVariable Long id, @RequestBody DocumentType updatedDocumentType) {
         try {
             return ResponseEntity.ok(documentTypeService.updateDocumentType(id, updatedDocumentType));
