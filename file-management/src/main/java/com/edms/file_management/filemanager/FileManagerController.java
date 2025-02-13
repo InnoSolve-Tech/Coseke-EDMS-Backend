@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,13 +103,25 @@ public class FileManagerController {
             @RequestPart("fileData") String fileData,
             @PathVariable("folderId") Long folderId) throws Exception {
 
-        List<FileManager> fileDataList = new ObjectMapper().readValue(fileData, new TypeReference<>() {});
+        // Create a custom TypeReference for List of FileManager
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, Object>> fileDataList = mapper.readValue(fileData, new TypeReference<List<Map<String, Object>>>() {});
 
-        fileService.bulkStoreById(fileDataList, files, folderId);
+        // Convert the Map objects to FileManager objects
+        List<FileManager> fileManagers = fileDataList.stream()
+                .map(data -> FileManager.builder()
+                        .documentType((String) data.get("documentType"))
+                        .documentName((String) data.get("documentName"))
+                        .mimeType((String) data.get("mimeType"))
+                        .folderID(folderId.intValue())
+                        .metadata((Map<String, Object>) data.get("metadata"))
+                        .build())
+                .collect(Collectors.toList());
+
+        fileService.bulkStoreById(fileManagers, files, folderId);
 
         return ResponseEntity.ok().body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
     }
-
 
 
     @PostMapping("/file-update")
