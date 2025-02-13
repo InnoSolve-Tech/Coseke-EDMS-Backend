@@ -3,6 +3,7 @@ package com.edms.file_management.filemanager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,26 +104,46 @@ public class FileManagerController {
             @RequestPart("fileData") String fileData,
             @PathVariable("folderId") Long folderId) throws Exception {
 
-        // Create a custom TypeReference for List of FileManager
-        ObjectMapper mapper = new ObjectMapper();
-        List<Map<String, Object>> fileDataList = mapper.readValue(fileData, new TypeReference<List<Map<String, Object>>>() {});
+        System.out.println("Received bulk upload request:");
+        System.out.println("FileData: " + fileData);
+        System.out.println("Number of files: " + files.length);
 
-        // Convert the Map objects to FileManager objects
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, Object>> fileDataList = mapper.readValue(fileData,
+                new TypeReference<List<Map<String, Object>>>() {});
+
+        // Convert the Map objects to FileManager objects with explicit type handling
         List<FileManager> fileManagers = fileDataList.stream()
-                .map(data -> FileManager.builder()
-                        .documentType((String) data.get("documentType"))
-                        .documentName((String) data.get("documentName"))
-                        .mimeType((String) data.get("mimeType"))
-                        .folderID(folderId.intValue())
-                        .metadata((Map<String, Object>) data.get("metadata"))
-                        .build())
+                .map(data -> {
+                    System.out.println("Processing file data: " + data);
+                    return FileManager.builder()
+                            .documentType(String.valueOf(data.get("documentType")))
+                            .documentName(String.valueOf(data.get("documentName")))
+                            .mimeType(String.valueOf(data.get("mimeType")))
+                            .folderID(folderId.intValue())
+                            .metadata(convertMetadata(data.get("metadata")))
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         fileService.bulkStoreById(fileManagers, files, folderId);
 
-        return ResponseEntity.ok().body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
+        return ResponseEntity.ok()
+                .body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
     }
 
+    // Helper method to safely convert metadata
+    private Map<String, Object> convertMetadata(Object metadataObj) {
+        if (metadataObj == null) {
+            return new HashMap<>();
+        }
+        if (metadataObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> metadata = (Map<String, Object>) metadataObj;
+            return metadata;
+        }
+        return new HashMap<>();
+    }
 
     @PostMapping("/file-update")
     public  ResponseEntity<FileManager> handleFileUpdate(@RequestBody FileManager fileManager) {
