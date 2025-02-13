@@ -2,13 +2,12 @@ package com.edms.file_management.filemanager;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/files")
 public class FileManagerController {
@@ -99,30 +100,59 @@ public class FileManagerController {
 
     @PostMapping("/bulk/{folderId}")
     public ResponseEntity<String> handleBulkFileUploadById(
-            @RequestPart("files") MultipartFile[] files,
-            @RequestPart("fileData") String fileData,
-            @PathVariable("folderId") Long folderId) throws Exception {
+            @PathVariable("folderId") Long folderId,
+            HttpServletRequest request) throws Exception {
 
-        // Create a custom TypeReference for List of FileManager
-        ObjectMapper mapper = new ObjectMapper();
-        List<Map<String, Object>> fileDataList = mapper.readValue(fileData, new TypeReference<List<Map<String, Object>>>() {});
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        List<FileManager> fileManagers = new ArrayList<>();
+        List<MultipartFile> files = new ArrayList<>();
 
-        // Convert the Map objects to FileManager objects
-        List<FileManager> fileManagers = fileDataList.stream()
-                .map(data -> FileManager.builder()
-                        .documentType((String) data.get("documentType"))
-                        .documentName((String) data.get("documentName"))
-                        .mimeType((String) data.get("mimeType"))
-                        .folderID(folderId.intValue())
-                        .metadata((Map<String, Object>) data.get("metadata"))
-                        .build())
-                .collect(Collectors.toList());
+        Iterator<String> paramNames = multipartRequest.getFileNames();
+
+        while (paramNames.hasNext()) {
+            String paramName = paramNames.next();
+            if (paramName.startsWith("file_")) {
+                String index = paramName.substring("file_".length());
+                MultipartFile file = multipartRequest.getFile(paramName);
+                String fileDataJson = multipartRequest.getParameter("fileData_" + index);
+
+                if (file != null && fileDataJson != null) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, Object> fileData = mapper.readValue(fileDataJson,
+                            new TypeReference<Map<String, Object>>() {});
+
+                    FileManager fileManager = FileManager.builder()
+                            .documentType(String.valueOf(fileData.get("documentType")))
+                            .documentName(String.valueOf(fileData.get("documentName")))
+                            .mimeType(String.valueOf(fileData.get("mimeType")))
+                            .folderID(folderId.intValue())
+                            .metadata(convertMetadata(fileData.get("metadata")))
+                            .filename(file.getOriginalFilename())
+                            .build();
+
+                    fileManagers.add(fileManager);
+                    files.add(file);
+                }
+            }
+        }
 
         fileService.bulkStoreById(fileManagers, files, folderId);
 
-        return ResponseEntity.ok().body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
+        return ResponseEntity.ok()
+                .body("Successfully uploaded " + files.size() + " files under folder ID: " + folderId);
     }
 
+    private Map<String, Object> convertMetadata(Object metadataObj) {
+        if (metadataObj == null) {
+            return new HashMap<>();
+        }
+        if (metadataObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> metadata = (Map<String, Object>) metadataObj;
+            return metadata;
+        }
+        return new HashMap<>();
+    }
 
     @PostMapping("/file-update")
     public  ResponseEntity<FileManager> handleFileUpdate(@RequestBody FileManager fileManager) {
