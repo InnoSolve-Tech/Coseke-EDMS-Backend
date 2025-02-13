@@ -6,33 +6,37 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.edms.workflows.node.NodeRepository;
-import com.edms.workflows.edge.EdgeRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
-    private final NodeRepository nodeRepository;
-    private final EdgeRepository edgeRepository;
 
     @Transactional
     public Workflow createWorkflow(Workflow workflow) {
         // Ensure nodes are attached to the workflow
         if (workflow.getNodes() != null) {
-            workflow.getNodes().forEach(node -> node.setWorkflow(workflow));
+            workflow.getNodes().forEach(node -> {
+                node.setWorkflow(workflow); // Set the workflow for each node
+    
+                // Ensure conditions are attached to their respective nodes (for decision nodes)
+                if (node.getType() != null && node.getType().equals("decision") && node.getData() != null && node.getData().getCondition() != null) {
+                    node.getData().getCondition().forEach(condition -> condition.setNode(node));
+                }
+            });
         }
-
+    
         // Ensure edges are attached to the workflow
         if (workflow.getEdges() != null) {
             workflow.getEdges().forEach(edge -> edge.setWorkflow(workflow));
         }
-
-        return workflowRepository.save(workflow);
+    
+        // Save the workflow
+        Workflow newWorkflow = workflowRepository.save(workflow);
+    
+        return newWorkflow;
     }
-
     public List<Workflow> getAllWorkflows() {
         return workflowRepository.findAll();
     }
@@ -64,6 +68,13 @@ public class WorkflowService {
                     node.setWorkflow(existingWorkflow);  // Make sure the bidirectional relationship is maintained
                 }
             });
+    
+            // Update conditions for decision nodes
+            updatedWorkflow.getNodes().forEach(node -> {
+                if (node.getType().equals("decision") && node.getData() != null && node.getData().getCondition() != null) {
+                    node.getData().getCondition().forEach(condition -> condition.setNode(node));
+                }
+            });
         }
     
         // Update edges
@@ -83,7 +94,7 @@ public class WorkflowService {
         // Save and return the updated workflow
         return workflowRepository.save(existingWorkflow);
     }
-    
+
     @Transactional
     public HashMap<String,String> deleteWorkflow(Long id) {
         workflowRepository.deleteById(id);

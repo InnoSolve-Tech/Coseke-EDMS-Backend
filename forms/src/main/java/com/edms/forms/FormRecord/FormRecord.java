@@ -38,12 +38,7 @@ public class FormRecord {
     @JoinColumn(name = "form_id", nullable = false)
     private Form form;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinTable(
-        name = "form_record_fields",
-        joinColumns = @JoinColumn(name = "form_record_id"),
-        inverseJoinColumns = @JoinColumn(name = "form_field_id")
-    )
+    @OneToMany(mappedBy = "formRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FormFieldValue> formFieldValues;
 
     @Column(nullable = false)

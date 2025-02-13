@@ -30,6 +30,11 @@ public class UserService {
                 roles.add(fetchedRole);
             }
         }
+
+        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+        if(existingUser.isPresent()){
+        throw new NotFoundException("User with email " + request.getEmail() + " already exists");
+        }
         User user = User
                 .builder()
                 .email(request.getEmail())
