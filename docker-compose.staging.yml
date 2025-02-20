@@ -1,19 +1,19 @@
 version: "3.8"
 
 services:
-  edms-gateway-staging:
+  edms-gateway:
     image: benzidarwin/staging-gateway:latest
     ports:
       - "8787:8787"
     depends_on:
-      - file-management-staging
-      - workflows-staging
-      - tasks-staging
-      - forms-staging
+      - file-management
+      - workflows
+      - tasks
+      - forms
     networks:
-      - edms-network-staging
+      - edms-network
 
-  file-management-staging:
+  file-management:
     image: benzidarwin/staging-file-management:latest
     ports:
       - "8081:8081"
@@ -25,29 +25,29 @@ services:
       - ./storage:/app/storage
       - ./key:/app/key 
     networks:
-      - edms-network-staging
+      - edms-network
 
-  workflows-staging:
+  workflows:
     image: benzidarwin/staging-workflows:latest
     ports:
       - "8082:8082"
     networks:
-      - edms-network-staging
+      - edms-network
 
-  tasks-staging:
+  tasks:
     image: benzidarwin/staging-tasks:latest
     ports:
       - "8083:8083"
     networks:
-      - edms-network-staging
+      - edms-network
 
-  forms-staging:
+  forms:
     image: benzidarwin/staging-forms:latest
     ports:
       - "8084:8084"
     networks:
-      - edms-network-staging
+      - edms-network
 
 networks:
-  edms-network-staging:
+  edms-network:
     driver: bridge
