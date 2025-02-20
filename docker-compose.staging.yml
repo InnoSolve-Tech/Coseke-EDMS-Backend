@@ -23,7 +23,7 @@ services:
       
     volumes:
       - ./storage:/app/storage
-      - ./key:/app/key  
+      - ./key:/app/key 
     networks:
       - edms-network
 
