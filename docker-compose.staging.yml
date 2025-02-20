@@ -6,10 +6,10 @@ services:
     ports:
       - "8787:8787"
     depends_on:
-      - file-management
-      - workflows
-      - tasks
-      - forms
+      - file-management-staging
+      - workflows-staging
+      - tasks-staging
+      - forms-staging
     networks:
       - edms-network-staging
 
