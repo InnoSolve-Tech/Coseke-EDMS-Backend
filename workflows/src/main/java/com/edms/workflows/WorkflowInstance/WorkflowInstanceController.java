@@ -2,6 +2,7 @@ package com.edms.workflows.WorkflowInstance;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -74,6 +75,12 @@ public class WorkflowInstanceController {
     public ResponseEntity<WorkflowInstance> updateWorkflowInstance(@PathVariable Long id, @RequestBody WorkflowInstance workflowInstance) {
         WorkflowInstance updatedInstance = workflowInstanceService.updateWorkflowInstance(id, workflowInstance);
         return ResponseEntity.ok(updatedInstance);
+    }
+
+    @PutMapping("/{id}/current-step")
+    public ResponseEntity<WorkflowInstance> changeCurrentStep(@PathVariable Long id, @RequestParam String step) {
+        WorkflowInstance instance = workflowInstanceService.changeCurrentStep(id, step);
+        return ResponseEntity.ok(instance);
     }
 }
 
