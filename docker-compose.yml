@@ -17,13 +17,6 @@ services:
     image: benzidarwin/file-management:latest
     ports:
       - "8081:8081"
-    networks:
-      - edms-network
-
-  workflows:
-    image: benzidarwin/workflows:latest
-    ports:
-      - "8082:8082"
     environment:
       - STORAGE_LOCATION=/app/storage
       - SECRET_KEY=/app/key/keyfile.key
@@ -31,6 +24,13 @@ services:
     volumes:
       - ./storage:/app/storage
       - ./key:/app/key
+    networks:
+      - edms-network
+
+  workflows:
+    image: benzidarwin/workflows:latest
+    ports:
+      - "8082:8082"
     networks:
       - edms-network
 
