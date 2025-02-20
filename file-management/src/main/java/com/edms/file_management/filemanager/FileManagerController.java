@@ -3,9 +3,13 @@ package com.edms.file_management.filemanager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -95,9 +99,50 @@ public class FileManagerController {
 
 
     @PostMapping("/bulk/{folderId}")
-    public ResponseEntity<String> handleBulkFileUploadById(@RequestPart("files") MultipartFile[] files, @PathVariable("folderId") Long folderId) throws Exception {
-        fileService.bulkStoreById(files, folderId);
-        return ResponseEntity.ok().body("You successfully uploaded " + files.length+ " files!");
+    public ResponseEntity<String> handleBulkFileUploadById(
+            @RequestPart("files") MultipartFile[] files,
+            @RequestPart("fileData") String fileData,
+            @PathVariable("folderId") Long folderId) throws Exception {
+
+        System.out.println("Received bulk upload request:");
+        System.out.println("FileData: " + fileData);
+        System.out.println("Number of files: " + files.length);
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String, Object>> fileDataList = mapper.readValue(fileData,
+                new TypeReference<List<Map<String, Object>>>() {});
+
+        // Convert the Map objects to FileManager objects with explicit type handling
+        List<FileManager> fileManagers = fileDataList.stream()
+                .map(data -> {
+                    System.out.println("Processing file data: " + data);
+                    return FileManager.builder()
+                            .documentType(String.valueOf(data.get("documentType")))
+                            .documentName(String.valueOf(data.get("documentName")))
+                            .mimeType(String.valueOf(data.get("mimeType")))
+                            .folderID(folderId.intValue())
+                            .metadata(convertMetadata(data.get("metadata")))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        fileService.bulkStoreById(fileManagers, files, folderId);
+
+        return ResponseEntity.ok()
+                .body("Successfully uploaded " + files.length + " files under folder ID: " + folderId);
+    }
+
+    // Helper method to safely convert metadata
+    private Map<String, Object> convertMetadata(Object metadataObj) {
+        if (metadataObj == null) {
+            return new HashMap<>();
+        }
+        if (metadataObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> metadata = (Map<String, Object>) metadataObj;
+            return metadata;
+        }
+        return new HashMap<>();
     }
 
     @PostMapping("/file-update")
