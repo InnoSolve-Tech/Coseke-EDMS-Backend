@@ -225,52 +225,63 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         return fileRepository.save(fileManager);
     }
 
-    public void bulkStoreById(MultipartFile[] files, Long folderId) throws Exception {
+    public void bulkStoreById(List<FileManager> fileManagers, MultipartFile[] files, Long folderId) throws Exception {
+        if (files.length != fileManagers.size()) {
+            throw new Exception("Mismatch between file count and metadata count.");
+        }
+
         List<String> fileNames = new ArrayList<>();
+
         try {
-            for (MultipartFile file : files) {
+            for (int i = 0; i < files.length; i++) {
+                MultipartFile file = files[i];
+                FileManager fileManager = fileManagers.get(i);
+
                 if (file.isEmpty()) {
-                    throw new Exception("Failed to store empty file.");
+                    throw new Exception("Failed to store empty file: " + file.getOriginalFilename());
                 }
+
                 fileNames.add(file.getOriginalFilename());
-            }
-            for (int x = 0; x < files.length; x++) {
+
+                // Find the directory based on folder ID
                 Optional<Directory> directory = directoryRepository.findById(folderId);
-                FileManager fileManager;
-                if (directory.isPresent()) {
-                    fileManager = FileManager.builder()
-                            .folderID(directory.get().getFolderID())
-                            .filename(files[x].getOriginalFilename())
-                            .mimeType(files[x].getContentType())
-                            .build();
-                    fileRepository.save(fileManager);
-                } else {
-                    throw  new Exception("Folder with id " + folderId +" doesn't exist!");
+                if (directory.isEmpty()) {
+                    throw new Exception("Folder with ID " + folderId + " not found.");
                 }
+
+                // Update the FileManager with file-specific information
+                fileManager.setFilename(file.getOriginalFilename());
+                fileManager.setMimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream");
+                fileManager.setFolderID(directory.get().getFolderID());
+
+                // Save the initial FileManager entry
+                fileRepository.save(fileManager);
+
+                // Generate hash for filename
                 String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
-                // Resolve the destination file within the folder path
+                fileManager.setHashName(hash);
+
+                // Define file storage path
                 Path destinationFile = Paths.get(this.rootLocation)
-                        .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
+                        .resolve(hash + getFileExtension(file.getOriginalFilename()))
                         .normalize()
                         .toAbsolutePath();
 
-
-                // Create directories if they don't exist
                 Files.createDirectories(destinationFile.getParent());
 
-                // Encrypt the file before storing it
-                try (InputStream inputStream = files[x].getInputStream();
+                // Encrypt and store file
+                try (InputStream inputStream = file.getInputStream();
                      OutputStream outputStream = Files.newOutputStream(destinationFile)) {
                     EncryptionUtil.encrypt(inputStream, outputStream);
                 }
-                fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
+
+                // Save the updated FileManager with hash
                 fileRepository.save(fileManager);
             }
         } catch (Exception e) {
-            throw new Exception("Failed to store files.", e);
+            throw new Exception("Failed to store files: " + e.getMessage(), e);
         }
     }
-
 
     private String getFileExtension(String filename) {
     if (filename == null) {
