@@ -87,14 +87,14 @@ public class FileManagerController {
     }
 
     @PostMapping("/{folderId}")
-    public ResponseEntity<String> handleFileUploadById(
+    public ResponseEntity<FileManager> handleFileUploadById(
             @RequestPart("fileData") String fileData,
             @RequestPart("file") MultipartFile file,
             @PathVariable("folderId") Long folderId) throws Exception {
         System.out.println("Received fileData: " + fileData); // Log for debugging
         FileManager dataManager = fileService.convertStringToDataManager(fileData);
-        fileService.storeById(dataManager, file, folderId);
-        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
+        FileManager newFile = fileService.storeById(dataManager, file, folderId);
+        return ResponseEntity.ok().body(newFile);
     }
 
 

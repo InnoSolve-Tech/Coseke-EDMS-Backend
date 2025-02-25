@@ -180,7 +180,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         fileRepository.save(fileManager);
     }
 
-    public void storeById(FileManager data, MultipartFile file, Long folderId) throws Exception {
+    public FileManager storeById(FileManager data, MultipartFile file, Long folderId) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
@@ -222,7 +222,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
         // Save the file hash name
         fileManager.setHashName(hash);
-        fileRepository.save(fileManager);
+        return fileRepository.save(fileManager);
     }
 
     public void bulkStoreById(List<FileManager> fileManagers, MultipartFile[] files, Long folderId) throws Exception {
