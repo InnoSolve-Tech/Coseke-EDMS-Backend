@@ -67,9 +67,6 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setRoles(roles);
         user.setAddress(request.getAddress());
-        if(request.getPassword() != null &&  !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
         return userRepository.save(user);
     }
 
