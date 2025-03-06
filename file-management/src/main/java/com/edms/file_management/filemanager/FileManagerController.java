@@ -1,5 +1,6 @@
 package com.edms.file_management.filemanager;
 
+import io.github.pixee.security.Newlines;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public class FileManagerController {
     public void handleFileDownload(@PathVariable String hash, HttpServletResponse response) {
         try {
             Path encryptedFile = fileService.getEncryptedFilePath(hash);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + hash + "\"");
+            response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=\"" + hash + "\""));
             response.setContentType("application/octet-stream");
 
             // Decrypt and write the file to the response's output stream
@@ -172,7 +173,7 @@ public class FileManagerController {
         try {
             Path encryptedFilePath = fileService.getEncryptedFilePath(hashname);
 
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + hashname + "\"");
+            response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=\"" + hashname + "\""));
             response.setContentType("application/octet-stream");
 
             fileService.decryptFile(encryptedFilePath, response.getOutputStream());
