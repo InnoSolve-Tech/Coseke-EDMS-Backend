@@ -33,6 +33,24 @@ public class FileManagerController {
         this.fileRepository = fileRepository;
     }
 
+    @GetMapping("/search/content")
+    public ResponseEntity<?> fullTextSearch(@RequestParam String searchTerm) {
+        try {
+            List<FileManager> results = fileService.fullTextSearch(searchTerm);
+            if (results == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Search returned null results");
+            }
+            if (results.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error during search: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/allfiles")
     public ResponseEntity<List<FileManager>> getAllFiles() {
         try {
