@@ -275,7 +275,12 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                     EncryptionUtil.encrypt(inputStream, outputStream);
                 }
 
-                // Save the updated FileManager with hash
+                // ✅ Generate fileLink URL based on your server's public URL
+                String baseUrl = "https://yourserver.com/uploads/";
+                String fileUrl = baseUrl + hash + getFileExtension(file.getOriginalFilename());
+
+                // 🔹 Save the fileLink in the database
+                fileManager.setFileLink(fileUrl);
                 fileRepository.save(fileManager);
             }
         } catch (Exception e) {
