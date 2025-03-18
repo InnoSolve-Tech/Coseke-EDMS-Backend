@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/comments")
+@RequestMapping("/api/v1/files/comments")
 public class CommentController {
 
     private final CommentService commentService;
