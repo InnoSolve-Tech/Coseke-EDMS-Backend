@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.edms.file_management.comment.Comment;
 import com.edms.file_management.comment.CommentRepository;
+import com.edms.file_management.comment.CommentService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class FileManagerController {
     private final FileManagerService fileService;
 
     private final FileManagerRepository fileRepository;
+
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     public FileManagerController(FileManagerService fileService, FileManagerRepository fileRepository) {
@@ -227,22 +231,50 @@ public class FileManagerController {
         return ResponseEntity.ok(fileService.clearMetadata(fileId));
     }
 
-    @PostMapping("/{documentId}/comments")
-    public ResponseEntity<Comment> addComment(
-            @PathVariable Long documentId,
-            @RequestBody Map<String, String> payload) {
+    @PostMapping("/document/{documentId}")
+    public ResponseEntity<Comment> createComment(@PathVariable Long documentId, @RequestBody Map<String, Object> payload) {
+        Long userId = Long.parseLong(payload.get("userId").toString());
+        String content = (String) payload.get("content");
 
-        Long userId = Long.valueOf(payload.get("userId"));
-        String content = payload.get("content");
-
-        Comment savedComment = fileService.saveComment(documentId, userId, content);
-        return ResponseEntity.ok(savedComment);
+        Comment newComment = commentService.addComment(documentId, userId, content);
+        return ResponseEntity.ok(newComment);
     }
 
-    @GetMapping("/{documentId}/comments")
-    public ResponseEntity<List<Comment>> getCommentsByDocumentId(@PathVariable Long documentId) {
-        List<Comment> comments = commentRepository.findByDocumentId(documentId);
-        return ResponseEntity.ok(comments);
+    @GetMapping("/document/{documentId}")
+    public ResponseEntity<List<Comment>> getCommentsByDocument(@PathVariable Long documentId) {
+        return ResponseEntity.ok(commentService.getCommentsByDocumentId(documentId));
     }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<?> updateComment(
+            @PathVariable Long commentId,
+            @RequestBody Map<String, Object> payload) {
+
+        Long userId = Long.parseLong(payload.get("userId").toString());
+        String content = (String) payload.get("content");
+
+        try {
+            Comment updated = commentService.updateComment(commentId, userId, content);
+            return ResponseEntity.ok(updated);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<?> deleteComment(
+            @PathVariable Long commentId,
+            @RequestBody Map<String, Object> payload) {
+
+        Long userId = Long.parseLong(payload.get("userId").toString());
+
+        try {
+            commentService.deleteComment(commentId, userId);
+            return ResponseEntity.noContent().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
 
 }
