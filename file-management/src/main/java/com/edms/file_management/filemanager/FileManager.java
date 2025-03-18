@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.edms.file_management.comment.Comment;
 import com.edms.file_management.directory.Directory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -81,4 +82,11 @@ public class FileManager {
             this.metadata = (Map<String, Object>) metadata;
         }
     }
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "documentId")
+    private List<Comment> comments;
+
 }
+

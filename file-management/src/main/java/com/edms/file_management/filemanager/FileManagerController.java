@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.edms.file_management.comment.Comment;
+import com.edms.file_management.comment.CommentRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class FileManagerController {
         this.fileService = fileService;
         this.fileRepository = fileRepository;
     }
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @GetMapping("/allfiles")
     public ResponseEntity<List<FileManager>> getAllFiles() {
@@ -222,5 +227,22 @@ public class FileManagerController {
         return ResponseEntity.ok(fileService.clearMetadata(fileId));
     }
 
+    @PostMapping("/{documentId}/comments")
+    public ResponseEntity<Comment> addComment(
+            @PathVariable Long documentId,
+            @RequestBody Map<String, String> payload) {
+
+        Long userId = Long.valueOf(payload.get("userId"));
+        String content = payload.get("content");
+
+        Comment savedComment = fileService.saveComment(documentId, userId, content);
+        return ResponseEntity.ok(savedComment);
+    }
+
+    @GetMapping("/{documentId}/comments")
+    public ResponseEntity<List<Comment>> getCommentsByDocumentId(@PathVariable Long documentId) {
+        List<Comment> comments = commentRepository.findByDocumentId(documentId);
+        return ResponseEntity.ok(comments);
+    }
 
 }

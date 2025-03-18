@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.edms.file_management.comment.Comment;
+import com.edms.file_management.comment.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -48,6 +50,9 @@ public class FileManagerService implements StorageService  {
    private FileManagerRepository fileRepository;
     @Autowired
    private final ObjectMapper objectMapper;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
 	@Autowired
 	public FileManagerService(StorageProperties properties) throws Exception {
@@ -475,4 +480,17 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         return fileRepository.findAll(); // Assuming the repository has a findAll() method.
     }
 
+    public Comment saveComment(Long documentId, Long userId, String content) {
+        Comment comment = Comment.builder()
+                .documentId(documentId)
+                .userId(userId)
+                .content(content)
+                .build();
+        return commentRepository.save(comment);
+    }
+
+    // Fetch comments by document ID
+    public List<Comment> getCommentsByDocumentId(Long documentId) {
+        return commentRepository.findByDocumentId(documentId);
+    }
 }
