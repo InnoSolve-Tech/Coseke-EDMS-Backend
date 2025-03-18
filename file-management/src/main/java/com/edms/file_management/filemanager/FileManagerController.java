@@ -240,7 +240,7 @@ public class FileManagerController {
         return ResponseEntity.ok(newComment);
     }
 
-    @GetMapping("/document/{documentId}")
+    @GetMapping("/getDocument/{documentId}")
     public ResponseEntity<List<Comment>> getCommentsByDocument(@PathVariable Long documentId) {
         return ResponseEntity.ok(commentService.getCommentsByDocumentId(documentId));
     }
