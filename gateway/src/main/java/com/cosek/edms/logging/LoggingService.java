@@ -1,5 +1,6 @@
 package com.cosek.edms.logging;
 
+import io.github.pixee.security.BoundedLineReader;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -19,7 +20,7 @@ public class LoggingService {
             String line;
             Logging logging = null;
 
-            while ((line = reader.readLine()) != null) {
+            while ((line = BoundedLineReader.readLine(reader, 5_000_000)) != null) {
                 if (line.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\[.*?\\] \\w+ .*")) {
                     // This is a new log entry
                     if (logging != null) {

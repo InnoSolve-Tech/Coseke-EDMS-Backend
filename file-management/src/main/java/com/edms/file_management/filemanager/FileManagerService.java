@@ -1,9 +1,6 @@
 package com.edms.file_management.filemanager;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Stream;
 
-import com.edms.file_management.comment.Comment;
-import com.edms.file_management.comment.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -31,7 +28,15 @@ import com.edms.file_management.exception.ResourceNotFoundException;
 import com.edms.file_management.helper.EncryptionUtil;
 import com.edms.file_management.helper.HashUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import jakarta.transaction.Transactional;
 
 
@@ -50,9 +55,7 @@ public class FileManagerService implements StorageService  {
    private FileManagerRepository fileRepository;
     @Autowired
    private final ObjectMapper objectMapper;
-
-    @Autowired
-    private CommentRepository commentRepository;
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	@Autowired
 	public FileManagerService(StorageProperties properties) throws Exception {
@@ -185,7 +188,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         fileRepository.save(fileManager);
     }
 
-    public void storeById(FileManager data, MultipartFile file, Long folderId) throws Exception {
+    public FileManager storeById(FileManager data, MultipartFile file, Long folderId) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
@@ -227,7 +230,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
         // Save the file hash name
         fileManager.setHashName(hash);
-        fileRepository.save(fileManager);
+        return fileRepository.save(fileManager);
     }
 
     public void bulkStoreById(List<FileManager> fileManagers, MultipartFile[] files, Long folderId) throws Exception {
@@ -280,12 +283,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                     EncryptionUtil.encrypt(inputStream, outputStream);
                 }
 
-                // ✅ Generate fileLink URL based on your server's public URL
-                String baseUrl = "https://yourserver.com/uploads/";
-                String fileUrl = baseUrl + hash + getFileExtension(file.getOriginalFilename());
-
-                // 🔹 Save the fileLink in the database
-                fileManager.setFileLink(fileUrl);
+                // Save the updated FileManager with hash
                 fileRepository.save(fileManager);
             }
         } catch (Exception e) {
@@ -480,17 +478,147 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         return fileRepository.findAll(); // Assuming the repository has a findAll() method.
     }
 
-    public Comment saveComment(Long documentId, Long userId, String content) {
-        Comment comment = Comment.builder()
-                .documentId(documentId)
-                .userId(userId)
-                .content(content)
-                .build();
-        return commentRepository.save(comment);
+    public List<FileManager> fullTextSearch(String searchTerm) throws Exception {
+        List<FileManager> results = new ArrayList<>();
+        List<FileManager> allFiles = getAllFiles();
+
+        for (FileManager file : allFiles) {
+            // Skip files without hash names
+            if (file.getHashName() == null || file.getHashName().isEmpty()) {
+                continue;
+            }
+
+            // Check if file is of supported type
+            String mimeType = file.getMimeType();
+            String extension = getFileExtension(file.getFilename()).toLowerCase();
+
+            // Skip unsupported file types
+            if (!isSearchableDocument(mimeType, extension)) {
+                continue;
+            }
+
+            // Get path to encrypted file
+            Path encryptedFilePath = getEncryptedFilePath(file.getHashName());
+
+            // Check if file exists
+            if (!Files.exists(encryptedFilePath)) {
+                continue;
+            }
+
+            // Create temporary file for decrypted content
+            Path tempFile = Files.createTempFile("decrypted_", extension);
+
+            try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
+                // Decrypt the file to the temporary location
+                decryptFile(encryptedFilePath, outputStream);
+
+                // Extract text based on file type
+                String fileContent = extractTextFromFile(tempFile.toFile(), mimeType, extension);
+
+                // Check if the file contains the search term (case-insensitive)
+                if (fileContent != null && fileContent.toLowerCase().contains(searchTerm.toLowerCase())) {
+                    results.add(file);
+                }
+            } catch (Exception e) {
+                // Log the error but continue processing other files
+                System.err.println("Error searching in file " + file.getFilename() + ": " + e.getMessage());
+            } finally {
+                // Delete the temporary file
+                Files.deleteIfExists(tempFile);
+            }
+        }
+
+        return results;
     }
 
-    // Fetch comments by document ID
-    public List<Comment> getCommentsByDocumentId(Long documentId) {
-        return commentRepository.findByDocumentId(documentId);
+
+    private boolean isSearchableDocument(String mimeType, String extension) {
+        if (mimeType == null) {
+            mimeType = "";
+        }
+
+        // Check common MIME types for the supported document formats
+        return mimeType.contains("application/vnd.openxmlformats-officedocument.wordprocessingml.document") ||
+                mimeType.contains("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ||
+                mimeType.contains("application/vnd.ms-excel") ||
+                mimeType.contains("application/pdf") ||
+                extension.equals(".docx") ||
+                extension.equals(".xlsx") ||
+                extension.equals(".xls") ||
+                extension.equals(".pdf");
     }
+
+    private String extractTextFromFile(File file, String mimeType, String extension) throws Exception {
+        // Extract text based on file extension
+        if (extension.equals(".pdf")) {
+            return extractTextFromPdf(file);
+        } else if (extension.equals(".docx")) {
+            return extractTextFromDocx(file);
+        } else if (extension.equals(".xlsx") || extension.equals(".xls")) {
+            return extractTextFromExcel(file);
+        } else {
+            // Fall back to MIME type if extension doesn't match
+            if (mimeType.contains("pdf")) {
+                return extractTextFromPdf(file);
+            } else if (mimeType.contains("word")) {
+                return extractTextFromDocx(file);
+            } else if (mimeType.contains("excel") || mimeType.contains("spreadsheet")) {
+                return extractTextFromExcel(file);
+            }
+        }
+
+        // If we can't determine the file type or it's not supported
+        return null;
+    }
+
+    private String extractTextFromPdf(File file) throws Exception {
+        try (PDDocument document = PDDocument.load(file)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+        }
+    }
+
+    private String extractTextFromDocx(File file) throws Exception {
+        try (XWPFDocument document = new XWPFDocument(Files.newInputStream(file.toPath()))) {
+            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+            return extractor.getText();
+        }
+    }
+
+    private String extractTextFromExcel(File file) throws Exception {
+        StringBuilder textContent = new StringBuilder();
+
+        try (Workbook workbook = WorkbookFactory.create(file)) {
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+                textContent.append("Sheet: ").append(sheet.getSheetName()).append("\n");
+
+                for (Row row : sheet) {
+                    for (Cell cell : row) {
+                        switch (cell.getCellType()) {
+                            case STRING:
+                                textContent.append(cell.getStringCellValue()).append(" ");
+                                break;
+                            case NUMERIC:
+                                textContent.append(cell.getNumericCellValue()).append(" ");
+                                break;
+                            case BOOLEAN:
+                                textContent.append(cell.getBooleanCellValue()).append(" ");
+                                break;
+                            case FORMULA:
+                                textContent.append(cell.getCellFormula()).append(" ");
+                                break;
+                            default:
+                                // Skip other cell types
+                                break;
+                        }
+                    }
+                    textContent.append("\n");
+                }
+            }
+        }
+
+        return textContent.toString();
+    }
+
 }

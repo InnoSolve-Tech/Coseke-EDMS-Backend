@@ -1,5 +1,6 @@
 package com.edms.file_management.filemanager;
 
+import io.github.pixee.security.Newlines;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -8,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.edms.file_management.comment.Comment;
-import com.edms.file_management.comment.CommentRepository;
-import com.edms.file_management.comment.CommentService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +29,28 @@ public class FileManagerController {
     private final FileManagerRepository fileRepository;
 
     @Autowired
-    private CommentService commentService;
-
-    @Autowired
     public FileManagerController(FileManagerService fileService, FileManagerRepository fileRepository) {
         this.fileService = fileService;
         this.fileRepository = fileRepository;
     }
 
-    @Autowired
-    private CommentRepository commentRepository;
+    @GetMapping("/search/content")
+    public ResponseEntity<?> fullTextSearch(@RequestParam String searchTerm) {
+        try {
+            List<FileManager> results = fileService.fullTextSearch(searchTerm);
+            if (results == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Search returned null results");
+            }
+            if (results.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error during search: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/allfiles")
     public ResponseEntity<List<FileManager>> getAllFiles() {
@@ -63,7 +73,7 @@ public class FileManagerController {
     public void handleFileDownload(@PathVariable String hash, HttpServletResponse response) {
         try {
             Path encryptedFile = fileService.getEncryptedFilePath(hash);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + hash + "\"");
+            response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=\"" + hash + "\""));
             response.setContentType("application/octet-stream");
 
             // Decrypt and write the file to the response's output stream
@@ -96,14 +106,14 @@ public class FileManagerController {
     }
 
     @PostMapping("/{folderId}")
-    public ResponseEntity<String> handleFileUploadById(
+    public ResponseEntity<FileManager> handleFileUploadById(
             @RequestPart("fileData") String fileData,
             @RequestPart("file") MultipartFile file,
             @PathVariable("folderId") Long folderId) throws Exception {
         System.out.println("Received fileData: " + fileData); // Log for debugging
         FileManager dataManager = fileService.convertStringToDataManager(fileData);
-        fileService.storeById(dataManager, file, folderId);
-        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
+        FileManager newFile = fileService.storeById(dataManager, file, folderId);
+        return ResponseEntity.ok().body(newFile);
     }
 
 
@@ -181,7 +191,7 @@ public class FileManagerController {
         try {
             Path encryptedFilePath = fileService.getEncryptedFilePath(hashname);
 
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + hashname + "\"");
+            response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=\"" + hashname + "\""));
             response.setContentType("application/octet-stream");
 
             fileService.decryptFile(encryptedFilePath, response.getOutputStream());
@@ -229,51 +239,6 @@ public class FileManagerController {
     @DeleteMapping("/{fileId}/metadata/all")
     public ResponseEntity<FileManager> clearMetadata(@PathVariable Long fileId) {
         return ResponseEntity.ok(fileService.clearMetadata(fileId));
-    }
-
-    @PostMapping("/document/{documentId}")
-    public ResponseEntity<Comment> createComment(@PathVariable Long documentId, @RequestBody Map<String, Object> payload) {
-        Long userId = Long.parseLong(payload.get("userId").toString());
-        String content = (String) payload.get("content");
-
-        Comment newComment = commentService.addComment(documentId, userId, content);
-        return ResponseEntity.ok(newComment);
-    }
-
-    @GetMapping("/getComments/{documentId}")
-    public ResponseEntity<List<Comment>> getCommentsByDocument(@PathVariable Long documentId) {
-        return ResponseEntity.ok(commentService.getCommentsByDocumentId(documentId));
-    }
-
-    @PutMapping("/{commentId}")
-    public ResponseEntity<?> updateComment(
-            @PathVariable Long commentId,
-            @RequestBody Map<String, Object> payload) {
-
-        Long userId = Long.parseLong(payload.get("userId").toString());
-        String content = (String) payload.get("content");
-
-        try {
-            Comment updated = commentService.updateComment(commentId, userId, content);
-            return ResponseEntity.ok(updated);
-        } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> deleteComment(
-            @PathVariable Long commentId,
-            @RequestBody Map<String, Object> payload) {
-
-        Long userId = Long.parseLong(payload.get("userId").toString());
-
-        try {
-            commentService.deleteComment(commentId, userId);
-            return ResponseEntity.noContent().build();
-        } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
     }
 
 
