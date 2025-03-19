@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CommentService {
@@ -22,11 +23,32 @@ public class CommentService {
                 .userId(userId)
                 .content(content)
                 .build();
-        return commentRepository.save(comment);
+
+        Comment savedComment = commentRepository.save(comment);
+
+        // Fetch user details and set them in the comment
+        Map<String, Object> userDetails = commentRepository.getUserDetailsById(userId);
+        savedComment.setUserEmail((String) userDetails.get("email"));
+        savedComment.setUserFirstName((String) userDetails.get("firstName"));
+        savedComment.setUserLastName((String) userDetails.get("lastName"));
+        savedComment.setUserPhone((String) userDetails.get("phone"));
+
+        return savedComment;
     }
 
     public List<Comment> getCommentsByDocumentId(Long documentId) {
-        return commentRepository.findByDocumentId(documentId);
+        List<Comment> comments = commentRepository.findByDocumentId(documentId);
+
+        // Fetch user details for each comment
+        for (Comment comment : comments) {
+            Map<String, Object> userDetails = commentRepository.getUserDetailsById(comment.getUserId());
+            comment.setUserEmail((String) userDetails.get("email"));
+            comment.setUserFirstName((String) userDetails.get("firstName"));
+            comment.setUserLastName((String) userDetails.get("lastName"));
+            comment.setUserPhone((String) userDetails.get("phone"));
+        }
+
+        return comments;
     }
 
     @Transactional
