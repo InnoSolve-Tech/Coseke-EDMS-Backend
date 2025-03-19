@@ -18,23 +18,27 @@ public class CommentService {
     }
 
     public Comment addComment(Long documentId, Long userId, String content) {
+        // Fetch user details before creating the comment
+        Map<String, Object> userDetails = commentRepository.getUserDetailsById(userId);
+
+        if (userDetails == null || userDetails.isEmpty()) {
+            throw new RuntimeException("User details not found for user ID: " + userId);
+        }
+
+        // Create and save comment with user details
         Comment comment = Comment.builder()
                 .documentId(documentId)
                 .userId(userId)
                 .content(content)
+                .userEmail((String) userDetails.getOrDefault("email", "N/A"))
+                .userFirstName((String) userDetails.getOrDefault("firstName", "Unknown"))
+                .userLastName((String) userDetails.getOrDefault("lastName", "Unknown"))
+                .userPhone((String) userDetails.getOrDefault("phone", "Not Provided"))
                 .build();
 
-        Comment savedComment = commentRepository.save(comment);
-
-        // Fetch user details and set them in the comment
-        Map<String, Object> userDetails = commentRepository.getUserDetailsById(userId);
-        savedComment.setUserEmail((String) userDetails.get("email"));
-        savedComment.setUserFirstName((String) userDetails.get("firstName"));
-        savedComment.setUserLastName((String) userDetails.get("lastName"));
-        savedComment.setUserPhone((String) userDetails.get("phone"));
-
-        return savedComment;
+        return commentRepository.save(comment);
     }
+
 
     public List<Comment> getCommentsByDocumentId(Long documentId) {
         List<Comment> comments = commentRepository.findByDocumentId(documentId);
