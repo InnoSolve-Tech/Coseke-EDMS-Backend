@@ -1,0 +1,11 @@
+package com.edms.file_management.version;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface VersionCommentRepository extends JpaRepository<VersionComment, Long> {
+    List<VersionComment> findByVersionId(Long versionId);
+}
