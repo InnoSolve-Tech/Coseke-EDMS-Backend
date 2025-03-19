@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Stream;
 
+import com.edms.file_management.comment.Comment;
+import com.edms.file_management.comment.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -50,6 +52,9 @@ public class FileManagerService implements StorageService  {
 
    @Autowired
    private DirectoryRepository directoryRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
    @Autowired
    private FileManagerRepository fileRepository;
@@ -621,4 +626,17 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         return textContent.toString();
     }
 
+    public Comment saveComment(Long documentId, Long userId, String content) {
+        Comment comment = Comment.builder()
+                .documentId(documentId)
+                .userId(userId)
+                .content(content)
+                .build();
+        return commentRepository.save(comment);
+    }
+
+    // Fetch comments by document ID
+    public List<Comment> getCommentsByDocumentId(Long documentId) {
+        return commentRepository.findByDocumentId(documentId);
+    }
 }
