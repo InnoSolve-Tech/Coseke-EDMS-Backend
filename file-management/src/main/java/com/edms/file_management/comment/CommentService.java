@@ -4,6 +4,8 @@ import com.edms.file_management.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +27,7 @@ public class CommentService {
             throw new RuntimeException("User details not found for user ID: " + userId);
         }
 
-        // Create and save comment with user details
+        // Create comment with user details
         Comment comment = Comment.builder()
                 .documentId(documentId)
                 .userId(userId)
@@ -34,9 +36,12 @@ public class CommentService {
                 .userFirstName((String) userDetails.getOrDefault("firstName", "Unknown"))
                 .userLastName((String) userDetails.getOrDefault("lastName", "Unknown"))
                 .userPhone((String) userDetails.getOrDefault("phone", "Not Provided"))
+                .createdAt(new Date())  // Ensure timestamps are set
+                .updatedAt(new Date())
                 .build();
 
-        return commentRepository.save(comment);
+        // Save comment and flush to ensure data is written to the database
+        return commentRepository.saveAndFlush(comment);
     }
 
 

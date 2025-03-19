@@ -1,57 +1,41 @@
 package com.edms.file_management.comment;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
-@Table(name = "comments")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "comments")
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private Long documentId;
-
-    @Column(nullable = false)
     private Long userId;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
     private String content;
 
-    // User details as transient fields
-    @Transient
+    // User details (ensure these exist)
     private String userEmail;
-
-    @Transient
     private String userFirstName;
-
-    @Transient
     private String userLastName;
-
-    @Transient
     private String userPhone;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt = new Date();
 
-    @PrePersist
-    void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt = new Date();
 }

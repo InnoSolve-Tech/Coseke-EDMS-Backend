@@ -13,4 +13,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(value = "SELECT email, first_name AS firstName, last_name AS lastName, phone FROM users WHERE id = :userId", nativeQuery = true)
     Map<String, Object> getUserDetailsById(@Param("userId") Long userId);
+
 }
