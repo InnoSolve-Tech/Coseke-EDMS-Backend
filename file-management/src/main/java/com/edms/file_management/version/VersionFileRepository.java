@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface VersionFileRepository extends JpaRepository<VersionFile, Long> {
-    List<VersionFile> findByDocument_Id(Long documentId);
+    List<VersionFile> findByDocumentIdOrderByUploadedAtDesc(Long documentId);
 }
