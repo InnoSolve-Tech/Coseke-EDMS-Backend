@@ -45,4 +45,8 @@ public class Version {
 
     @OneToMany(mappedBy = "version", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VersionComment> versionComments;
+
+    @Enumerated(EnumType.STRING)
+    private VersionType versionType;
+
 }

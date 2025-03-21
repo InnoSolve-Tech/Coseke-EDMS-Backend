@@ -1,5 +1,6 @@
 package com.edms.file_management.version.dto;
 
+import com.edms.file_management.version.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,5 +21,6 @@ public class VersionDTO {
     private Long createdBy;
     private String createdByUsername; // To be populated from the user service
     private Long documentId;
+    private VersionType versionType;
 }
 

@@ -1,5 +1,6 @@
 package com.edms.file_management.version.dto;
 
+import com.edms.file_management.version.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class CreateVersionDTO {
     private String changes;
     private String fileUrl;
     private Long documentId;
+    private VersionType versionType;
 }

@@ -101,6 +101,49 @@ public class VersionService {
                 .createdDate(version.getCreatedDate())
                 .createdBy(version.getCreatedBy())
                 .documentId(version.getDocument().getId())
+                .versionType(version.getVersionType())
                 .build();
     }
+
+    public String generateNextVersionName(Long documentId, VersionType versionType) {
+        List<Version> versions = versionRepository.findByDocumentId(documentId);
+        versions.sort((a, b) -> b.getCreatedDate().compareTo(a.getCreatedDate()));
+
+        if (versions.isEmpty()) {
+            return versionType == VersionType.MAJOR ? "1" : "1.0";
+        }
+
+        String lastVersion = versions.get(0).getVersionName();
+        String[] parts = lastVersion.split("\\.");
+
+        int major = Integer.parseInt(parts[0]);
+        int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+
+        if (versionType == VersionType.MAJOR) {
+            return (major + 1) + "";
+        } else {
+            return major + "." + (minor + 1);
+        }
+    }
+
+    @Transactional
+    public VersionDTO createVersionWithAutoVersionName(CreateVersionDTO dto, Long userId) {
+        FileManager document = fileManagerRepository.findById(dto.getDocumentId())
+                .orElseThrow(() -> new EntityNotFoundException("Document not found with id: " + dto.getDocumentId()));
+
+        String versionName = generateNextVersionName(dto.getDocumentId(), dto.getVersionType());
+
+        Version version = Version.builder()
+                .versionName(versionName)
+                .versionType(dto.getVersionType())
+                .changes(dto.getChanges())
+                .fileUrl(dto.getFileUrl())
+                .document(document)
+                .createdBy(userId)
+                .createdDate(LocalDateTime.now())
+                .build();
+
+        return mapToDTO(versionRepository.save(version));
+    }
+
 }

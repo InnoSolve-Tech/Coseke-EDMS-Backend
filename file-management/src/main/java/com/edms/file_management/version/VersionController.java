@@ -53,4 +53,21 @@ public class VersionController {
         versionService.deleteVersion(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/major")
+    public ResponseEntity<VersionDTO> createMajorVersion(
+            @RequestBody CreateVersionDTO dto,
+            @RequestHeader("userId") Long userId) {
+        dto.setVersionType(VersionType.MAJOR);
+        return new ResponseEntity<>(versionService.createVersionWithAutoVersionName(dto, userId), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/minor")
+    public ResponseEntity<VersionDTO> createMinorVersion(
+            @RequestBody CreateVersionDTO dto,
+            @RequestHeader("userId") Long userId) {
+        dto.setVersionType(VersionType.MINOR);
+        return new ResponseEntity<>(versionService.createVersionWithAutoVersionName(dto, userId), HttpStatus.CREATED);
+    }
+
 }
