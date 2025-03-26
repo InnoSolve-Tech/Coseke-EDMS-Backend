@@ -1,5 +1,8 @@
 package com.edms.file_management.filemanager;
 
+import com.edms.file_management.version.VersionService;
+import com.edms.file_management.version.dto.CreateVersionDTO;
+import com.edms.file_management.version.dto.VersionDTO;
 import io.github.pixee.security.Newlines;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,6 +33,8 @@ public class FileManagerController {
     private final FileManagerService fileService;
 
     private final FileManagerRepository fileRepository;
+
+    private  VersionService versionService;
 
     @Autowired
     public FileManagerController(FileManagerService fileService, FileManagerRepository fileRepository) {
@@ -292,6 +297,39 @@ public class FileManagerController {
         }
     }
 
+    @PostMapping("/upload-version")
+    public ResponseEntity<VersionDTO> uploadNewVersion(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("versionData") String versionData,
+            @RequestHeader("userId") Long userId) throws Exception {
+
+        // Parse JSON string into CreateVersionDTO
+        ObjectMapper mapper = new ObjectMapper();
+        CreateVersionDTO versionDTO = mapper.readValue(versionData, CreateVersionDTO.class);
+
+        // Fetch the existing document
+        FileManager existingFile = fileService.getFileByID(versionDTO.getDocumentId());
+
+        // Create new FileManager entity to store the new version file
+        FileManager newVersionFile = FileManager.builder()
+                .documentType(existingFile.getDocumentType())
+                .documentName(existingFile.getDocumentName())
+                .folderID(existingFile.getFolderID())
+                .mimeType(file.getContentType())
+                .metadata(existingFile.getMetadata())
+                .build();
+
+        // Store the file
+        FileManager storedFile = fileService.storeById(newVersionFile, file, existingFile.getFolderID().longValue());
+
+        // Set the stored file hash as fileUrl in DTO
+        versionDTO.setFileUrl(storedFile.getHashName());
+
+        // Create version with auto-generated version name
+        VersionDTO createdVersion = versionService.createVersionWithAutoVersionName(versionDTO, userId);
+
+        return new ResponseEntity<>(createdVersion, HttpStatus.CREATED);
+    }
 
 
 }
