@@ -49,4 +49,8 @@ public class Version {
     @Enumerated(EnumType.STRING)
     private VersionType versionType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "versionFileId")
+    private FileManager versionFile;
+
 }

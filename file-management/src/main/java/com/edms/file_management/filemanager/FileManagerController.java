@@ -323,7 +323,7 @@ public class FileManagerController {
 
         versionDTO.setFileUrl(storedFile.getHashName());
 
-        VersionDTO createdVersion = versionService.createVersionWithAutoVersionName(versionDTO, userId);
+        VersionDTO createdVersion = versionService.createVersionWithAutoVersionName(versionDTO, userId,storedFile);
 
         return new ResponseEntity<>(createdVersion, HttpStatus.CREATED);
     }

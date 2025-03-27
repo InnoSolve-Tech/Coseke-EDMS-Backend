@@ -127,7 +127,7 @@ public class VersionService {
     }
 
     @Transactional
-    public VersionDTO createVersionWithAutoVersionName(CreateVersionDTO dto, Long userId) {
+    public VersionDTO createVersionWithAutoVersionName(CreateVersionDTO dto, Long userId, FileManager storedFile) {
         FileManager document = fileManagerRepository.findById(dto.getDocumentId())
                 .orElseThrow(() -> new EntityNotFoundException("Document not found with id: " + dto.getDocumentId()));
 
@@ -137,8 +137,10 @@ public class VersionService {
                 .versionName(versionName)
                 .versionType(dto.getVersionType())
                 .changes(dto.getChanges())
+                .fileUrl(storedFile.getHashName())
                 .fileUrl(dto.getFileUrl())
                 .document(document)
+                .versionFile(storedFile)
                 .createdBy(userId)
                 .createdDate(LocalDateTime.now())
                 .build();
