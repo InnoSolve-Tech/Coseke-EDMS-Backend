@@ -34,12 +34,13 @@ public class FileManagerController {
 
     private final FileManagerRepository fileRepository;
 
-    private  VersionService versionService;
+    private final VersionService versionService;
 
     @Autowired
-    public FileManagerController(FileManagerService fileService, FileManagerRepository fileRepository) {
+    public FileManagerController(FileManagerService fileService, FileManagerRepository fileRepository, VersionService versionService) {
         this.fileService = fileService;
         this.fileRepository = fileRepository;
+        this.versionService = versionService;
     }
 
     @Autowired
