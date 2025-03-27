@@ -16,4 +16,5 @@ public class CreateVersionDTO {
     private String fileUrl;
     private Long documentId;
     private VersionType versionType;
+    private Long userId;
 }

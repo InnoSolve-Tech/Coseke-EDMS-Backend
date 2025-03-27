@@ -297,20 +297,19 @@ public class FileManagerController {
         }
     }
 
+
     @PostMapping("/upload-version")
     public ResponseEntity<VersionDTO> uploadNewVersion(
             @RequestPart("file") MultipartFile file,
-            @RequestPart("versionData") String versionData,
-            @RequestHeader("userId") Long userId) throws Exception {
+            @RequestPart("versionData") String versionData) throws Exception {
 
-        // Parse JSON string into CreateVersionDTO
         ObjectMapper mapper = new ObjectMapper();
         CreateVersionDTO versionDTO = mapper.readValue(versionData, CreateVersionDTO.class);
 
-        // Fetch the existing document
+        Long userId = versionDTO.getUserId(); // ✅ userId from payload
+
         FileManager existingFile = fileService.getFileByID(versionDTO.getDocumentId());
 
-        // Create new FileManager entity to store the new version file
         FileManager newVersionFile = FileManager.builder()
                 .documentType(existingFile.getDocumentType())
                 .documentName(existingFile.getDocumentName())
@@ -319,13 +318,10 @@ public class FileManagerController {
                 .metadata(existingFile.getMetadata())
                 .build();
 
-        // Store the file
         FileManager storedFile = fileService.storeById(newVersionFile, file, existingFile.getFolderID().longValue());
 
-        // Set the stored file hash as fileUrl in DTO
         versionDTO.setFileUrl(storedFile.getHashName());
 
-        // Create version with auto-generated version name
         VersionDTO createdVersion = versionService.createVersionWithAutoVersionName(versionDTO, userId);
 
         return new ResponseEntity<>(createdVersion, HttpStatus.CREATED);
