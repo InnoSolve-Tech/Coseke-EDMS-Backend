@@ -102,6 +102,7 @@ public class VersionService {
                 .createdBy(version.getCreatedBy())
                 .documentId(version.getDocument().getId())
                 .versionType(version.getVersionType())
+                .versionFileId(version.getVersionFile() != null ? version.getVersionFile().getId() : null)
                 .build();
     }
 

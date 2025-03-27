@@ -22,5 +22,6 @@ public class VersionDTO {
     private String createdByUsername; // To be populated from the user service
     private Long documentId;
     private VersionType versionType;
+    private Long versionFileId;
 }
 
