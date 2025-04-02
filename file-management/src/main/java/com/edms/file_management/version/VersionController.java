@@ -1,8 +1,11 @@
 package com.edms.file_management.version;
 
+import com.edms.file_management.filemanager.FileManager;
+import com.edms.file_management.filemanager.FileManagerRepository;
 import com.edms.file_management.version.dto.CreateVersionDTO;
 import com.edms.file_management.version.dto.UpdateVersionDTO;
 import com.edms.file_management.version.dto.VersionDTO;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import java.util.List;
 public class VersionController {
 
     private final VersionService versionService;
+    private final FileManagerRepository fileRepository;
 
     @GetMapping("/document/{documentId}")
     public ResponseEntity<List<VersionDTO>> getAllVersionsForDocument(@PathVariable Long documentId) {
@@ -53,21 +57,25 @@ public class VersionController {
         versionService.deleteVersion(id, userId);
         return ResponseEntity.noContent().build();
     }
-//
-//    @PostMapping("/major")
-//    public ResponseEntity<VersionDTO> createMajorVersion(
-//            @RequestBody CreateVersionDTO dto,
-//            @RequestHeader("userId") Long userId) {
-//        dto.setVersionType(VersionType.MAJOR);
-//        return new ResponseEntity<>(versionService.createVersionWithAutoVersionName(dto, userId), HttpStatus.CREATED);
-//    }
-//
-//    @PostMapping("/minor")
-//    public ResponseEntity<VersionDTO> createMinorVersion(
-//            @RequestBody CreateVersionDTO dto,
-//            @RequestHeader("userId") Long userId) {
-//        dto.setVersionType(VersionType.MINOR);
-//        return new ResponseEntity<>(versionService.createVersionWithAutoVersionName(dto, userId), HttpStatus.CREATED);
-//    }
+
+    @PostMapping("/major")
+    public ResponseEntity<VersionDTO> createMajorVersion(
+            @RequestBody CreateVersionDTO dto,
+            @RequestHeader("userId") Long userId) {
+        dto.setVersionType(VersionType.MAJOR);
+        FileManager storedFile = fileRepository.findByHashName(dto.getFileUrl())
+                .orElseThrow(() -> new EntityNotFoundException("File not found for hash: " + dto.getFileUrl()));
+        return new ResponseEntity<>(versionService.createVersionWithAutoVersionName(dto, userId, storedFile), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/minor")
+    public ResponseEntity<VersionDTO> createMinorVersion(
+            @RequestBody CreateVersionDTO dto,
+            @RequestHeader("userId") Long userId) {
+        dto.setVersionType(VersionType.MINOR);
+        FileManager storedFile = fileRepository.findByHashName(dto.getFileUrl())
+                .orElseThrow(() -> new EntityNotFoundException("File not found for hash: " + dto.getFileUrl()));
+        return new ResponseEntity<>(versionService.createVersionWithAutoVersionName(dto, userId, storedFile), HttpStatus.CREATED);
+    }
 
 }
