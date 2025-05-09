@@ -182,6 +182,17 @@ public class FileManagerController {
 
     }
 
+    @PutMapping("/file/{id}/document-type")
+    public ResponseEntity<FileManager> updateDocumentType(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload) {
+        String newType = payload.get("documentType");
+        FileManager file = fileService.getFileByID(id);
+        file.setDocumentType(newType);
+        return ResponseEntity.ok(fileService.updateFile(file));
+    }
+
+
     @PostMapping("/bulk")
     public ResponseEntity<String> handleBulkFileUpload(@RequestParam("data") FileManager[] fileData, @RequestParam("files") MultipartFile[] files) throws Exception {
         fileService.bulkStore(fileData, files);
