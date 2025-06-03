@@ -20,7 +20,7 @@ public class ProxyController {
         
     }
 
-    @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
+    @RequestMapping(value = {"/file-management/**", "/workflows/**", "/tasks/**", "/forms/**"}, method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
     public ResponseEntity<String> proxyRequest(HttpServletRequest request, @RequestBody(required = false) String body) {
         try {
             // Extract HTTP method

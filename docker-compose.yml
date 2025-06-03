@@ -20,10 +20,9 @@ services:
     environment:
       - STORAGE_LOCATION=/app/storage
       - SECRET_KEY=/app/key/keyfile.key
-      
     volumes:
-      - ./storage:/app/storage
-      - ./key:/app/key
+      - storage-data:/app/storage
+      - key-data:/app/key
     networks:
       - edms-network
 
@@ -51,3 +50,7 @@ services:
 networks:
   edms-network:
     driver: bridge
+
+volumes:
+  storage-data:
+  key-data:
