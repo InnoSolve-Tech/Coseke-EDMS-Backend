@@ -4,6 +4,8 @@ services:
   edms-gateway:
     build:
       context: ./gateway
+    env_file:
+      - .env
     ports:
       - "8787:8787"
     depends_on:
@@ -17,6 +19,8 @@ services:
   file-management:
     build:
       context: ./file-management
+    env_file:
+      - .env
     environment:
       - STORAGE_LOCATION=/app/storage
       - SECRET_KEY=/app/key/keyfile.key

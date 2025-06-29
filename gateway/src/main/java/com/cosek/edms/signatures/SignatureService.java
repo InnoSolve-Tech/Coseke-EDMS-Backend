@@ -94,7 +94,6 @@ public class SignatureService {
         } else {
             email = principal.toString(); // fallback if principal is a raw string
         }
-        System.out.println("Email: " + email);
         User user = userRepository.findByEmail(email).orElseThrow();
         List<Signature> signatures = signatureRepository.findByUser(user).orElseThrow();
         return signatures;

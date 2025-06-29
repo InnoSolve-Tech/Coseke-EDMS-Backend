@@ -27,7 +27,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "http://localhost:8787"
+                "http://localhost:8787",
+                "http://192.168.100.40:3000",
+                "http://192.168.100.40:8787"
+
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);

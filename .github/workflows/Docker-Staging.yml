@@ -18,28 +18,28 @@ jobs:
 
       - name: Build and Push edms-gateway Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-gateway:latest ./gateway
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-staging-gateway:latest ./gateway
           docker push ${{ secrets.DOCKER_USERNAME }}/staging-gateway:latest
 
       - name: Build and Push file-management Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-file-management:latest ./file-management
-          docker push ${{ secrets.DOCKER_USERNAME }}/staging-file-management:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-staging-file-management:latest ./file-management
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-staging-file-management:latest
 
       - name: Build and Push workflows Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-workflows:latest ./workflows
-          docker push ${{ secrets.DOCKER_USERNAME }}/staging-workflows:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-staging-workflows:latest ./workflows
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-staging-workflows:latest
 
       - name: Build and Push tasks Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-tasks:latest ./tasks
-          docker push ${{ secrets.DOCKER_USERNAME }}/staging-tasks:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-staging-tasks:latest ./tasks
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-staging-tasks:latest
 
       - name: Build and Push forms Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/staging-forms:latest ./forms
-          docker push ${{ secrets.DOCKER_USERNAME }}/staging-forms:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-staging-forms:latest ./forms
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-staging-forms:latest
 
       - name: Log out of Docker Hub
         run: docker logout

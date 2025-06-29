@@ -18,28 +18,28 @@ jobs:
 
       - name: Build and Push edms-gateway Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/gateway:latest ./gateway
-          docker push ${{ secrets.DOCKER_USERNAME }}/gateway:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-gateway:latest ./gateway
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-gateway:latest
 
       - name: Build and Push file-management Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/file-management:latest ./file-management
-          docker push ${{ secrets.DOCKER_USERNAME }}/file-management:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-file-management:latest ./file-management
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-file-management:latest
 
       - name: Build and Push workflows Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/workflows:latest ./workflows
-          docker push ${{ secrets.DOCKER_USERNAME }}/workflows:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-workflows:latest ./workflows
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-workflows:latest
 
       - name: Build and Push tasks Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/tasks:latest ./tasks
-          docker push ${{ secrets.DOCKER_USERNAME }}/tasks:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-tasks:latest ./tasks
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-tasks:latest
 
       - name: Build and Push forms Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/forms:latest ./forms
-          docker push ${{ secrets.DOCKER_USERNAME }}/forms:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/edms-forms:latest ./forms
+          docker push ${{ secrets.DOCKER_USERNAME }}/edms-forms:latest
 
       - name: Log out of Docker Hub
         run: docker logout

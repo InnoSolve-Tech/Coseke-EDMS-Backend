@@ -72,24 +72,93 @@ public class FileManagerController {
     @GetMapping("/download/{hash}")
     public void handleFileDownload(@PathVariable String hash, HttpServletResponse response) {
         try {
+            // Get file info from database
+            FileManager fileManager = fileRepository.findByHashName(hash)
+                    .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
+
+            // Get the actual file path (works with both SFTP and local storage)
             Path encryptedFile = fileService.getEncryptedFilePath(hash);
-            response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=\"" + hash + "\""));
-            response.setContentType("application/octet-stream");
+
+            // Set response headers with original filename
+            String originalFilename = fileManager.getFilename();
+            if (originalFilename == null || originalFilename.isEmpty()) {
+                originalFilename = hash;
+            }
+
+            response.setHeader("Content-Disposition",
+                    Newlines.stripAll("attachment; filename=\"" + originalFilename + "\""));
+            response.setContentType(fileManager.getMimeType() != null ?
+                    fileManager.getMimeType() : "application/octet-stream");
 
             // Decrypt and write the file to the response's output stream
             fileService.decryptFile(encryptedFile, response.getOutputStream());
+            response.getOutputStream().flush();
+
         } catch (Exception e) {
-            // Log the error and set the response status before calling getOutputStream
+            // Log the error
+            System.err.println("Error downloading file with hash " + hash + ": " + e.getMessage());
+            e.printStackTrace();
+
+            // Set error response
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType("text/plain");
             try {
-                response.getOutputStream().write(("Failed to download file: " + e.getMessage()).getBytes());
-                response.getOutputStream().flush();
+                if (!response.isCommitted()) {
+                    response.getOutputStream().write(
+                            ("Failed to download file: " + e.getMessage()).getBytes());
+                    response.getOutputStream().flush();
+                }
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                System.err.println("Error writing error response: " + ioException.getMessage());
             }
         }
     }
+
+    @GetMapping("/file/hash/{hashname}")
+    public void getFileByHashName(@PathVariable String hashname, HttpServletResponse response) {
+        try {
+            // Get file info from database
+            FileManager fileManager = fileRepository.findByHashName(hashname)
+                    .orElseThrow(() -> new Exception("File with hash " + hashname + " not found"));
+
+            // Get the encrypted file path
+            Path encryptedFilePath = fileService.getEncryptedFilePath(hashname);
+
+            // Set response headers with original filename
+            String originalFilename = fileManager.getFilename();
+            if (originalFilename == null || originalFilename.isEmpty()) {
+                originalFilename = hashname;
+            }
+
+            response.setHeader("Content-Disposition",
+                    Newlines.stripAll("attachment; filename=\"" + originalFilename + "\""));
+            response.setContentType(fileManager.getMimeType() != null ?
+                    fileManager.getMimeType() : "application/octet-stream");
+
+            // Decrypt and stream the file
+            fileService.decryptFile(encryptedFilePath, response.getOutputStream());
+            response.getOutputStream().flush();
+
+        } catch (Exception e) {
+            // Log the error
+            System.err.println("Error downloading file with hash " + hashname + ": " + e.getMessage());
+            e.printStackTrace();
+
+            // Set error response
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setContentType("text/plain");
+            try {
+                if (!response.isCommitted()) {
+                    response.getOutputStream().write(
+                            ("Failed to download file: " + e.getMessage()).getBytes());
+                    response.getOutputStream().flush();
+                }
+            } catch (IOException ioException) {
+                System.err.println("Error writing error response: " + ioException.getMessage());
+            }
+        }
+    }
+
     @GetMapping("/{folderID}/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable Long folderID, @PathVariable String filename) throws Exception {
         Resource file = fileService.loadAsResource(filename, folderID);
@@ -184,27 +253,6 @@ public class FileManagerController {
     @GetMapping("/file/{id}")
     public ResponseEntity<FileManager> getFileByID(@PathVariable Long id) {
         return ResponseEntity.ok(fileService.getFileByID(id));
-    }
-
-    @GetMapping("/file/hash/{hashname}")
-    public void getFileByHashName(@PathVariable String hashname, HttpServletResponse response) {
-        try {
-            Path encryptedFilePath = fileService.getEncryptedFilePath(hashname);
-
-            response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=\"" + hashname + "\""));
-            response.setContentType("application/octet-stream");
-
-            fileService.decryptFile(encryptedFilePath, response.getOutputStream());
-        } catch (Exception e) {
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setContentType("text/plain");
-            try {
-                response.getOutputStream().write(("Failed to download file: " + e.getMessage()).getBytes());
-                response.getOutputStream().flush();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-        }
     }
 
     @GetMapping("/search")

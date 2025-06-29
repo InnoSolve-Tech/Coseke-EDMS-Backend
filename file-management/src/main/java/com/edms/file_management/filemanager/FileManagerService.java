@@ -5,15 +5,18 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,10 @@ import com.edms.file_management.exception.ResourceNotFoundException;
 import com.edms.file_management.helper.EncryptionUtil;
 import com.edms.file_management.helper.HashUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -39,206 +46,546 @@ import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import jakarta.transaction.Transactional;
 
-
 @Service
-public class FileManagerService implements StorageService  {
-    
-   private final String rootLocation;
+@RequiredArgsConstructor
+public class FileManagerService implements StorageService {
 
-   @Autowired
-   private DirectoryService directoryService;
+    private final String rootLocation;
 
-   @Autowired
-   private DirectoryRepository directoryRepository;
+    @Value("${sftp.username:}")
+    private String sftpUsername;
 
-   @Autowired
-   private FileManagerRepository fileRepository;
+    @Value("${sftp.password:}")
+    private String sftpPassword;
+
+    @Value("${sftp.host:}")
+    private String sftpHost;
+
+    @Value("${sftp.port:22}")
+    private int sftpPort;
+
+    @Value("${sftp.enabled:false}")
+    private boolean sftpEnabled;
+
+    // Base SFTP upload directory
+    private final String remoteBasePath = "/uploads";
+
     @Autowired
-   private final ObjectMapper objectMapper;
+    private DirectoryService directoryService;
+
+    @Autowired
+    private EncryptionUtil encryptionUtil;
+
+    @Autowired
+    private DirectoryRepository directoryRepository;
+
+    @Autowired
+    private FileManagerRepository fileRepository;
+
+    @Autowired
+    private final ObjectMapper objectMapper;
+
+    private final ConcurrentHashMap<String, AtomicInteger> folderFileCountCache = new ConcurrentHashMap<>();
+
+    // Maximum files per folder
+    private static final int MAX_FILES_PER_FOLDER = 20;
+
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-	@Autowired
-	public FileManagerService(StorageProperties properties) throws Exception {
+    @Autowired
+    public FileManagerService(StorageProperties properties) throws Exception {
         if(properties.getLocation().trim().length() == 0){
-            throw new Exception("File upload location can not be Empty."); 
+            throw new Exception("File upload location can not be Empty.");
         }
-		this.rootLocation = properties.getLocation();
+        this.rootLocation = properties.getLocation();
         objectMapper = new ObjectMapper();
-	}
+    }
 
-	@Override
-public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exception {
-    List<String> fileNames = new ArrayList<>();
-    try {
-        for (MultipartFile file : files) {
-            if (file.isEmpty()) {
-                throw new Exception("Failed to store empty file.");
+    public String generateFilePath(String originalFilename, String hashName) throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        String year = now.format(DateTimeFormatter.ofPattern("yyyy"));
+        String month = now.format(DateTimeFormatter.ofPattern("MM"));
+
+        // Base path: Year/Month
+        String basePath = year + "/" + month;
+
+        // Find the appropriate folder number
+        int folderNumber = findAvailableFolder(basePath);
+
+        // Complete path structure
+        String folderName = "folder-" + folderNumber;
+        String completePath = basePath + "/" + folderName;
+
+        // Return the complete file path
+        return completePath + "/" + hashName + ".bin";
+    }
+
+    /**
+     * Finds an available folder that has space (less than 20 files)
+     * or creates a new one if all existing folders are full
+     */
+    private int findAvailableFolder(String basePath) throws Exception {
+        int folderNumber = 0;
+
+        while (true) {
+            String folderPath = basePath + "/folder-" + folderNumber;
+            String fullPath = getFinalStoragePath(folderPath);
+
+            int fileCount = getFileCountInFolder(fullPath, folderPath);
+
+            if (fileCount < MAX_FILES_PER_FOLDER) {
+                // Update cache
+                folderFileCountCache.computeIfAbsent(folderPath, k -> new AtomicInteger(0))
+                        .set(fileCount);
+                return folderNumber;
             }
-            fileNames.add(file.getOriginalFilename());
+
+            folderNumber++;
+
+            // Safety check to prevent infinite loop (optional)
+            if (folderNumber > 1000) {
+                throw new Exception("Too many folders created. Please check the system.");
+            }
         }
-        for (int x = 0; x < files.length; x++) {
-            Optional<Directory> directory = directoryRepository.findByName(data[x].getDocumentType());
-            FileManager fileManager;
-            if (directory.isPresent()) {
-                fileManager = FileManager.builder()
-                    .documentType(data[x].getDocumentType())
-                    .folderID(directory.get().getFolderID())
-                    .filename(files[x].getOriginalFilename())
-                        .mimeType(data[x].getMimeType())
-                    .build();
-                fileRepository.save(fileManager);
+    }
+
+    /**
+     * Gets the final storage path (local or SFTP base path)
+     */
+    private String getFinalStoragePath(String relativePath) {
+        if (sftpEnabled) {
+            return remoteBasePath + "/" + relativePath;
+        } else {
+            return Paths.get(rootLocation, relativePath).toString();
+        }
+    }
+
+    /**
+     * Counts files in a folder (works for both local and SFTP)
+     */
+    private int getFileCountInFolder(String fullPath, String relativePath) throws Exception {
+        // Check cache first
+        AtomicInteger cachedCount = folderFileCountCache.get(relativePath);
+        if (cachedCount != null) {
+            return cachedCount.get();
+        }
+
+        int count;
+        if (sftpEnabled) {
+            count = countFilesInSFTPFolder(fullPath);
+        } else {
+            count = countFilesInLocalFolder(fullPath);
+        }
+
+        // Update cache
+        folderFileCountCache.put(relativePath, new AtomicInteger(count));
+        return count;
+    }
+
+    /**
+     * Counts files in local folder
+     */
+    private int countFilesInLocalFolder(String folderPath) throws Exception {
+        Path path = Paths.get(folderPath);
+
+        if (!Files.exists(path)) {
+            return 0;
+        }
+
+        try (Stream<Path> files = Files.list(path)) {
+            return (int) files.filter(Files::isRegularFile).count();
+        } catch (IOException e) {
+            throw new Exception("Failed to count files in local folder: " + folderPath, e);
+        }
+    }
+
+    /**
+     * Counts files in SFTP folder
+     */
+    private int countFilesInSFTPFolder(String remoteFolderPath) throws Exception {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            try {
+                @SuppressWarnings("unchecked")
+                Vector<ChannelSftp.LsEntry> files = channel.ls(remoteFolderPath);
+                // Filter out directories (. and ..)
+                return (int) files.stream()
+                        .filter(entry -> !entry.getAttrs().isDir())
+                        .count();
+            } catch (Exception e) {
+                // Folder doesn't exist, return 0
+                return 0;
+            }
+
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Creates directory structure (works for both local and SFTP)
+     */
+    private void createDirectoryStructure(String path) throws Exception {
+        if (sftpEnabled) {
+            createSFTPDirectoryStructure(path);
+        } else {
+            createLocalDirectoryStructure(path);
+        }
+    }
+
+    /**
+     * Creates local directory structure
+     */
+    private void createLocalDirectoryStructure(String path) throws Exception {
+        Path dirPath = Paths.get(path).getParent();
+        if (dirPath != null) {
+            Files.createDirectories(dirPath);
+        }
+    }
+
+    /**
+     * Creates SFTP directory structure
+     */
+    private void createSFTPDirectoryStructure(String remotePath) throws Exception {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            String dirPath = remotePath.substring(0, remotePath.lastIndexOf("/"));
+            createRemoteDirectory(channel, dirPath);
+
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Store file via SFTP with structured path
+     */
+    private void storeFileViaSFTPWithPath(MultipartFile file, String filePath) throws Exception {
+        // Encrypt file in memory
+        ByteArrayOutputStream encryptedOutput = new ByteArrayOutputStream();
+        try (InputStream input = file.getInputStream()) {
+            encryptionUtil.encrypt(input, encryptedOutput);
+        }
+
+        // Create directory structure first
+        createSFTPDirectoryStructure(remoteBasePath + "/" + filePath);
+
+        // SFTP upload
+        String remotePath = remoteBasePath + "/" + filePath;
+        uploadFileViaSFTP(
+                encryptedOutput.toByteArray(),
+                remotePath,
+                sftpUsername,
+                sftpHost,
+                sftpPort,
+                sftpPassword
+        );
+    }
+
+    /**
+     * Updates folder cache after file addition
+     */
+    private void updateFolderCache(String filePath) {
+        // Extract folder path from file path
+        String[] pathParts = filePath.split("/");
+        if (pathParts.length >= 3) {
+            String year = pathParts[0];
+            String month = pathParts[1];
+            String folderName = pathParts[2];
+            String folderPath = year + "/" + month + "/" + folderName;
+
+            AtomicInteger count = folderFileCountCache.get(folderPath);
+            if (count != null) {
+                count.incrementAndGet();
+            }
+        }
+    }
+
+    /**
+     * Gets file path from hash (updated to work with new structure)
+     */
+    public String getFilePathFromHash(String hash) throws Exception {
+        FileManager file = fileRepository.findByHashName(hash)
+                .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
+
+        // For files stored with the new structure, we need to search for them
+        // This is a fallback method for files that might not have path stored in DB
+        LocalDateTime createdDate = file.getCreatedDate();
+        String year = createdDate.format(DateTimeFormatter.ofPattern("yyyy"));
+        String month = createdDate.format(DateTimeFormatter.ofPattern("MM"));
+
+        return findFileInYearMonth(year, month, hash + ".bin");
+    }
+
+    /**
+     * Searches for a file in year/month folder structure
+     */
+    private String findFileInYearMonth(String year, String month, String filename) throws Exception {
+        String basePath = year + "/" + month;
+        int folderNumber = 0;
+
+        while (folderNumber < 1000) { // Safety limit
+            String folderPath = basePath + "/folder-" + folderNumber;
+            String fullPath = getFinalStoragePath(folderPath) + "/" + filename;
+
+            if (sftpEnabled) {
+                if (fileExistsOnSFTP(remoteBasePath + "/" + folderPath + "/" + filename)) {
+                    return folderPath + "/" + filename;
+                }
             } else {
-                Directory newDirectory = Directory.builder().name(data[x].getDocumentType()).build();
-                newDirectory = directoryService.creaDirectoryWithName(newDirectory);
-                fileManager = FileManager.builder()
-                    .documentType(data[x].getDocumentType())
-                    .folderID(newDirectory.getFolderID())
-                    .filename(files[x].getOriginalFilename())
-                        .documentName(data[x].getDocumentName())
-                    .build();
-                fileRepository.save(fileManager);
+                Path localPath = Paths.get(rootLocation, folderPath, filename);
+                if (Files.exists(localPath)) {
+                    return folderPath + "/" + filename;
+                }
             }
-            String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
-             // Resolve the destination file within the folder path
-			Path destinationFile = Paths.get(this.rootLocation)
-            .resolve(hash + getFileExtension(files[x].getOriginalFilename()))
-            .normalize()
-            .toAbsolutePath();
-    
 
-        // Create directories if they don't exist
-        Files.createDirectories(destinationFile.getParent());
-
-         // Encrypt the file before storing it
-        try (InputStream inputStream = files[x].getInputStream();
-        OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-        EncryptionUtil.encrypt(inputStream, outputStream);
-    }
-            fileManager.setHashName(HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate()));
-            fileRepository.save(fileManager);
+            folderNumber++;
         }
-    } catch (Exception e) {
-        throw new Exception("Failed to store files.", e);
+
+        throw new Exception("File not found: " + filename);
     }
-}
+
+    /**
+     * Checks if file exists on SFTP server
+     */
+    private boolean fileExistsOnSFTP(String remotePath) {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            channel.stat(remotePath);
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
 
     @Override
-    public void store(FileManager data, MultipartFile file) throws Exception {
+    @Transactional
+    public List<FileManager> bulkStore(FileManager[] data, MultipartFile[] files) throws Exception {
+        List<FileManager> createdFiles = new ArrayList<>();
+
+        if (data.length != files.length) {
+            throw new Exception("Mismatch between file count and metadata count.");
+        }
+
+        try {
+            for (int i = 0; i < files.length; i++) {
+                MultipartFile file = files[i];
+                FileManager fileData = data[i];
+
+                if (file.isEmpty()) {
+                    throw new Exception("Failed to store empty file: " + file.getOriginalFilename());
+                }
+
+                // Find or create directory
+                Optional<Directory> directory = directoryRepository.findByName(fileData.getDocumentType());
+                Directory targetDirectory;
+
+                if (directory.isPresent()) {
+                    targetDirectory = directory.get();
+                } else {
+                    Directory newDirectory = Directory.builder()
+                            .name(fileData.getDocumentType())
+                            .build();
+                    targetDirectory = directoryService.creaDirectoryWithName(newDirectory);
+                }
+                LocalDateTime now = LocalDateTime.now();
+                // Generate hash after saving (so we have createdDate)
+                String hash = HashUtil.generateHash(data[i].getFilename(), now);
+
+                // Generate structured file path
+                String filePath = generateFilePath(data[i].getFilename(), hash);
+
+                // Create FileManager entity
+                FileManager fileManager = FileManager.builder()
+                        .documentType(fileData.getDocumentType())
+                        .folderID(targetDirectory.getFolderID())
+                        .fileLink(filePath)
+                        .hashName(hash)
+                        .filename(file.getOriginalFilename())
+                        .documentName(fileData.getDocumentName())
+                        .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                        .metadata(fileData.getMetadata())
+                        .build();
+
+                // Save to get ID and timestamp
+                fileManager = fileRepository.save(fileManager);
+
+
+
+
+                storeFileViaSFTPWithPath(file, filePath);
+
+                // Update cache after successful file storage
+                updateFolderCache(filePath);
+
+                // Save again with hash
+                fileManager = fileRepository.save(fileManager);
+                createdFiles.add(fileManager);
+            }
+        } catch (Exception e) {
+            throw new Exception("Failed to store files: " + e.getMessage(), e);
+        }
+
+        return createdFiles;
+    }
+
+    @Override
+    @Transactional
+    public FileManager store(FileManager data, MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
 
-        // Fetch or create the directory entity
+        // Find or create directory
         Optional<Directory> directory = directoryRepository.findByName(data.getDocumentType());
-        FileManager fileManager;
+        Directory targetDirectory;
+        LocalDateTime now = LocalDateTime.now();
+        // Generate hash after saving (so we have createdDate)
+        String hash = HashUtil.generateHash(data.getFilename(), now);
+        String filePath = generateFilePath(data.getFilename(), hash);
+        storeFileViaSFTPWithPath(file, filePath);
 
         if (directory.isPresent()) {
-            fileManager = FileManager.builder()
-                    .documentType(data.getDocumentType())
-                    .folderID(directory.get().getFolderID())
-                    .filename(file.getOriginalFilename())
-                    .documentName(data.getDocumentName())
-                    .mimeType(data.getMimeType())
-                    .hashName(data.getHashName())
-                    .metadata(data.getMetadata())
-                    .build();
-            fileRepository.save(fileManager);
+            targetDirectory = directory.get();
         } else {
-            // Create new directory if it doesn't exist
             Directory newDirectory = Directory.builder()
                     .name(data.getDocumentType())
                     .build();
-
-            newDirectory = directoryService.creaDirectoryWithName(newDirectory);
-            newDirectory.setParentFolderID((int) newDirectory.getFolderID());
-            directoryRepository.save(newDirectory);
-
-            fileManager = FileManager.builder()
-                    .documentType(data.getDocumentType())
-                    .folderID(newDirectory.getFolderID())
-                    .filename(file.getOriginalFilename())
-                    .documentName(data.getDocumentName())
-                    .mimeType(data.getMimeType())
-                    .hashName(data.getHashName())
-                    .metadata(data.getMetadata())
-                    .build();
-            fileRepository.save(fileManager);
+            targetDirectory = directoryService.creaDirectoryWithName(newDirectory);
+            targetDirectory.setParentFolderID((int) targetDirectory.getFolderID());
+            directoryRepository.save(targetDirectory);
         }
 
-        // Generate the file hash
-        String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+        // Create FileManager entity
+        FileManager fileManager = FileManager.builder()
+                .documentType(data.getDocumentType())
+                .folderID(targetDirectory.getFolderID())
+                .filename(file.getOriginalFilename())
+                .hashName(hash)
+                .fileLink(filePath)
+                .documentName(data.getDocumentName())
+                .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                .metadata(data.getMetadata())
+                .build();
 
-        // Resolve the destination file within the folder path
-        Path destinationFile = Paths.get(this.rootLocation)
-                .resolve(hash + getFileExtension(file.getOriginalFilename()))
-                .normalize()
-                .toAbsolutePath();
+        // Save to get ID and timestamp
+        fileManager = fileRepository.save(fileManager);
 
-        // Create directories if they don't exist
-        Files.createDirectories(destinationFile.getParent());
 
-        // Encrypt the file before storing it
-        try (InputStream inputStream = file.getInputStream();
-             OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-            EncryptionUtil.encrypt(inputStream, outputStream);
-        }
+        // Update cache after successful file storage
+        updateFolderCache(filePath);
 
-        // Save the file hash name
-        fileManager.setHashName(hash);
-        fileRepository.save(fileManager);
+        // Save again with hash
+        return fileRepository.save(fileManager);
     }
 
+    @Transactional
     public FileManager storeById(FileManager data, MultipartFile file, Long folderId) throws Exception {
         if (file.isEmpty()) {
             throw new Exception("Failed to store empty file.");
         }
 
-        // Fetch or create the directory entity
-        Optional<Directory> directory = directoryRepository.findById(folderId);
-        FileManager fileManager;
-        if (directory.isPresent()) {
-            fileManager = FileManager.builder()
-                    .documentType(data.getDocumentType())
-                    .documentName(data.getDocumentName())
-                    .folderID(directory.get().getFolderID())
-                    .filename(file.getOriginalFilename())
-                    .metadata(data.getMetadata())
-                    .mimeType(data.getMimeType())
-                    .build();
-            fileRepository.save(fileManager);
-        } else {
-           throw  new Exception("Folder with id " + folderId +" doesn't exist!");
-        }
+        // Find directory by ID
+        Directory directory = directoryRepository.findById(folderId)
+                .orElseThrow(() -> new Exception("Folder with id " + folderId + " doesn't exist!"));
+        // Generate hash after saving (so we have createdDate)
+        LocalDateTime now = LocalDateTime.now();
+        String hash = HashUtil.generateHash(data.getFilename(), now);
+        String filePath = generateFilePath(data.getFilename(), hash);
+        storeFileViaSFTPWithPath(file, filePath);
 
-        // Generate the file hash
-        String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
+        // Create FileManager entity
+        FileManager fileManager = FileManager.builder()
+                .documentType(data.getDocumentType())
+                .documentName(data.getDocumentName())
+                .folderID(directory.getFolderID())
+                .filename(file.getOriginalFilename())
+                .fileLink(filePath)
+                .hashName(hash)
+                .metadata(data.getMetadata())
+                .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
+                .build();
 
-        // Resolve the destination file within the folder path
-        Path destinationFile = Paths.get(this.rootLocation)
-                .resolve(hash + getFileExtension(file.getOriginalFilename()))
-                .normalize()
-                .toAbsolutePath();
+        // Save to get ID and timestamp
+        fileManager = fileRepository.save(fileManager);
 
-        // Create directories if they don't exist
-        Files.createDirectories(destinationFile.getParent());
+        // Update cache after successful file storage
+        updateFolderCache(filePath);
 
-        // Encrypt the file before storing it
-        try (InputStream inputStream = file.getInputStream();
-             OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-            EncryptionUtil.encrypt(inputStream, outputStream);
-        }
-
-        // Save the file hash name
-        fileManager.setHashName(hash);
+        // Save again with hash
         return fileRepository.save(fileManager);
     }
 
+    @Transactional
     public void bulkStoreById(List<FileManager> fileManagers, MultipartFile[] files, Long folderId) throws Exception {
         if (files.length != fileManagers.size()) {
             throw new Exception("Mismatch between file count and metadata count.");
         }
 
-        List<String> fileNames = new ArrayList<>();
+        // Find directory by ID
+        Directory directory = directoryRepository.findById(folderId)
+                .orElseThrow(() -> new Exception("Folder with ID " + folderId + " not found."));
 
         try {
             for (int i = 0; i < files.length; i++) {
@@ -248,42 +595,30 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 if (file.isEmpty()) {
                     throw new Exception("Failed to store empty file: " + file.getOriginalFilename());
                 }
+                LocalDateTime now = LocalDateTime.now();
+                // Generate hash after saving (so we have createdDate)
+                String hash = HashUtil.generateHash(fileManager.getFilename(), now);
+                fileManager.setHashName(hash);
 
-                fileNames.add(file.getOriginalFilename());
-
-                // Find the directory based on folder ID
-                Optional<Directory> directory = directoryRepository.findById(folderId);
-                if (directory.isEmpty()) {
-                    throw new Exception("Folder with ID " + folderId + " not found.");
-                }
+                // Generate structured file path
+                String filePath = generateFilePath(fileManager.getFilename(), hash);
+                fileManager.setFileLink(filePath);
+                storeFileViaSFTPWithPath(file, filePath);
 
                 // Update the FileManager with file-specific information
                 fileManager.setFilename(file.getOriginalFilename());
                 fileManager.setMimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream");
-                fileManager.setFolderID(directory.get().getFolderID());
+                fileManager.setFolderID(directory.getFolderID());
 
-                // Save the initial FileManager entry
-                fileRepository.save(fileManager);
+                // Save to get ID and timestamp
+                fileManager = fileRepository.save(fileManager);
 
-                // Generate hash for filename
-                String hash = HashUtil.generateHash(fileManager.getFilename(), fileManager.getCreatedDate());
-                fileManager.setHashName(hash);
 
-                // Define file storage path
-                Path destinationFile = Paths.get(this.rootLocation)
-                        .resolve(hash + getFileExtension(file.getOriginalFilename()))
-                        .normalize()
-                        .toAbsolutePath();
 
-                Files.createDirectories(destinationFile.getParent());
+                // Update cache after successful file storage
+                updateFolderCache(filePath);
 
-                // Encrypt and store file
-                try (InputStream inputStream = file.getInputStream();
-                     OutputStream outputStream = Files.newOutputStream(destinationFile)) {
-                    EncryptionUtil.encrypt(inputStream, outputStream);
-                }
-
-                // Save the updated FileManager with hash
+                // Save again with hash
                 fileRepository.save(fileManager);
             }
         } catch (Exception e) {
@@ -291,74 +626,273 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         }
     }
 
-    private String getFileExtension(String filename) {
-    if (filename == null) {
-        return "";
+
+
+    /**
+     * Upload encrypted file to SFTP server
+     */
+    private void uploadFileViaSFTP(
+            byte[] encryptedData,
+            String remoteFilePath,
+            String username,
+            String host,
+            int port,
+            String password
+    ) throws Exception {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(username, host, port);
+            session.setPassword(password);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            String remoteDir = remoteFilePath.substring(0, remoteFilePath.lastIndexOf("/"));
+            try {
+                channel.cd(remoteDir);
+            } catch (Exception e) {
+                // Directory doesn't exist, create it
+                createRemoteDirectory(channel, remoteDir);
+                channel.cd(remoteDir);
+            }
+
+            String remoteFilename = remoteFilePath.substring(remoteFilePath.lastIndexOf("/") + 1);
+            try (ByteArrayInputStream inputStream = new ByteArrayInputStream(encryptedData)) {
+                channel.put(inputStream, remoteFilename);
+            }
+
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
     }
-    int dotIndex = filename.lastIndexOf('.');
-    return (dotIndex == -1) ? "" : filename.substring(dotIndex);
-}
 
-	@Override
-	public Stream<Path> loadAll(Long folderID) throws Exception {
-		try {
-			String folderPath = directoryService.getDirectoryPath(folderID);
-			Path destinationPath = Paths.get(folderPath);
-			return Files.walk(destinationPath, 1)
-				.filter(path -> !path.equals(destinationPath))
-				.map(destinationPath::relativize);
-		}
-		catch (IOException e) {
-			throw new Exception("Failed to read stored files", e);
-		}
-	}
+    /**
+     * Create remote directory recursively
+     */
+    private void createRemoteDirectory(ChannelSftp channel, String remotePath) throws Exception {
+        String[] directories = remotePath.split("/");
+        String currentPath = "";
 
-    public  List<FileManager> getAllFiles(Long folderId) {
+        for (String dir : directories) {
+            if (dir.isEmpty()) continue;
+
+            currentPath += "/" + dir;
+            try {
+                channel.cd(currentPath);
+            } catch (Exception e) {
+                channel.mkdir(currentPath);
+                channel.cd(currentPath);
+            }
+        }
+    }
+
+    /**
+     * Get file link by hash - updated for SFTP support
+     */
+    public String getFileLinkByHash(String hash) throws Exception {
+        FileManager file = fileRepository.findByHashName(hash)
+                .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
+
+        if (sftpEnabled) {
+            // Return SFTP-based file path
+            String extension = getFileExtension(file.getFilename());
+            return "/files-manager/" + hash + extension;
+        } else {
+            // Return local file path
+            String extension = getFileExtension(file.getFilename());
+            return "/files-manager/" + hash + extension;
+        }
+    }
+
+    /**
+     * Get encrypted file path - updated for structured path and SFTP support
+     */
+    public Path getEncryptedFilePath(String hash) throws Exception {
+        FileManager file = fileRepository.findByHashName(hash)
+                .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
+
+        if (sftpEnabled) {
+            // For SFTP, download the file to a temporary location
+            return downloadFileFromSFTPByPath(file.getFileLink());
+        } else {
+            // For local storage, use the structured path
+            String filePath = file.getFileLink();
+            if (filePath == null || filePath.isEmpty()) {
+                // Fallback: try to find the file using the old method
+                filePath = findFileInYearMonth(
+                        file.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy")),
+                        file.getCreatedDate().format(DateTimeFormatter.ofPattern("MM")),
+                        hash + ".bin"
+                );
+            }
+
+            Path localPath = Paths.get(rootLocation).resolve(filePath);
+            if (!Files.exists(localPath)) {
+                throw new Exception("File not found at path: " + localPath);
+            }
+            return localPath;
+        }
+    }
+
+    /**
+     * Download file from SFTP server using the stored file path
+     */
+    private Path downloadFileFromSFTPByPath(String filePath) throws Exception {
+        if (filePath == null || filePath.isEmpty()) {
+            throw new Exception("File path is null or empty");
+        }
+
+        String remoteFilePath = remoteBasePath + "/" + filePath;
+        String fileExtension = filePath.substring(filePath.lastIndexOf('.'));
+        Path tempFile = Files.createTempFile("sftp_download_", fileExtension);
+
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
+                channel.get(remoteFilePath, outputStream);
+            }
+
+            return tempFile;
+
+        } catch (Exception e) {
+            // Clean up temp file if download failed
+            Files.deleteIfExists(tempFile);
+            throw new Exception("Failed to download file from SFTP: " + remoteFilePath, e);
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Download file from SFTP server for local processing
+     */
+    private Path downloadFileFromSFTP(String hash, String extension) throws Exception {
+        String remoteFilePath = remoteBasePath + "/" + hash + extension;
+        Path tempFile = Files.createTempFile("sftp_download_", extension);
+
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
+                channel.get(remoteFilePath, outputStream);
+            }
+
+            return tempFile;
+
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
+    private String getFileExtension(String filename) {
+        if (filename == null) {
+            return "";
+        }
+        int dotIndex = filename.lastIndexOf('.');
+        return (dotIndex == -1) ? "" : filename.substring(dotIndex);
+    }
+    // ... (rest of the existing methods remain unchanged)
+    
+    @Override
+    public Stream<Path> loadAll(Long folderID) throws Exception {
+        try {
+            String folderPath = directoryService.getDirectoryPath(folderID);
+            Path destinationPath = Paths.get(folderPath);
+            return Files.walk(destinationPath, 1)
+                .filter(path -> !path.equals(destinationPath))
+                .map(destinationPath::relativize);
+        }
+        catch (IOException e) {
+            throw new Exception("Failed to read stored files", e);
+        }
+    }
+
+    public List<FileManager> getAllFiles(Long folderId) {
         return fileRepository.findByFolderID(folderId).orElseThrow();
     }
     
-	@Override
-	public Path load(String filename, Long folderID) {
-		String folderPath = directoryService.getDirectoryPath(folderID);
-		Path destinationPath = Paths.get(folderPath);
-		return destinationPath.resolve(filename);
-	}
+    @Override
+    public Path load(String filename, Long folderID) {
+        String folderPath = directoryService.getDirectoryPath(folderID);
+        Path destinationPath = Paths.get(folderPath);
+        return destinationPath.resolve(filename);
+    }
 
-	@Override
-	public Resource loadAsResource(String filename, Long folderID) throws Exception {
-		try {
-			Path file = load(filename, folderID);
-			Resource resource = new UrlResource(file.toUri());
-			if (resource.exists() || resource.isReadable()) {
-				return resource;
-			}
-			else {
-				throw new Exception(
-						"Could not read file: " + filename);
+    @Override
+    public Resource loadAsResource(String filename, Long folderID) throws Exception {
+        try {
+            Path file = load(filename, folderID);
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            }
+            else {
+                throw new Exception("Could not read file: " + filename);
+            }
+        }
+        catch (MalformedURLException e) {
+            throw new Exception("Could not read file: " + filename, e);
+        }
+    }
 
-			}
-		}
-		catch (MalformedURLException e) {
-			throw new Exception("Could not read file: " + filename, e);
-		}
-	}
-
-	@Override
-	public void deleteAll() {
-		try {
-			Path root = Paths.get(rootLocation);
-			FileSystemUtils.deleteRecursively(root);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-    public Path getEncryptedFilePath(String hash) {
-        FileManager file = fileRepository.findByHashName(hash).orElseThrow();
-        return Paths.get(this.rootLocation)
-            .resolve(hash + getFileExtension(file.getFilename()))
-            .normalize()
-            .toAbsolutePath();
+    @Override
+    public void deleteAll() {
+        try {
+            Path root = Paths.get(rootLocation);
+            FileSystemUtils.deleteRecursively(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void decryptFile(Path encryptedFilePath, OutputStream outputStream) throws Exception {
@@ -366,28 +900,28 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
             if (inputStream == null) {
                 throw new IOException("Unable to create input stream for encrypted file");
             }
-
-            // Use the decryption logic from EncryptionUtil
-            EncryptionUtil.decrypt(inputStream, outputStream);
+            encryptionUtil.decrypt(inputStream, outputStream);
         } catch (Exception e) {
             throw new Exception("Failed to decrypt file: " + e.getMessage(), e);
         }
     }
 
-	@Override
-	public void init() throws Exception {
-		try {
-			Path root = Paths.get(rootLocation);
-			Files.createDirectories(root);
-		}
-		catch (IOException e) {
-			throw new Exception("Could not initialize storage", e);
-		}
-	}
+    @Override
+    public void init() throws Exception {
+        try {
+            if (!sftpEnabled) {
+                Path root = Paths.get(rootLocation);
+                Files.createDirectories(root);
+            }
+        }
+        catch (IOException e) {
+            throw new Exception("Could not initialize storage", e);
+        }
+    }
 
-	public List<FileManager> getFilesInStore() {
-		return fileRepository.findAll();
-	}
+    public List<FileManager> getFilesInStore() {
+        return fileRepository.findAll();
+    }
 
     public FileManager getFileByID(Long id) {
         return fileRepository.findById(id).orElseThrow();
@@ -395,25 +929,23 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
     @Transactional
     public FileManager updateFile(FileManager fileManager) {
-    FileManager file = fileRepository.findByHashName(fileManager.getHashName()).orElseThrow();
-    file.setMetadata(fileManager.getMetadata());
-    if(fileManager.getDocumentType() != null) {
-        file.setDocumentType(fileManager.getDocumentType());
-    }
-    file.setDocumentName(fileManager.getDocumentName());
-    fileRepository.save(file);
-    return file;
+        FileManager file = fileRepository.findByHashName(fileManager.getHashName()).orElseThrow();
+        file.setMetadata(fileManager.getMetadata());
+        if(fileManager.getDocumentType() != null) {
+            file.setDocumentType(fileManager.getDocumentType());
+        }
+        file.setDocumentName(fileManager.getDocumentName());
+        fileRepository.save(file);
+        return file;
     }
 
     public List<FileManager> searchFiles(String keyword) {
         Optional<List<FileManager>> optionalFiles = fileRepository.searchFiles(keyword);
         return optionalFiles.orElseThrow(() -> new ResourceNotFoundException("No files found with keyword: " + keyword));
-
     }
 
     public FileManager convertStringToDataManager(String fileData) {
         try {
-            // Convert the JSON string to a FileManager object
             return objectMapper.readValue(fileData, FileManager.class);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error converting JSON string to FileManager: " + e.getMessage(), e);
@@ -421,25 +953,60 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     }
 
     public void deleteFileById(Long id) throws Exception {
-        // Find the file in the repository
         FileManager file = fileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + id));
 
-        // Get the physical file's path
-        Path filePath = Paths.get(this.rootLocation)
-                .resolve(file.getHashName() + getFileExtension(file.getFilename()))
-                .normalize()
-                .toAbsolutePath();
-
-        // Delete the file from the filesystem
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            throw new Exception("Failed to delete the file from the filesystem.", e);
+        if (sftpEnabled) {
+            // Delete from SFTP server
+            deleteFileFromSFTP(file.getHashName(), getFileExtension(file.getFilename()));
+        } else {
+            // Delete from local filesystem
+            Path filePath = Paths.get(this.rootLocation)
+                    .resolve(file.getHashName() + getFileExtension(file.getFilename()))
+                    .normalize()
+                    .toAbsolutePath();
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                throw new Exception("Failed to delete the file from the filesystem.", e);
+            }
         }
 
-        // Remove the file from the repository
         fileRepository.delete(file);
+    }
+
+    /**
+     * Delete file from SFTP server
+     */
+    private void deleteFileFromSFTP(String hash, String extension) throws Exception {
+        String remoteFilePath = remoteBasePath + "/" + hash + extension;
+
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            channel.rm(remoteFilePath);
+
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
     }
 
     @Transactional
@@ -447,7 +1014,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         FileManager file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + fileId));
 
-        file.getMetadata().putAll(newMetadata); // Add or update metadata
+        file.getMetadata().putAll(newMetadata);
         fileRepository.save(file);
         return file;
     }
@@ -458,7 +1025,7 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                 .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + fileId));
 
         for (String key : keys) {
-            file.getMetadata().remove(key); // Remove metadata keys
+            file.getMetadata().remove(key);
         }
         fileRepository.save(file);
         return file;
@@ -469,13 +1036,13 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         FileManager file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + fileId));
 
-        file.setMetadata(null); // Clear all metadata
+        file.setMetadata(null);
         fileRepository.save(file);
         return file;
     }
 
     public List<FileManager> getAllFiles() {
-        return fileRepository.findAll(); // Assuming the repository has a findAll() method.
+        return fileRepository.findAll();
     }
 
     public List<FileManager> fullTextSearch(String searchTerm) throws Exception {
@@ -483,61 +1050,53 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         List<FileManager> allFiles = getAllFiles();
 
         for (FileManager file : allFiles) {
-            // Skip files without hash names
             if (file.getHashName() == null || file.getHashName().isEmpty()) {
                 continue;
             }
 
-            // Check if file is of supported type
             String mimeType = file.getMimeType();
             String extension = getFileExtension(file.getFilename()).toLowerCase();
 
-            // Skip unsupported file types
             if (!isSearchableDocument(mimeType, extension)) {
                 continue;
             }
 
-            // Get path to encrypted file
-            Path encryptedFilePath = getEncryptedFilePath(file.getHashName());
+            try {
+                Path encryptedFilePath = getEncryptedFilePath(file.getHashName());
+                
+                if (!Files.exists(encryptedFilePath)) {
+                    continue;
+                }
 
-            // Check if file exists
-            if (!Files.exists(encryptedFilePath)) {
-                continue;
-            }
+                Path tempFile = Files.createTempFile("decrypted_", extension);
 
-            // Create temporary file for decrypted content
-            Path tempFile = Files.createTempFile("decrypted_", extension);
+                try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
+                    decryptFile(encryptedFilePath, outputStream);
+                    String fileContent = extractTextFromFile(tempFile.toFile(), mimeType, extension);
 
-            try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
-                // Decrypt the file to the temporary location
-                decryptFile(encryptedFilePath, outputStream);
-
-                // Extract text based on file type
-                String fileContent = extractTextFromFile(tempFile.toFile(), mimeType, extension);
-
-                // Check if the file contains the search term (case-insensitive)
-                if (fileContent != null && fileContent.toLowerCase().contains(searchTerm.toLowerCase())) {
-                    results.add(file);
+                    if (fileContent != null && fileContent.toLowerCase().contains(searchTerm.toLowerCase())) {
+                        results.add(file);
+                    }
+                } finally {
+                    Files.deleteIfExists(tempFile);
+                    // Clean up temporary SFTP downloads
+                    if (sftpEnabled && encryptedFilePath.toString().contains("sftp_download_")) {
+                        Files.deleteIfExists(encryptedFilePath);
+                    }
                 }
             } catch (Exception e) {
-                // Log the error but continue processing other files
                 System.err.println("Error searching in file " + file.getFilename() + ": " + e.getMessage());
-            } finally {
-                // Delete the temporary file
-                Files.deleteIfExists(tempFile);
             }
         }
 
         return results;
     }
 
-
     private boolean isSearchableDocument(String mimeType, String extension) {
         if (mimeType == null) {
             mimeType = "";
         }
 
-        // Check common MIME types for the supported document formats
         return mimeType.contains("application/vnd.openxmlformats-officedocument.wordprocessingml.document") ||
                 mimeType.contains("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ||
                 mimeType.contains("application/vnd.ms-excel") ||
@@ -549,7 +1108,6 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
     }
 
     private String extractTextFromFile(File file, String mimeType, String extension) throws Exception {
-        // Extract text based on file extension
         if (extension.equals(".pdf")) {
             return extractTextFromPdf(file);
         } else if (extension.equals(".docx")) {
@@ -557,7 +1115,6 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
         } else if (extension.equals(".xlsx") || extension.equals(".xls")) {
             return extractTextFromExcel(file);
         } else {
-            // Fall back to MIME type if extension doesn't match
             if (mimeType.contains("pdf")) {
                 return extractTextFromPdf(file);
             } else if (mimeType.contains("word")) {
@@ -567,7 +1124,6 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
             }
         }
 
-        // If we can't determine the file type or it's not supported
         return null;
     }
 
@@ -609,7 +1165,6 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
                                 textContent.append(cell.getCellFormula()).append(" ");
                                 break;
                             default:
-                                // Skip other cell types
                                 break;
                         }
                     }
@@ -620,5 +1175,4 @@ public void bulkStore(FileManager[] data, MultipartFile[] files) throws Exceptio
 
         return textContent.toString();
     }
-
 }
