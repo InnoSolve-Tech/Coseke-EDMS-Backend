@@ -12,6 +12,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static com.cosek.edms.helper.Constants.*;
 
@@ -23,15 +29,48 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final RequestLoggingFilter requestLoggingFilter;
 
-
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Allow all origins (you might want to restrict this in production)
+        // For production, replace with specific domains:
+        // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://yourdomain.com"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
+
+        // Allow all HTTP methods
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
+        ));
+
+        // Allow all headers
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // Allow credentials (if needed for JWT tokens)
+        configuration.setAllowCredentials(true);
+
+        // Cache preflight response for 1 hour
+        configuration.setMaxAge(3600L);
+
+        // Expose headers that might be needed by frontend
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization", "Content-Type", "X-Total-Count", "X-Forwarded-For"
+        ));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(AUTH_ROUTE)
                                 .permitAll()

@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   edms-gateway:
-    image: benzidarwin/gateway:latest
+    image: benzidarwin/edms-gateway:latest
+    env_file:
+      - .env
     ports:
       - "8787:8787"
     depends_on:
@@ -14,7 +16,9 @@ services:
       - edms-network
 
   file-management:
-    image: benzidarwin/file-management:latest
+    image: benzidarwin/edms-file-management:latest
+    env_file:
+      - .env
     ports:
       - "8081:8081"
     environment:
@@ -27,21 +31,27 @@ services:
       - edms-network
 
   workflows:
-    image: benzidarwin/workflows:latest
+    image: benzidarwin/edms-workflows:latest
+    env_file:
+      - .env
     ports:
       - "8082:8082"
     networks:
       - edms-network
 
   tasks:
-    image: benzidarwin/tasks:latest
+    image: benzidarwin/edms-tasks:latest
+    env_file:
+      - .env
     ports:
       - "8083:8083"
     networks:
       - edms-network
 
   forms:
-    image: benzidarwin/forms:latest
+    image: benzidarwin/edms-forms:latest
+    env_file:
+      - .env
     ports:
       - "8084:8084"
     networks:

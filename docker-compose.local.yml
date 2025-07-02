@@ -35,6 +35,8 @@ services:
   workflows:
     build:
       context: ./workflows
+    env_file:
+      - .env
     ports:
       - "8082:8082"
     networks:
@@ -43,6 +45,8 @@ services:
   tasks:
     build:
       context: ./tasks
+    env_file:
+      - .env
     ports:
       - "8083:8083"
     networks:
@@ -51,6 +55,8 @@ services:
   forms:
     build:
       context: ./forms
+    env_file:
+      - .env
     ports:
       - "8084:8084"
     networks:

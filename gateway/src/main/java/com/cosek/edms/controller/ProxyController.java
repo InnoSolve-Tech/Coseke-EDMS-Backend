@@ -15,7 +15,11 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(
+        origins = "*",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS},
+        allowedHeaders = "*"
+)
 public class ProxyController {
 
     private static final Logger log = LoggerFactory.getLogger(ProxyController.class);
