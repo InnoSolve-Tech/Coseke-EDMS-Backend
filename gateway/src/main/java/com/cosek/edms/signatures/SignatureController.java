@@ -3,6 +3,7 @@ package com.cosek.edms.signatures;
 import com.cosek.edms.config.StorageProperties;
 import com.cosek.edms.helper.EncryptionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.pixee.security.Newlines;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class SignatureController {
         }
 
         response.setContentType(contentType);
-        response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
+        response.setHeader("Content-Disposition", Newlines.stripAll("inline; filename=\"" + fileName + "\""));
 
         try (InputStream encryptedStream = Files.newInputStream(filePath);
              OutputStream outStream = response.getOutputStream()) {
