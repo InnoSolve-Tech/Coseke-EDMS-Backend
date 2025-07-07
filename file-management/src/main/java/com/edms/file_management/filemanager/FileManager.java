@@ -1,12 +1,15 @@
 package com.edms.file_management.filemanager;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.edms.file_management.directory.Directory;
+import com.edms.file_management.fileVersions.FileVersions;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -41,7 +44,6 @@ public class FileManager {
     private String documentType;
     private String documentName;
     private String hashName;
-    private String fileLink;
     private String mimeType;
 
     @Convert(converter = JsonMapConverter.class)
@@ -68,6 +70,10 @@ public class FileManager {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folderID", insertable = false, updatable = false)
     private Directory directory;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "fileManager", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<FileVersions> fileVersions = new ArrayList<>();
 
     @JsonSetter("metadata")
     public void setMetadata(Object metadata) {

@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public interface StorageService {
-
-	void init() throws Exception;
-
 	FileManager store(FileManager data, MultipartFile file) throws Exception;
 
 	List<FileManager> bulkStore(FileManager[] data, MultipartFile[] files) throws Exception;

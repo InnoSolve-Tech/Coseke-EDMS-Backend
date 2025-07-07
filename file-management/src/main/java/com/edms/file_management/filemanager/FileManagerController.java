@@ -1,5 +1,6 @@
 package com.edms.file_management.filemanager;
 
+import com.edms.file_management.fileVersions.FileVersions;
 import io.github.pixee.security.Newlines;
 import io.github.pixee.security.Newlines;
 import java.io.IOException;
@@ -71,14 +72,14 @@ public class FileManagerController {
     }
 
     @GetMapping("/download/{hash}")
-    public void handleFileDownload(@PathVariable String hash, HttpServletResponse response) {
+    public void handleFileDownload(@PathVariable String hash, HttpServletResponse response, @RequestParam(value = "version", required = false) String version) {
         try {
             // Get file info from database
             FileManager fileManager = fileRepository.findByHashName(hash)
                     .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
 
             // Get the actual file path (works with both SFTP and local storage)
-            Path encryptedFile = fileService.getEncryptedFilePath(hash);
+            Path encryptedFile = fileService.getEncryptedFilePath(hash, version);
 
             // Set response headers with original filename
             String originalFilename = fileManager.getFilename();
@@ -123,7 +124,7 @@ public class FileManagerController {
                     .orElseThrow(() -> new Exception("File with hash " + hashname + " not found"));
 
             // Get the encrypted file path
-            Path encryptedFilePath = fileService.getEncryptedFilePath(hashname);
+            Path encryptedFilePath = fileService.getEncryptedFilePath(hashname, null);
 
             // Set response headers with original filename
             String originalFilename = fileManager.getFilename();
@@ -167,6 +168,12 @@ public class FileManagerController {
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<String> updateFile(@RequestPart("fileData") FileVersions fileData, @RequestPart("file") MultipartFile file) throws Exception {
+        fileService.updateFile(fileData, file);
+        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
     }
 
     @PostMapping("/")

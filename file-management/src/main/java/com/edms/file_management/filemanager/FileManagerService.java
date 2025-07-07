@@ -1,20 +1,39 @@
 package com.edms.file_management.filemanager;
 
-import java.io.*;
+import static com.edms.file_management.helper.Constants.REMOTE_FILE_PATH;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import lombok.RequiredArgsConstructor;
+import com.edms.file_management.fileVersions.FileVersionsRepository;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -28,6 +47,8 @@ import com.edms.file_management.directory.Directory;
 import com.edms.file_management.directory.DirectoryRepository;
 import com.edms.file_management.directory.DirectoryService;
 import com.edms.file_management.exception.ResourceNotFoundException;
+import com.edms.file_management.fileVersions.FileVersions;
+import com.edms.file_management.fileVersions.FileVersionsService;
 import com.edms.file_management.helper.EncryptionUtil;
 import com.edms.file_management.helper.HashUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,16 +56,8 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -64,14 +77,11 @@ public class FileManagerService implements StorageService {
     @Value("${sftp.port:22}")
     private int sftpPort;
 
-    @Value("${sftp.enabled:false}")
-    private boolean sftpEnabled;
-
-    // Base SFTP upload directory
-    private final String remoteBasePath = "/uploads";
-
     @Autowired
     private DirectoryService directoryService;
+
+    @Autowired
+    private FileManagerRepository fileManagerRepository;
 
     @Autowired
     private EncryptionUtil encryptionUtil;
@@ -83,103 +93,30 @@ public class FileManagerService implements StorageService {
     private FileManagerRepository fileRepository;
 
     @Autowired
+    private FileVersionsService fileVersionsService;
+
+    @Autowired
+    private FileVersionsRepository fileVersionsRepository;
+
+    @Autowired
     private final ObjectMapper objectMapper;
 
-    private final ConcurrentHashMap<String, AtomicInteger> folderFileCountCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AtomicInteger> folderFileCountCache;
 
-    // Maximum files per folder
-    private static final int MAX_FILES_PER_FOLDER = 20;
 
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Autowired
-    public FileManagerService(StorageProperties properties) throws Exception {
+    public FileManagerService(
+            StorageProperties properties,
+            ConcurrentHashMap<String, AtomicInteger> folderFileCountCache
+    ) throws Exception {
         if(properties.getLocation().trim().length() == 0){
             throw new Exception("File upload location can not be Empty.");
         }
         this.rootLocation = properties.getLocation();
-        objectMapper = new ObjectMapper();
-    }
-
-    public String generateFilePath(String originalFilename, String hashName) throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        String year = now.format(DateTimeFormatter.ofPattern("yyyy"));
-        String month = now.format(DateTimeFormatter.ofPattern("MM"));
-
-        // Base path: Year/Month
-        String basePath = year + "/" + month;
-
-        // Find the appropriate folder number
-        int folderNumber = findAvailableFolder(basePath);
-
-        // Complete path structure
-        String folderName = "folder-" + folderNumber;
-        String completePath = basePath + "/" + folderName;
-
-        // Return the complete file path
-        return completePath + "/" + hashName + ".bin";
-    }
-
-    /**
-     * Finds an available folder that has space (less than 20 files)
-     * or creates a new one if all existing folders are full
-     */
-    private int findAvailableFolder(String basePath) throws Exception {
-        int folderNumber = 0;
-
-        while (true) {
-            String folderPath = basePath + "/folder-" + folderNumber;
-            String fullPath = getFinalStoragePath(folderPath);
-
-            int fileCount = getFileCountInFolder(fullPath, folderPath);
-
-            if (fileCount < MAX_FILES_PER_FOLDER) {
-                // Update cache
-                folderFileCountCache.computeIfAbsent(folderPath, k -> new AtomicInteger(0))
-                        .set(fileCount);
-                return folderNumber;
-            }
-
-            folderNumber++;
-
-            // Safety check to prevent infinite loop (optional)
-            if (folderNumber > 1000) {
-                throw new Exception("Too many folders created. Please check the system.");
-            }
-        }
-    }
-
-    /**
-     * Gets the final storage path (local or SFTP base path)
-     */
-    private String getFinalStoragePath(String relativePath) {
-        if (sftpEnabled) {
-            return remoteBasePath + "/" + relativePath;
-        } else {
-            return Paths.get(rootLocation, relativePath).toString();
-        }
-    }
-
-    /**
-     * Counts files in a folder (works for both local and SFTP)
-     */
-    private int getFileCountInFolder(String fullPath, String relativePath) throws Exception {
-        // Check cache first
-        AtomicInteger cachedCount = folderFileCountCache.get(relativePath);
-        if (cachedCount != null) {
-            return cachedCount.get();
-        }
-
-        int count;
-        if (sftpEnabled) {
-            count = countFilesInSFTPFolder(fullPath);
-        } else {
-            count = countFilesInLocalFolder(fullPath);
-        }
-
-        // Update cache
-        folderFileCountCache.put(relativePath, new AtomicInteger(count));
-        return count;
+        this.folderFileCountCache = folderFileCountCache;
+        this.objectMapper = new ObjectMapper();
     }
 
     /**
@@ -200,56 +137,10 @@ public class FileManagerService implements StorageService {
     }
 
     /**
-     * Counts files in SFTP folder
-     */
-    private int countFilesInSFTPFolder(String remoteFolderPath) throws Exception {
-        JSch jsch = new JSch();
-        Session session = null;
-        ChannelSftp channel = null;
-
-        try {
-            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
-            session.setPassword(sftpPassword);
-
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.connect();
-
-            channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-
-            try {
-                @SuppressWarnings("unchecked")
-                Vector<ChannelSftp.LsEntry> files = channel.ls(remoteFolderPath);
-                // Filter out directories (. and ..)
-                return (int) files.stream()
-                        .filter(entry -> !entry.getAttrs().isDir())
-                        .count();
-            } catch (Exception e) {
-                // Folder doesn't exist, return 0
-                return 0;
-            }
-
-        } finally {
-            if (channel != null && channel.isConnected()) {
-                channel.disconnect();
-            }
-            if (session != null && session.isConnected()) {
-                session.disconnect();
-            }
-        }
-    }
-
-    /**
      * Creates directory structure (works for both local and SFTP)
      */
     private void createDirectoryStructure(String path) throws Exception {
-        if (sftpEnabled) {
-            createSFTPDirectoryStructure(path);
-        } else {
-            createLocalDirectoryStructure(path);
-        }
+        createSFTPDirectoryStructure(path);
     }
 
     /**
@@ -306,10 +197,10 @@ public class FileManagerService implements StorageService {
         }
 
         // Create directory structure first
-        createSFTPDirectoryStructure(remoteBasePath + "/" + filePath);
+        createSFTPDirectoryStructure(REMOTE_FILE_PATH + "/" + filePath);
 
         // SFTP upload
-        String remotePath = remoteBasePath + "/" + filePath;
+        String remotePath = REMOTE_FILE_PATH + "/" + filePath;
         uploadFileViaSFTP(
                 encryptedOutput.toByteArray(),
                 remotePath,
@@ -339,21 +230,6 @@ public class FileManagerService implements StorageService {
         }
     }
 
-    /**
-     * Gets file path from hash (updated to work with new structure)
-     */
-    public String getFilePathFromHash(String hash) throws Exception {
-        FileManager file = fileRepository.findByHashName(hash)
-                .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
-
-        // For files stored with the new structure, we need to search for them
-        // This is a fallback method for files that might not have path stored in DB
-        LocalDateTime createdDate = file.getCreatedDate();
-        String year = createdDate.format(DateTimeFormatter.ofPattern("yyyy"));
-        String month = createdDate.format(DateTimeFormatter.ofPattern("MM"));
-
-        return findFileInYearMonth(year, month, hash + ".bin");
-    }
 
     /**
      * Searches for a file in year/month folder structure
@@ -364,18 +240,13 @@ public class FileManagerService implements StorageService {
 
         while (folderNumber < 1000) { // Safety limit
             String folderPath = basePath + "/folder-" + folderNumber;
-            String fullPath = getFinalStoragePath(folderPath) + "/" + filename;
+            String fullPath = fileVersionsService.getFinalStoragePath(folderPath) + "/" + filename;
 
-            if (sftpEnabled) {
-                if (fileExistsOnSFTP(remoteBasePath + "/" + folderPath + "/" + filename)) {
+
+                if (fileExistsOnSFTP(REMOTE_FILE_PATH + "/" + folderPath + "/" + filename)) {
                     return folderPath + "/" + filename;
                 }
-            } else {
-                Path localPath = Paths.get(rootLocation, folderPath, filename);
-                if (Files.exists(localPath)) {
-                    return folderPath + "/" + filename;
-                }
-            }
+
 
             folderNumber++;
         }
@@ -454,13 +325,12 @@ public class FileManagerService implements StorageService {
                 String hash = HashUtil.generateHash(data[i].getFilename(), now);
 
                 // Generate structured file path
-                String filePath = generateFilePath(data[i].getFilename(), hash);
+                String filePath = fileVersionsService.generateFilePath(data[i].getFilename(), hash, "v1.0");
 
                 // Create FileManager entity
                 FileManager fileManager = FileManager.builder()
                         .documentType(fileData.getDocumentType())
                         .folderID(targetDirectory.getFolderID())
-                        .fileLink(filePath)
                         .hashName(hash)
                         .filename(file.getOriginalFilename())
                         .documentName(fileData.getDocumentName())
@@ -471,8 +341,7 @@ public class FileManagerService implements StorageService {
                 // Save to get ID and timestamp
                 fileManager = fileRepository.save(fileManager);
 
-
-
+                fileVersionsService.createFileVersion(fileManager.getId(), "v1.0");
 
                 storeFileViaSFTPWithPath(file, filePath);
 
@@ -503,7 +372,7 @@ public class FileManagerService implements StorageService {
         LocalDateTime now = LocalDateTime.now();
         // Generate hash after saving (so we have createdDate)
         String hash = HashUtil.generateHash(data.getFilename(), now);
-        String filePath = generateFilePath(data.getFilename(), hash);
+        String filePath = fileVersionsService.generateFilePath(data.getFilename(), hash, "v1.0");
         storeFileViaSFTPWithPath(file, filePath);
 
         if (directory.isPresent()) {
@@ -523,7 +392,6 @@ public class FileManagerService implements StorageService {
                 .folderID(targetDirectory.getFolderID())
                 .filename(file.getOriginalFilename())
                 .hashName(hash)
-                .fileLink(filePath)
                 .documentName(data.getDocumentName())
                 .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
                 .metadata(data.getMetadata())
@@ -532,10 +400,27 @@ public class FileManagerService implements StorageService {
         // Save to get ID and timestamp
         fileManager = fileRepository.save(fileManager);
 
+        fileVersionsService.createFileVersion(fileManager.getId(), "v1.0");
+
 
         // Update cache after successful file storage
         updateFolderCache(filePath);
 
+        // Save again with hash
+        return fileRepository.save(fileManager);
+    }
+
+
+    public FileManager updateFile(FileVersions data, MultipartFile file) throws Exception {
+        if (file.isEmpty()) {
+            throw new Exception("Failed to store empty file.");
+        }
+        FileManager fileManager = fileManagerRepository.findById(data.getFileManager().getId()).orElseThrow(() -> new RuntimeException("File Manager not found!!"));
+        fileVersionsService.createFileVersion(fileManager.getId(), data.getVersionName());
+        String filePath = fileVersionsService.generateFilePath(data.getFileManager().getFilename(), data.getFileManager().getHashName(), data.getVersionName());
+        storeFileViaSFTPWithPath(file, filePath);
+        // Update cache after successful file storage
+        updateFolderCache(filePath);
         // Save again with hash
         return fileRepository.save(fileManager);
     }
@@ -552,7 +437,7 @@ public class FileManagerService implements StorageService {
         // Generate hash after saving (so we have createdDate)
         LocalDateTime now = LocalDateTime.now();
         String hash = HashUtil.generateHash(data.getFilename(), now);
-        String filePath = generateFilePath(data.getFilename(), hash);
+        String filePath = fileVersionsService.generateFilePath(data.getFilename(), hash, "v1.0");
         storeFileViaSFTPWithPath(file, filePath);
 
         // Create FileManager entity
@@ -561,7 +446,6 @@ public class FileManagerService implements StorageService {
                 .documentName(data.getDocumentName())
                 .folderID(directory.getFolderID())
                 .filename(file.getOriginalFilename())
-                .fileLink(filePath)
                 .hashName(hash)
                 .metadata(data.getMetadata())
                 .mimeType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
@@ -569,6 +453,7 @@ public class FileManagerService implements StorageService {
 
         // Save to get ID and timestamp
         fileManager = fileRepository.save(fileManager);
+        fileVersionsService.createFileVersion(fileManager.getId(), "v1.0");
 
         // Update cache after successful file storage
         updateFolderCache(filePath);
@@ -601,8 +486,7 @@ public class FileManagerService implements StorageService {
                 fileManager.setHashName(hash);
 
                 // Generate structured file path
-                String filePath = generateFilePath(fileManager.getFilename(), hash);
-                fileManager.setFileLink(filePath);
+                String filePath = fileVersionsService.generateFilePath(fileManager.getFilename(), hash, "v1.0");
                 storeFileViaSFTPWithPath(file, filePath);
 
                 // Update the FileManager with file-specific information
@@ -613,7 +497,7 @@ public class FileManagerService implements StorageService {
                 // Save to get ID and timestamp
                 fileManager = fileRepository.save(fileManager);
 
-
+                fileVersionsService.createFileVersion(fileManager.getId(), "v1.0");
 
                 // Update cache after successful file storage
                 updateFolderCache(filePath);
@@ -699,54 +583,51 @@ public class FileManagerService implements StorageService {
         }
     }
 
-    /**
-     * Get file link by hash - updated for SFTP support
-     */
-    public String getFileLinkByHash(String hash) throws Exception {
+    public Path getEncryptedFilePath(String hash, String version) throws Exception {
         FileManager file = fileRepository.findByHashName(hash)
                 .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
 
-        if (sftpEnabled) {
-            // Return SFTP-based file path
-            String extension = getFileExtension(file.getFilename());
-            return "/files-manager/" + hash + extension;
+        FileVersions latestVersion;
+
+        if (version != null) {
+            latestVersion = fileVersionsRepository.findByVersionName(version)
+                    .orElseThrow(() -> new RuntimeException("File with this version doesn't exist!"));
         } else {
-            // Return local file path
-            String extension = getFileExtension(file.getFilename());
-            return "/files-manager/" + hash + extension;
+            latestVersion = getLastFileVersion(file.getFileVersions());
+            if (latestVersion == null) {
+                throw new Exception("No valid file versions found for file with hash " + hash);
+            }
         }
+
+        // For SFTP, download the file to a temporary location
+        return downloadFileFromSFTPByPath(latestVersion.getFilePath());
     }
 
-    /**
-     * Get encrypted file path - updated for structured path and SFTP support
-     */
-    public Path getEncryptedFilePath(String hash) throws Exception {
-        FileManager file = fileRepository.findByHashName(hash)
-                .orElseThrow(() -> new Exception("File with hash " + hash + " not found"));
+    private FileVersions getLastFileVersion(List<FileVersions> fileVersions) {
+        FileVersions latestVersion = null;
+        double maxVersion = -1.0; // Initialize to -1 to handle version 0.0
 
-        if (sftpEnabled) {
-            // For SFTP, download the file to a temporary location
-            return downloadFileFromSFTPByPath(file.getFileLink());
-        } else {
-            // For local storage, use the structured path
-            String filePath = file.getFileLink();
-            if (filePath == null || filePath.isEmpty()) {
-                // Fallback: try to find the file using the old method
-                filePath = findFileInYearMonth(
-                        file.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy")),
-                        file.getCreatedDate().format(DateTimeFormatter.ofPattern("MM")),
-                        hash + ".bin"
-                );
+        for (FileVersions version : fileVersions) {
+            String versionString = version.getVersionName();
+            if (versionString != null && versionString.startsWith("v")) {
+                try {
+                    // Remove 'v' prefix and parse as double
+                    double currentVersion = Double.parseDouble(versionString.substring(1));
+                    if (currentVersion > maxVersion) {
+                        maxVersion = currentVersion;
+                        latestVersion = version;
+                    }
+                } catch (NumberFormatException e) {
+                    // Log the invalid version format if needed
+                    System.err.println("Invalid version format: " + versionString);
+                    // Skip invalid version formats
+                    continue;
+                }
             }
-
-            Path localPath = Paths.get(rootLocation).resolve(filePath);
-            if (!Files.exists(localPath)) {
-                throw new Exception("File not found at path: " + localPath);
-            }
-            return localPath;
         }
-    }
 
+        return latestVersion;
+    }
     /**
      * Download file from SFTP server using the stored file path
      */
@@ -755,7 +636,7 @@ public class FileManagerService implements StorageService {
             throw new Exception("File path is null or empty");
         }
 
-        String remoteFilePath = remoteBasePath + "/" + filePath;
+        String remoteFilePath = REMOTE_FILE_PATH + "/" + filePath;
         String fileExtension = filePath.substring(filePath.lastIndexOf('.'));
         Path tempFile = Files.createTempFile("sftp_download_", fileExtension);
 
@@ -785,45 +666,6 @@ public class FileManagerService implements StorageService {
             // Clean up temp file if download failed
             Files.deleteIfExists(tempFile);
             throw new Exception("Failed to download file from SFTP: " + remoteFilePath, e);
-        } finally {
-            if (channel != null && channel.isConnected()) {
-                channel.disconnect();
-            }
-            if (session != null && session.isConnected()) {
-                session.disconnect();
-            }
-        }
-    }
-
-    /**
-     * Download file from SFTP server for local processing
-     */
-    private Path downloadFileFromSFTP(String hash, String extension) throws Exception {
-        String remoteFilePath = remoteBasePath + "/" + hash + extension;
-        Path tempFile = Files.createTempFile("sftp_download_", extension);
-
-        JSch jsch = new JSch();
-        Session session = null;
-        ChannelSftp channel = null;
-
-        try {
-            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
-            session.setPassword(sftpPassword);
-
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.connect();
-
-            channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-
-            try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
-                channel.get(remoteFilePath, outputStream);
-            }
-
-            return tempFile;
-
         } finally {
             if (channel != null && channel.isConnected()) {
                 channel.disconnect();
@@ -906,19 +748,6 @@ public class FileManagerService implements StorageService {
         }
     }
 
-    @Override
-    public void init() throws Exception {
-        try {
-            if (!sftpEnabled) {
-                Path root = Paths.get(rootLocation);
-                Files.createDirectories(root);
-            }
-        }
-        catch (IOException e) {
-            throw new Exception("Could not initialize storage", e);
-        }
-    }
-
     public List<FileManager> getFilesInStore() {
         return fileRepository.findAll();
     }
@@ -955,22 +784,9 @@ public class FileManagerService implements StorageService {
     public void deleteFileById(Long id) throws Exception {
         FileManager file = fileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + id));
-
-        if (sftpEnabled) {
             // Delete from SFTP server
-            deleteFileFromSFTP(file.getHashName(), getFileExtension(file.getFilename()));
-        } else {
-            // Delete from local filesystem
-            Path filePath = Paths.get(this.rootLocation)
-                    .resolve(file.getHashName() + getFileExtension(file.getFilename()))
-                    .normalize()
-                    .toAbsolutePath();
-            try {
-                Files.deleteIfExists(filePath);
-            } catch (IOException e) {
-                throw new Exception("Failed to delete the file from the filesystem.", e);
-            }
-        }
+        deleteFileFromSFTP(file.getHashName(), getFileExtension(file.getFilename()));
+
 
         fileRepository.delete(file);
     }
@@ -979,7 +795,7 @@ public class FileManagerService implements StorageService {
      * Delete file from SFTP server
      */
     private void deleteFileFromSFTP(String hash, String extension) throws Exception {
-        String remoteFilePath = remoteBasePath + "/" + hash + extension;
+        String remoteFilePath = REMOTE_FILE_PATH + "/" + hash + extension;
 
         JSch jsch = new JSch();
         Session session = null;
@@ -1062,7 +878,7 @@ public class FileManagerService implements StorageService {
             }
 
             try {
-                Path encryptedFilePath = getEncryptedFilePath(file.getHashName());
+                Path encryptedFilePath = getEncryptedFilePath(file.getHashName(), null);
                 
                 if (!Files.exists(encryptedFilePath)) {
                     continue;
@@ -1078,11 +894,7 @@ public class FileManagerService implements StorageService {
                         results.add(file);
                     }
                 } finally {
-                    Files.deleteIfExists(tempFile);
-                    // Clean up temporary SFTP downloads
-                    if (sftpEnabled && encryptedFilePath.toString().contains("sftp_download_")) {
-                        Files.deleteIfExists(encryptedFilePath);
-                    }
+                    Files.deleteIfExists(encryptedFilePath);
                 }
             } catch (Exception e) {
                 System.err.println("Error searching in file " + file.getFilename() + ": " + e.getMessage());

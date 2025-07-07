@@ -16,6 +16,7 @@ public class Constants {
     public static final String UPDATE_PERMISSION = "UPDATE_PERMISSION";
     public static final String USER_ROUTE = GENERAL_ROUTE + "/users/**";
     public static final String ROLE_ROUTE = GENERAL_ROUTE + "/roles/**";
+    public static final String REMOTE_FILE_PATH = "/uploads";
     public static final String PERMISSION_ROUTE = GENERAL_ROUTE + "/permissions/**";
     public static final String AUTH_ROUTE = GENERAL_ROUTE + "/auth/**";
     public static final String SUPER_ADMIN = "SUPER_ADMIN";
