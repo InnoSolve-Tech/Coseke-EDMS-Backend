@@ -590,7 +590,7 @@ public class FileManagerService implements StorageService {
         FileVersions latestVersion;
 
         if (version != null) {
-            latestVersion = fileVersionsRepository.findByVersionName(version)
+            latestVersion = fileVersionsRepository.findFirstByVersionNameAndFileManager_Id(version, file.getId())
                     .orElseThrow(() -> new RuntimeException("File with this version doesn't exist!"));
         } else {
             latestVersion = getLastFileVersion(file.getFileVersions());

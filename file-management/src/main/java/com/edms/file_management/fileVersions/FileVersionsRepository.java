@@ -9,5 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface FileVersionsRepository extends JpaRepository<FileVersions, Long> {
-    Optional<FileVersions> findByVersionName(String versionName);
+    Optional<List<FileVersions>> findByVersionName(String versionName);
+    Optional<FileVersions> findFirstByVersionNameAndFileManager_Id(String versionName, Long fileId);
 }
