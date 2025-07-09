@@ -168,10 +168,11 @@ public class FileVersionsService {
         LocalDateTime now = LocalDateTime.now();
         String year = now.format(DateTimeFormatter.ofPattern("yyyy"));
         String month = now.format(DateTimeFormatter.ofPattern("MM"));
+        String day = now.format(DateTimeFormatter.ofPattern("dd"));
+        String hour = now.format(DateTimeFormatter.ofPattern("HH"));
 
-
-        // Base path: Year/Month
-        String basePath = year + "/" + month;
+        // Base path: Year/Month/Day/Hour
+        String basePath = year + "/" + month + "/" + day + "/" + hour;
 
         // Find the appropriate folder number
         int folderNumber = findAvailableFolder(basePath);
@@ -183,5 +184,6 @@ public class FileVersionsService {
         // Return the complete file path
         return completePath + "/" + versionName + ".bin";
     }
+
 
 }
