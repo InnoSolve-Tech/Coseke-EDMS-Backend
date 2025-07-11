@@ -37,18 +37,40 @@ public class DatabaseInitializer {
 
     private List<Permission> initializePermissions() {
         return Arrays.asList(
+                // Permission permissions
                 ensurePermission(READ_PERMISSION),
                 ensurePermission(CREATE_PERMISSION),
                 ensurePermission(UPDATE_PERMISSION),
                 ensurePermission(DELETE_PERMISSION),
+                // Role permissions
                 ensurePermission(READ_ROLE),
                 ensurePermission(CREATE_ROLE),
                 ensurePermission(UPDATE_ROLE),
                 ensurePermission(DELETE_ROLE),
+                // User permissions
                 ensurePermission(CREATE_USER),
                 ensurePermission(READ_USER),
                 ensurePermission(UPDATE_USER),
-                ensurePermission(DELETE_USER)
+                ensurePermission(DELETE_USER),
+                // Workflow permissions
+                ensurePermission(READ_WORKFLOW),
+                ensurePermission(CREATE_WORKFLOW),
+                ensurePermission(UPDATE_WORKFLOW),
+                ensurePermission(DELETE_WORKFLOW),
+                // Form permissions
+                ensurePermission(READ_FORM),
+                ensurePermission(CREATE_FORM),
+                ensurePermission(UPDATE_FORM),
+                ensurePermission(DELETE_FORM),
+                // Log permissions
+                ensurePermission(READ_LOG),
+                ensurePermission(CREATE_LOG),
+                ensurePermission(UPDATE_LOG),
+                ensurePermission(DELETE_LOG),
+                // Folder permissions
+                ensurePermission(CREATE_FOLDER),
+                ensurePermission(UPDATE_FOLDER),
+                ensurePermission(DELETE_FOLDER)
         );
     }
 
