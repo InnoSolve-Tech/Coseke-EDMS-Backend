@@ -29,7 +29,9 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:8787",
                 "http://192.168.100.40:3000",
-                "http://192.168.100.40:8787"
+                "http://192.168.100.40:8787",
+                "http://192.168.100.40:4000",
+                "http://localhost:4000"
 
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));

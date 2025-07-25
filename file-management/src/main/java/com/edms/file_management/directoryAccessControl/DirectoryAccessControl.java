@@ -29,5 +29,5 @@ public class DirectoryAccessControl {
     @JoinColumn(name = "directory_id", insertable = true, updatable = false)
     private Directory directory;
 
-    private List<Integer> users;
+    private List<Integer> roles;
 }
