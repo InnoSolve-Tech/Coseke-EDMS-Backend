@@ -1,6 +1,7 @@
 package com.edms.file_management.directoryAccessControl;
 
 import com.edms.file_management.directory.Directory;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,8 +18,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DirectoryAccessControl {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,8 @@ public class DirectoryAccessControl {
     private AccessType accessType;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "directory_id", insertable = true, updatable = false)
+    @JoinColumn(name = "directory_id", insertable = true, updatable = true) // <-- optional, but safe
+    @JsonBackReference
     private Directory directory;
 
     private List<Integer> roles;

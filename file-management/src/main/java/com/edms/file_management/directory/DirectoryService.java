@@ -1,7 +1,11 @@
 package com.edms.file_management.directory;
 
 import com.edms.file_management.config.StorageProperties;
+import com.edms.file_management.directoryAccessControl.AccessType;
+import com.edms.file_management.directoryAccessControl.DirectoryAccessControl;
+import com.edms.file_management.directoryAccessControl.DirectoryAccessControlRepository;
 import com.edms.file_management.exception.ResourceNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +18,9 @@ public class DirectoryService {
     @Autowired
     private DirectoryRepository directoryRepository;
 
+    @Autowired
+    private DirectoryAccessControlRepository accessControlRepository;
+
     private final String rootLocation;
     @Autowired
 	public DirectoryService(StorageProperties properties) throws Exception {
@@ -22,6 +29,7 @@ public class DirectoryService {
         }
 		this.rootLocation = properties.getLocation();
 	}
+
 
     public String getDirectoryPath(Long folderID) {
         String filePath = "";
@@ -40,16 +48,43 @@ public class DirectoryService {
                 .orElseThrow(() -> new Exception("Directory not found for this id :: " + folderID));
     }
 
-//    public List<Directory> getAllDirectories() {
-//        return directoryRepository.findAll();
-//    }
+    @Transactional
+    public Directory updateDirectory(Directory directory) throws Exception{
+        Directory folder = directoryRepository.findById((long) directory.getFolderID()).orElseThrow(() -> new RuntimeException("Failed to find folder!"));
+        if(folder.getAccessControl() != null) {
+            if(directory.getAccessControl().getAccessType() != null) {
+                DirectoryAccessControl accessControl = accessControlRepository.save(directory.getAccessControl());
+                folder.setAccessControl(accessControl);
+                folder.setName(directory.getName());
+                return directoryRepository.save(folder);
+            } else {
+                throw new RuntimeException("Access type should not be null!");
+            }
+        } else {
+            if(directory.getAccessControl().getAccessType() != null) {
+                directory.getAccessControl().setDirectory(folder);
+                folder.setName(directory.getName());
+                DirectoryAccessControl accessControl = accessControlRepository.save(directory.getAccessControl());
+                folder.setAccessControl(accessControl);
+                return directoryRepository.save(folder);
+            } else {
+                throw new RuntimeException("Access type should not be null!");
+            }
+        }
+    }
 
     public List<Directory> getAllDirectories() {
         return directoryRepository.findAllWithFiles();
     }
 
     public Directory createDirectory(Directory directory) {
-        return directoryRepository.save(directory);
+        DirectoryAccessControl accessControl = DirectoryAccessControl.builder().accessType(AccessType.PUBLIC).build();
+        accessControl = accessControlRepository.save(accessControl);
+        directory.setAccessControl(accessControl);
+        directory = directoryRepository.save(directory);
+        accessControl.setDirectory(directory);
+        accessControlRepository.save(accessControl);
+        return directory;
     }
 
     public Directory creaDirectoryWithName(Directory directory) {

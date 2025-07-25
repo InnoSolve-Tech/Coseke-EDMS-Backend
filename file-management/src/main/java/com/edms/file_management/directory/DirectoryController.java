@@ -1,5 +1,6 @@
 package com.edms.file_management.directory;
 
+import com.edms.file_management.directoryAccessControl.DirectoryAccessControl;
 import com.edms.file_management.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,11 @@ public class DirectoryController {
     @GetMapping("/all")
     public List<Directory> getAllDirectories() {
         return directoryService.getAllDirectories();
+    }
+
+    @PutMapping
+    public ResponseEntity<Directory> updateDirectory(@RequestBody Directory directory) throws Exception {
+        return  ResponseEntity.ok(directoryService.updateDirectory(directory));
     }
 
     @GetMapping("/{id}")

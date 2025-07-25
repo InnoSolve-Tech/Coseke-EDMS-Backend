@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.edms.file_management.directoryAccessControl.DirectoryAccessControl;
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -15,15 +17,6 @@ import com.edms.file_management.filemanager.FileManager;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -64,6 +57,11 @@ public class Directory {
     @CreatedBy
     @Column(name = "createdBy", nullable = false, updatable = false)
     private Long createdBy;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "access_id", insertable = true, updatable = true)
+    @JsonManagedReference
+    private DirectoryAccessControl accessControl;
 
     @Override
     public String toString() {
