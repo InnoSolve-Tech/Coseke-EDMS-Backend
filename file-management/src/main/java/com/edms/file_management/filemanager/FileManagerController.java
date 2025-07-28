@@ -1,5 +1,6 @@
 package com.edms.file_management.filemanager;
 
+import com.edms.file_management.fileAccessControl.FileAccessControl;
 import com.edms.file_management.fileVersions.FileVersions;
 import io.github.pixee.security.Newlines;
 import io.github.pixee.security.Newlines;
@@ -65,6 +66,10 @@ public class FileManagerController {
         }
     }
 
+    @PutMapping("/access/{id}")
+    public ResponseEntity<FileAccessControl> updateFilePermissions(@PathVariable("id") Long id, @RequestBody FileAccessControl accessControl) throws Exception {
+        return ResponseEntity.ok(fileService.updateFileAccessControl(id, accessControl));
+    }
 
     @GetMapping("/folder/{folderID}")
     public List<FileManager> listFilesByFolderId(@PathVariable Long folderID) throws Exception {

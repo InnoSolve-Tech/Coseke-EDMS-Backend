@@ -24,7 +24,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import com.edms.file_management.config.StorageProperties;
+import com.edms.file_management.directoryAccessControl.DirectoryAccessControl;
+import com.edms.file_management.fileAccessControl.FileAccessControl;
+import com.edms.file_management.fileAccessControl.FileAccessControlRepository;
 import com.edms.file_management.fileVersions.FileVersionsRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -42,7 +48,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.edms.file_management.config.StorageProperties;
 import com.edms.file_management.directory.Directory;
 import com.edms.file_management.directory.DirectoryRepository;
 import com.edms.file_management.directory.DirectoryService;
@@ -61,6 +66,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class FileManagerService implements StorageService {
 
     private final String rootLocation;
@@ -99,6 +105,9 @@ public class FileManagerService implements StorageService {
     private FileVersionsRepository fileVersionsRepository;
 
     @Autowired
+    private FileAccessControlRepository accessControlRepository;
+
+    @Autowired
     private final ObjectMapper objectMapper;
 
     private final ConcurrentHashMap<String, AtomicInteger> folderFileCountCache;
@@ -119,39 +128,8 @@ public class FileManagerService implements StorageService {
         this.objectMapper = new ObjectMapper();
     }
 
-    /**
-     * Counts files in local folder
-     */
-    private int countFilesInLocalFolder(String folderPath) throws Exception {
-        Path path = Paths.get(folderPath);
 
-        if (!Files.exists(path)) {
-            return 0;
-        }
 
-        try (Stream<Path> files = Files.list(path)) {
-            return (int) files.filter(Files::isRegularFile).count();
-        } catch (IOException e) {
-            throw new Exception("Failed to count files in local folder: " + folderPath, e);
-        }
-    }
-
-    /**
-     * Creates directory structure (works for both local and SFTP)
-     */
-    private void createDirectoryStructure(String path) throws Exception {
-        createSFTPDirectoryStructure(path);
-    }
-
-    /**
-     * Creates local directory structure
-     */
-    private void createLocalDirectoryStructure(String path) throws Exception {
-        Path dirPath = Paths.get(path).getParent();
-        if (dirPath != null) {
-            Files.createDirectories(dirPath);
-        }
-    }
 
     /**
      * Creates SFTP directory structure
@@ -230,63 +208,16 @@ public class FileManagerService implements StorageService {
         }
     }
 
-
-    /**
-     * Searches for a file in year/month folder structure
-     */
-    private String findFileInYearMonth(String year, String month, String filename) throws Exception {
-        String basePath = year + "/" + month;
-        int folderNumber = 0;
-
-        while (folderNumber < 1000) { // Safety limit
-            String folderPath = basePath + "/folder-" + folderNumber;
-            String fullPath = fileVersionsService.getFinalStoragePath(folderPath) + "/" + filename;
-
-
-                if (fileExistsOnSFTP(REMOTE_FILE_PATH + "/" + folderPath + "/" + filename)) {
-                    return folderPath + "/" + filename;
-                }
-
-
-            folderNumber++;
-        }
-
-        throw new Exception("File not found: " + filename);
-    }
-
-    /**
-     * Checks if file exists on SFTP server
-     */
-    private boolean fileExistsOnSFTP(String remotePath) {
-        JSch jsch = new JSch();
-        Session session = null;
-        ChannelSftp channel = null;
-
-        try {
-            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
-            session.setPassword(sftpPassword);
-
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.connect();
-
-            channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-
-            channel.stat(remotePath);
-            return true;
-
-        } catch (Exception e) {
-            return false;
-        } finally {
-            if (channel != null && channel.isConnected()) {
-                channel.disconnect();
+    @Transactional
+    public FileAccessControl updateFileAccessControl(Long id,FileAccessControl accessControl) throws Exception{
+        FileManager file = fileManagerRepository.findById(id).orElseThrow(() -> new RuntimeException("Failed to find file!"));
+            if(accessControl.getAccessType() != null) {
+                FileAccessControl savedAccessControl = accessControlRepository.save(accessControl);
+                file.setAccessControl(savedAccessControl);
+                return savedAccessControl;
+            } else {
+                throw new RuntimeException("Access type should not be null!");
             }
-            if (session != null && session.isConnected()) {
-                session.disconnect();
-            }
-        }
     }
 
 
@@ -684,7 +615,7 @@ public class FileManagerService implements StorageService {
         return (dotIndex == -1) ? "" : filename.substring(dotIndex);
     }
     // ... (rest of the existing methods remain unchanged)
-    
+
     @Override
     public Stream<Path> loadAll(Long folderID) throws Exception {
         try {
@@ -702,7 +633,7 @@ public class FileManagerService implements StorageService {
     public List<FileManager> getAllFiles(Long folderId) {
         return fileRepository.findByFolderID(folderId).orElseThrow();
     }
-    
+
     @Override
     public Path load(String filename, Long folderID) {
         String folderPath = directoryService.getDirectoryPath(folderID);
@@ -879,7 +810,7 @@ public class FileManagerService implements StorageService {
 
             try {
                 Path encryptedFilePath = getEncryptedFilePath(file.getHashName(), null);
-                
+
                 if (!Files.exists(encryptedFilePath)) {
                     continue;
                 }

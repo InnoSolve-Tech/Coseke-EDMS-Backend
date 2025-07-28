@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.edms.file_management.directory.Directory;
+import com.edms.file_management.directoryAccessControl.DirectoryAccessControl;
+import com.edms.file_management.fileAccessControl.FileAccessControl;
 import com.edms.file_management.fileVersions.FileVersions;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -74,6 +76,11 @@ public class FileManager {
     @JsonManagedReference
     @OneToMany(mappedBy = "fileManager", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FileVersions> fileVersions = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "access_id", insertable = true, updatable = true)
+    @JsonManagedReference
+    private FileAccessControl accessControl;
 
     @JsonSetter("metadata")
     public void setMetadata(Object metadata) {

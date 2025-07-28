@@ -51,7 +51,7 @@ public class DirectoryService {
     @Transactional
     public Directory updateDirectory(Directory directory) throws Exception{
         Directory folder = directoryRepository.findById((long) directory.getFolderID()).orElseThrow(() -> new RuntimeException("Failed to find folder!"));
-        if(folder.getAccessControl() != null) {
+        if(folder.getAccessControl() != null)      {
             if(directory.getAccessControl().getAccessType() != null) {
                 DirectoryAccessControl accessControl = accessControlRepository.save(directory.getAccessControl());
                 folder.setAccessControl(accessControl);
