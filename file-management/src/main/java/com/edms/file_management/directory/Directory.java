@@ -58,8 +58,8 @@ public class Directory {
     @Column(name = "createdBy", nullable = false, updatable = false)
     private Long createdBy;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "access_id", insertable = true, updatable = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "access_id", referencedColumnName = "id", nullable = true)
     @JsonManagedReference
     private DirectoryAccessControl accessControl;
 

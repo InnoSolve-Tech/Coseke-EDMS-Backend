@@ -25,7 +25,7 @@ public class DirectoryAccessControl {
     private Long id;
     private AccessType accessType;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "accessControl",fetch = FetchType.LAZY)
     @JoinColumn(name = "directory_id", insertable = true, updatable = true) // <-- optional, but safe
     @JsonBackReference
     private Directory directory;
