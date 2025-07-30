@@ -341,6 +341,58 @@ public class FileManagerService implements StorageService {
         return fileRepository.save(fileManager);
     }
 
+    public void deleteFileByHashName(String hashName) throws Exception {
+        FileManager file = fileRepository.findByHashName(hashName)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found with hash: " + hashName));
+
+        // Delete all versions of the file from SFTP server
+        deleteAllFileVersionsFromSFTP(file);
+
+        // Delete from database (cascade will handle file versions)
+        fileRepository.delete(file);
+    }
+
+    private void deleteAllFileVersionsFromSFTP(FileManager file) throws Exception {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp channel = null;
+
+        try {
+            session = jsch.getSession(sftpUsername, sftpHost, sftpPort);
+            session.setPassword(sftpPassword);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+
+            // Delete each version of the file
+            for (FileVersions version : file.getFileVersions()) {
+                if (version.getFilePath() != null && !version.getFilePath().isEmpty()) {
+                    String remoteFilePath = REMOTE_FILE_PATH + "/" + version.getFilePath();
+                    try {
+                        channel.rm(remoteFilePath);
+                        System.out.println("Deleted file version: " + remoteFilePath);
+                    } catch (Exception e) {
+                        System.err.println("Failed to delete file version: " + remoteFilePath + " - " + e.getMessage());
+                        // Continue with other versions even if one fails
+                    }
+                }
+            }
+
+        } finally {
+            if (channel != null && channel.isConnected()) {
+                channel.disconnect();
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
 
     public FileManager updateFile(FileVersions data, MultipartFile file) throws Exception {
         if (file.isEmpty()) {

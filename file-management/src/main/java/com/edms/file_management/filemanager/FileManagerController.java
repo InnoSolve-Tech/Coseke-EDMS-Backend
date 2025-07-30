@@ -273,10 +273,10 @@ public class FileManagerController {
         return fileService.searchFiles(keyword);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteFile(@PathVariable Long id) {
+    @DeleteMapping("/delete/{hash}")
+    public ResponseEntity<String> deleteFile(@PathVariable String hash) {
         try {
-            fileService.deleteFileById(id);
+            fileService.deleteFileByHashName(hash);
             return ResponseEntity.ok("File successfully deleted.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting file: " + e.getMessage());
