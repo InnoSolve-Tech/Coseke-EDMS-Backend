@@ -10,8 +10,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.core.annotation.Order;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
         methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS},
         allowedHeaders = "*"
 )
+@Order(100) // Lower priority than default controllers
 public class ProxyController {
 
     private static final Logger log = LoggerFactory.getLogger(ProxyController.class);
@@ -32,12 +36,18 @@ public class ProxyController {
         this.routingProperties = routingProperties;
     }
 
-    @RequestMapping("/**")
+    @RequestMapping(value = {"/{service:^(?!api$).*}/**", "/{service:^(?!api$).*}"})
     public ResponseEntity<String> proxyRequest(HttpServletRequest request, @RequestBody(required = false) String body) {
         String method = request.getMethod();
         String path = request.getRequestURI();
         String queryString = request.getQueryString();
         String clientIp = getClientIp(request);
+
+        // Skip proxying for internal API routes - let Spring handle them normally
+        if (path.startsWith("/api/")) {
+            log.debug("Skipping proxy for internal API route: {}", path);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "API route should be handled by internal controllers");
+        }
 
         log.info("=== PROXY REQUEST START ===");
         log.info("Client IP: {}", clientIp);
@@ -129,6 +139,12 @@ public class ProxyController {
         }
 
         String serviceKey = parts[1];
+
+        // This should never be reached for /api paths since we filter them out earlier
+        if (Objects.equals(serviceKey, "api")) {
+            throw new IllegalArgumentException("API routes should not be proxied");
+        }
+
         log.debug("Service key extracted: {}", serviceKey);
 
         String baseUrl = routingProperties.getRoutes().get(serviceKey);

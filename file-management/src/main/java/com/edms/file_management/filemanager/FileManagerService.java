@@ -24,13 +24,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import com.edms.file_management.config.StorageProperties;
-import com.edms.file_management.directoryAccessControl.DirectoryAccessControl;
-import com.edms.file_management.fileAccessControl.FileAccessControl;
-import com.edms.file_management.fileAccessControl.FileAccessControlRepository;
-import com.edms.file_management.fileVersions.FileVersionsRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -48,11 +41,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.edms.file_management.config.StorageProperties;
 import com.edms.file_management.directory.Directory;
 import com.edms.file_management.directory.DirectoryRepository;
 import com.edms.file_management.directory.DirectoryService;
 import com.edms.file_management.exception.ResourceNotFoundException;
+import com.edms.file_management.fileAccessControl.FileAccessControl;
+import com.edms.file_management.fileAccessControl.FileAccessControlRepository;
 import com.edms.file_management.fileVersions.FileVersions;
+import com.edms.file_management.fileVersions.FileVersionsRepository;
 import com.edms.file_management.fileVersions.FileVersionsService;
 import com.edms.file_management.helper.EncryptionUtil;
 import com.edms.file_management.helper.HashUtil;
@@ -62,6 +59,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -167,7 +165,7 @@ public class FileManagerService implements StorageService {
     /**
      * Store file via SFTP with structured path
      */
-    private void storeFileViaSFTPWithPath(MultipartFile file, String filePath) throws Exception {
+    private String storeFileViaSFTPWithPath(MultipartFile file, String filePath) throws Exception {
         // Encrypt file in memory
         ByteArrayOutputStream encryptedOutput = new ByteArrayOutputStream();
         try (InputStream input = file.getInputStream()) {
@@ -187,6 +185,7 @@ public class FileManagerService implements StorageService {
                 sftpPort,
                 sftpPassword
         );
+        return remotePath;
     }
 
     /**
@@ -494,6 +493,13 @@ public class FileManagerService implements StorageService {
     }
 
 
+    String storeFile(String filePath, MultipartFile file) throws Exception {
+        return storeFileViaSFTPWithPath(file, filePath) + "/" + file.getName();
+    } 
+
+    boolean deleteFile(String path, String name) throws Exception {
+        return deleteFileFromSFTP(path, name);
+    }
 
     /**
      * Upload encrypted file to SFTP server
@@ -777,8 +783,8 @@ public class FileManagerService implements StorageService {
     /**
      * Delete file from SFTP server
      */
-    private void deleteFileFromSFTP(String hash, String extension) throws Exception {
-        String remoteFilePath = REMOTE_FILE_PATH + "/" + hash + extension;
+    private boolean deleteFileFromSFTP(String path, String filename) throws Exception {
+        String remoteFilePath = REMOTE_FILE_PATH + "/" + path + filename;
 
         JSch jsch = new JSch();
         Session session = null;
@@ -806,6 +812,7 @@ public class FileManagerService implements StorageService {
                 session.disconnect();
             }
         }
+        return true;
     }
 
     @Transactional

@@ -1,9 +1,5 @@
 package com.edms.file_management.filemanager;
 
-import com.edms.file_management.fileAccessControl.FileAccessControl;
-import com.edms.file_management.fileVersions.FileVersions;
-import io.github.pixee.security.Newlines;
-import io.github.pixee.security.Newlines;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -12,16 +8,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.edms.file_management.fileAccessControl.FileAccessControl;
+import com.edms.file_management.fileVersions.FileVersions;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.pixee.security.Newlines;
 import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/v1/files")
@@ -179,6 +188,21 @@ public class FileManagerController {
     public ResponseEntity<String> updateFile(@RequestPart("fileData") FileVersions fileData, @RequestPart("file") MultipartFile file) throws Exception {
         fileService.updateFile(fileData, file);
         return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
+    }
+
+    @PostMapping("/storage")
+    public ResponseEntity<HashMap<String, String>> StoreFile(@RequestPart("fileData") String path, @RequestPart("file") MultipartFile file) throws Exception {
+        String res = fileService.storeFile(path, file);
+        HashMap<String, String> map = new HashMap<String,String>();
+        map.put("path", res);
+        map.put("message", "You successfully uploaded " + file.getOriginalFilename() + "!");
+        return ResponseEntity.ok().body(map);
+    }
+
+    @DeleteMapping("/storage")
+    public ResponseEntity<Boolean> DeleteFile(@RequestParam("path") String path, @RequestParam("name") String name) throws Exception {
+        boolean res = fileService.deleteFile(path, name);
+        return ResponseEntity.ok().body(res);
     }
 
     @PostMapping("/")

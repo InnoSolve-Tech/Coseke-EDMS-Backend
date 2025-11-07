@@ -53,6 +53,7 @@ public class Constants {
     public static final String FILES_MANAGEMENT_ROUTE =  "/file-management/**";
     public static final String LOG_ROUTE = GENERAL_ROUTE + "/logs/**";
     public static final String AUTH_ROUTE = GENERAL_ROUTE + "/auth/**";
+    public static final String SETTINGS_ROUTE = GENERAL_ROUTE + "/settings/**";
 
     // Admin configuration
     public static final String SUPER_ADMIN = "SUPER_ADMIN";

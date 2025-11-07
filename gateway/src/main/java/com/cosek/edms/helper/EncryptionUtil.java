@@ -1,5 +1,7 @@
 package com.cosek.edms.helper;
 
+import org.springframework.stereotype.Component;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -11,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 
+@Component
 public class EncryptionUtil {
 
     private static final String ALGORITHM = "AES";
